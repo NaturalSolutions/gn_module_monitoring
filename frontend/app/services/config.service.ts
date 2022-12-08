@@ -14,7 +14,7 @@ import { mergeMap } from "rxjs/operators";
 export class ConfigService {
   private _config;
 
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient) { }
 
   /** Configuration */
 
@@ -66,6 +66,12 @@ export class ConfigService {
     return `${api_url}${ModuleConfig.MODULE_URL}`;
   }
 
+  descriptionModule() {
+    return ModuleConfig.DESCRIPTION_MODULE;
+  }
+  titleModule() {
+    return ModuleConfig.TITLE_MODULE;
+  }
   /** Frontend Module Monitoring Url */
   frontendModuleMonitoringUrl() {
     return ModuleConfig.MODULE_URL;
