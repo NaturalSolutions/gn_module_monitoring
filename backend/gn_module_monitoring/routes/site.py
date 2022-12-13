@@ -7,21 +7,7 @@ from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.monitoring.models import BibCategorieSite
-
-
-def get_limit_offset(params: MultiDict) -> Tuple[int]:
-    return params.get("limit", 50), params.get("offset", 1)
-
-
-def paginate(query, object_name: str, limit: int, page: int):
-    result = query.paginate(page=page, error_out=False, max_per_page=limit)
-    data = {
-        object_name: [res.as_dict() for res in result.items],
-        "count": result.total,
-        "limit": limit,
-        "offset": page - 1,
-    }
-    return jsonify(data)
+from gn_module_monitoring.utils.routes import get_limit_offset, paginate
 
 
 @blueprint.route("/sites/categories", methods=["GET"])
