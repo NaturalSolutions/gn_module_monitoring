@@ -25,13 +25,12 @@ class TestSite:
     def test_get_categories_label(self, categories):
         label = list(categories.keys())[0]
 
-        r = self.client.get(url_for("monitorings.get_categories"), 
-                            query_string={"label": label})
+        r = self.client.get(url_for("monitorings.get_categories"), query_string={"label": label})
         assert categories[label].as_dict() in r.json["categories"]
 
     def test_get_sites(self, sites):
         r = self.client.get(url_for("monitorings.get_sites"))
-        
+
         assert r.json["count"] >= len(sites)
         assert any([site.as_dict() in r.json["sites"] for site in sites.values()])
 

@@ -34,10 +34,7 @@ def get_categories():
     if label is not None:
         query = query.filter_by(label=label)
     query = query.order_by(BibCategorieSite.id_categorie)
-    return paginate(query=query,
-                             object_name="categories",
-                             limit=limit,
-                             page=page)
+    return paginate(query=query, object_name="categories", limit=limit, page=page)
 
 
 @blueprint.route("/sites/categories/<int:id_categorie>", methods=["GET"])
@@ -52,7 +49,9 @@ def get_categories_by_id(id_categorie):
 def get_sites():
     # TODO: add filter support
     limit, page = get_limit_offset(params=MultiDict(request.args))
-    query = TBaseSites.query.join(BibCategorieSite, TBaseSites.id_categorie == BibCategorieSite.id_categorie)
+    query = TBaseSites.query.join(
+        BibCategorieSite, TBaseSites.id_categorie == BibCategorieSite.id_categorie
+    )
     return paginate(query=query, object_name="sites", limit=limit, page=page)
 
 
