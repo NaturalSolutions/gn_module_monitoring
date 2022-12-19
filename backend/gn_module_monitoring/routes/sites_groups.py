@@ -8,7 +8,7 @@ from gn_module_monitoring.utils.routes import get_limit_offset, paginate
 
 
 @blueprint.route("/sites_groups", methods=["GET"])
-def get_site_groups():
+def get_sites_groups():
     params = MultiDict(request.args)
     limit, page = get_limit_offset(params=params)
 
