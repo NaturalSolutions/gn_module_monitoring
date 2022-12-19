@@ -20,6 +20,20 @@ from geonature.core.gn_commons.models import TModules, cor_module_dataset
 from pypnusershub.db.models import User
 from geonature.core.gn_monitoring.models import corVisitObserver
 
+cor_module_categorie = DB.Table(
+    "cor_module_categorie",
+    DB.Column(
+        "id_module",
+        DB.Integer,
+        DB.ForeignKey("gn_commons.t_modules.id_module"),
+        primary_key=True,
+    ),
+        DB.Column(
+        "id_categorie",
+        DB.Integer,
+        DB.ForeignKey("gn_monitoring.bib_categorie_site.id_categorie"),
+        primary_key=True,
+    ), schema="gn_monitoring")
 
 @serializable
 class BibCategorieSite(DB.Model):
@@ -28,7 +42,7 @@ class BibCategorieSite(DB.Model):
     id_categorie = DB.Column(DB.Integer, primary_key=True, nullable=False, unique=True)
     label = DB.Column(DB.String, nullable=False)
     config = DB.Column(JSONB)
-
+ 
 
 @serializable
 class TMonitoringObservationDetails(DB.Model):
@@ -308,6 +322,12 @@ class TMonitoringModules(TModules):
         secondary=cor_module_dataset,
         join_depth=0,
         lazy="joined",
+    )
+
+    categories = DB.relationship(
+        "BibCategorieSite",
+        secondary=cor_module_categorie,
+        lazy="joined"
     )
 
 
