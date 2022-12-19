@@ -12,5 +12,5 @@ def sites_groups():
 
     with db.session.begin_nested():
         db.session.add_all(groups.values())
-    
+
     return groups
