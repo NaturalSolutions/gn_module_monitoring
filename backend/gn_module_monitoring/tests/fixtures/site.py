@@ -5,17 +5,8 @@ from geonature.utils.env import db
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
 from shapely.geometry import Point
 
-from gn_module_monitoring.monitoring.models import (BibCategorieSite,
-                                                    TMonitoringSitesGroups)
+from gn_module_monitoring.monitoring.models import BibCategorieSite
 
-
-@pytest.fixture
-def sites_groups():
-    names = ["Site_eolien", "Site_Groupe"]
-
-    site_groups = {}
-    for name in names:
-        pass
 
 @pytest.fixture()
 def categories():
