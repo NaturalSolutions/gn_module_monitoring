@@ -7,18 +7,16 @@ from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.monitoring.models import BibCategorieSite
-from gn_module_monitoring.utils.routes import get_limit_offset, paginate
+from gn_module_monitoring.utils.routes import (filter_params, get_limit_offset,
+                                               paginate)
 
 
 @blueprint.route("/sites/categories", methods=["GET"])
 def get_categories():
     params = MultiDict(request.args)
-    label = params.get("label")
     limit, page = get_limit_offset(params=params)
 
-    query = BibCategorieSite.query
-    if label is not None:
-        query = query.filter_by(label=label)
+    query = filter_params(query=BibCategorieSite.query, params=params)
     query = query.order_by(BibCategorieSite.id_categorie)
     return paginate(query=query, object_name="categories", limit=limit, page=page)
 
@@ -33,11 +31,13 @@ def get_categories_by_id(id_categorie):
 
 @blueprint.route("/sites", methods=["GET"])
 def get_sites():
+    params = MultiDict(request.args)
     # TODO: add filter support
-    limit, page = get_limit_offset(params=MultiDict(request.args))
+    limit, page = get_limit_offset(params=params)
     query = TBaseSites.query.join(
         BibCategorieSite, TBaseSites.id_categorie == BibCategorieSite.id_categorie
     )
+    query = filter_params(query=query, params=params)
     return paginate(query=query, object_name="sites", limit=limit, page=page)
 
 
