@@ -54,7 +54,6 @@ cor_site_type_categorie = DB.Table(
 class BibCategorieSite(DB.Model):
     __tablename__ = "bib_categorie_site"
     __table_args__ = {"schema": "gn_monitoring"}
-    __mapper_args__ = {'polymorphic_identity': 'categorie_site'}
     id_categorie = DB.Column(DB.Integer, primary_key=True, nullable=False, unique=True)
     label = DB.Column(DB.String, nullable=False)
     config = DB.Column(JSONB)
@@ -62,13 +61,8 @@ class BibCategorieSite(DB.Model):
         "TNomenclatures",
         secondary=cor_site_type_categorie,
         lazy="joined",
-        backref="categorie_site"
     )
-    # site_type = DB.relation(
-    #     BibNomenclaturesTypes,
-    #     primaryjoin=(id_categorie == BibNomenclaturesTypes.mnemonique=="TYPE_SITE"),
-    #     foreign_keys=[BibNomenclaturesTypes.id_type],
-    #     cascade="all,delete")
+
   
 @serializable
 class TMonitoringObservationDetails(DB.Model):
