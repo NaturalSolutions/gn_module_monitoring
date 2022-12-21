@@ -11,7 +11,7 @@ from utils_flask_sqla_geo.serializers import geoserializable
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
-
+from pypnnomenclature.models import TNomenclatures, BibNomenclaturesTypes
 from geonature.core.gn_commons.models import TMedias
 from geonature.core.gn_monitoring.models import TBaseSites, TBaseVisits
 from geonature.core.gn_meta.models import TDatasets
@@ -35,15 +35,41 @@ cor_module_categorie = DB.Table(
         primary_key=True,
     ), schema="gn_monitoring")
 
+cor_site_type_categorie = DB.Table(
+    "cor_site_type_categorie",
+    DB.Column(
+        "id_nomenclature",
+        DB.Integer,
+        DB.ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"),
+        primary_key=True,
+    ),
+        DB.Column(
+        "id_categorie",
+        DB.Integer,
+        DB.ForeignKey("gn_monitoring.bib_categorie_site.id_categorie"),
+        primary_key=True,
+    ), schema="gn_monitoring")
+
 @serializable
 class BibCategorieSite(DB.Model):
     __tablename__ = "bib_categorie_site"
     __table_args__ = {"schema": "gn_monitoring"}
+    __mapper_args__ = {'polymorphic_identity': 'categorie_site'}
     id_categorie = DB.Column(DB.Integer, primary_key=True, nullable=False, unique=True)
     label = DB.Column(DB.String, nullable=False)
     config = DB.Column(JSONB)
- 
-
+    site_type = DB.relationship(
+        "TNomenclatures",
+        secondary=cor_site_type_categorie,
+        lazy="joined",
+        backref="categorie_site"
+    )
+    # site_type = DB.relation(
+    #     BibNomenclaturesTypes,
+    #     primaryjoin=(id_categorie == BibNomenclaturesTypes.mnemonique=="TYPE_SITE"),
+    #     foreign_keys=[BibNomenclaturesTypes.id_type],
+    #     cascade="all,delete")
+  
 @serializable
 class TMonitoringObservationDetails(DB.Model):
     __tablename__ = "t_observation_details"
