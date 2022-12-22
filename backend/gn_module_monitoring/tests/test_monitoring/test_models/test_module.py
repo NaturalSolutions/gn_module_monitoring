@@ -15,7 +15,7 @@ class TestModule:
     def test_remove_categorie_from_module(self, monitoring_module, categories):
         with db.session.begin_nested():
             monitoring_module.categories.pop(0)
-        
+
         mon = TMonitoringModules.query.filter_by(id_module=monitoring_module.id_module).one()
 
         assert len(mon.categories) == len(categories) - 1
