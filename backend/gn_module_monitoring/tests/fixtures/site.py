@@ -4,7 +4,6 @@ from geonature.core.gn_monitoring.models import TBaseSites
 from geonature.utils.env import db
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
 from shapely.geometry import Point
-from sqlalchemy import and_
 
 from gn_module_monitoring.monitoring.models import BibCategorieSite
 
