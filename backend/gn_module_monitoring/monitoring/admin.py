@@ -19,16 +19,17 @@ class BibCategorieSiteView(CruvedProtectedMixin, ModelView):
         super(BibCategorieSiteView, self).__init__(BibCategorieSite, session, **kwargs)
 
     def get_only_type_site_asc():
-        return DB.session.query(TNomenclatures).filter(TNomenclatures.id_type == 116).order_by(
-                TNomenclatures.label_fr.asc()
-            )
-    
+        return (
+            DB.session.query(TNomenclatures)
+            .filter(TNomenclatures.id_type == 116)
+            .order_by(TNomenclatures.label_fr.asc())
+        )
+
     def get_label_fr_nomenclature(x):
         return x.label_fr
-    
+
     def list_label_site_type_formatter(view, _context, model, _name):
         return [item.label_fr for item in model.site_type]
-
 
     # Nom de colonne user friendly
     column_labels = dict(site_type="Type de site")
@@ -38,17 +39,8 @@ class BibCategorieSiteView(CruvedProtectedMixin, ModelView):
     column_hide_backrefs = False
 
     form_args = dict(
-        site_type=dict(
-            query_factory=get_only_type_site_asc,
-            get_label=get_label_fr_nomenclature
-        )
+        site_type=dict(query_factory=get_only_type_site_asc, get_label=get_label_fr_nomenclature)
     )
 
-    column_list=("label","config","site_type")
+    column_list = ("label", "config", "site_type")
     column_formatters = dict(site_type=list_label_site_type_formatter)
-
-
-
-
-
-

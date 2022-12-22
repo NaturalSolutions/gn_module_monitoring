@@ -5,8 +5,7 @@ from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.monitoring.models import BibCategorieSite
-from gn_module_monitoring.utils.routes import (filter_params, get_limit_offset,
-                                               paginate)
+from gn_module_monitoring.utils.routes import filter_params, get_limit_offset, paginate
 
 
 @blueprint.route("/sites/categories", methods=["GET"])
