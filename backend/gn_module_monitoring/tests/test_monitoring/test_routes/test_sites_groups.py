@@ -3,8 +3,6 @@ from flask import url_for
 
 from gn_module_monitoring.monitoring.models import TMonitoringSitesGroups
 from gn_module_monitoring.monitoring.schemas import MonitoringSitesGroupsSchema
-from gn_module_monitoring.tests.fixtures.site import categories, site_type, sites
-from gn_module_monitoring.tests.fixtures.sites_groups import sites_groups
 
 
 @pytest.mark.usefixtures("client_class", "temporary_transaction")
