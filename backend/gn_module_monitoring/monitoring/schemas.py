@@ -1,9 +1,11 @@
 import json
-
 from marshmallow import Schema, fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
-from gn_module_monitoring.monitoring.models import TMonitoringSitesGroups
+
+from pypnnomenclature.schemas import NomenclatureSchema
+
+from gn_module_monitoring.monitoring.models import TMonitoringSitesGroups,TMonitoringSites,BibCategorieSite,cor_site_type_categorie
 
 
 def paginate_schema(schema):
@@ -26,3 +28,29 @@ class MonitoringSitesGroupsSchema(SQLAlchemyAutoSchema):
     def serialize_geojson(self, obj):
         if obj.geom_geojson is not None:
             return json.loads(obj.geom_geojson)
+
+
+class MonitoringSitesSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = TMonitoringSites
+        # load_instance = True
+        exclude = ("geom_geojson","geom")
+
+    # geometry = fields.Method("serialize_geojson", dump_only=True)
+
+    # def serialize_geojson(self, obj):
+    #     if obj.geom is not None :
+    #         return json.loads(obj.geom)
+
+
+
+
+class BibCategorieSiteSchema(SQLAlchemyAutoSchema):
+        site_type = fields.Nested(NomenclatureSchema(only=("id_nomenclature","label_fr")), many=True, dump_only=True)
+        class Meta:
+            model = BibCategorieSite
+            include_fk=True
+            load_instance=True
+
+
+
