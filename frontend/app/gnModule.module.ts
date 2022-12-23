@@ -27,13 +27,12 @@ import { MonitoringPropertiesComponent } from "./components/monitoring-propertie
 import { MonitoringDatatableComponent } from "./components/monitoring-datatable/monitoring-datatable.component";
 
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
-import  { MatFormFieldModule} from "@angular/material/form-field";
-import { MatAutocompleteModule} from "@angular/material/autocomplete";
-import { MatSelectModule} from "@angular/material/select";
-import { MatInputModule} from "@angular/material/input";
-
-
-
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatSelectModule } from "@angular/material/select";
+import { MatInputModule } from "@angular/material/input";
+import { MonitoringSitesGroupsComponent } from "./components/monitoring-sitesgroups/monitoring-sitesgroups.component";
+import { SitesService } from "./services/sites.service";
 
 // my module routing
 const routes: Routes = [
@@ -41,9 +40,9 @@ const routes: Routes = [
   { path: "", component: ModulesComponent },
 
   /** module  */
-  { path: 'module/:moduleCode', component: MonitoringObjectComponent },
+  { path: "module/:moduleCode", component: MonitoringObjectComponent },
   /** create module */
-  { path: 'module', component: MonitoringObjectComponent },
+  { path: "module", component: MonitoringObjectComponent },
 
   /** object */
   {
@@ -54,6 +53,10 @@ const routes: Routes = [
   {
     path: "create_object/:moduleCode/:objectType",
     component: MonitoringObjectComponent,
+  },
+  {
+    path: "sites_groups",
+    component: MonitoringSitesGroupsComponent,
   },
 ];
 
@@ -69,6 +72,7 @@ const routes: Routes = [
     MonitoringListComponent,
     MonitoringPropertiesComponent,
     MonitoringDatatableComponent,
+    MonitoringSitesGroupsComponent,
   ],
   imports: [
     GN2CommonModule,
@@ -92,6 +96,7 @@ const routes: Routes = [
     DataUtilsService,
     ConfigService,
     MonitoringObjectService,
+    SitesService,
   ],
   bootstrap: [ModulesComponent],
   schemas: [

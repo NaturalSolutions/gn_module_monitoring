@@ -68,9 +68,9 @@ export class ModulesComponent implements OnInit {
     this.currentUser["cruved_objects"] = {};
   }
 
-  onAccessSitesClick(modules) {
-    console.log("accès aux sites avec droits ")
-    console.log(modules)
-  }
+  // onAccessSitesClick(modules) {
+  //   console.log("accès aux sites avec droits ")
+  //   console.log(modules)
+  // }
 
 }
