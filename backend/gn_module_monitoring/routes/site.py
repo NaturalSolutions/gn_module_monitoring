@@ -31,8 +31,8 @@ def get_categories():
 def get_categories_by_id(id_categorie):
     query = BibCategorieSite.query.filter_by(id_categorie=id_categorie)
     res = query.first()
-
-    return jsonify(res.as_dict())
+    schema = BibCategorieSiteSchema()
+    return schema.dump(res)
 
 
 @blueprint.route("/sites", methods=["GET"])
