@@ -29,9 +29,11 @@ class TestSite:
 
     def test_get_categories_label(self, categories):
         label = list(categories.keys())[0]
+        schema = BibCategorieSiteSchema()
         r = self.client.get(url_for("monitorings.get_categories"), query_string={"label": label})
-        assert categories[label].as_dict(depth=1) in r.json["items"][0]
-        # assert categories[label].as_dict(depth=1) in r.json["categories"]
+        assert schema.dump(categories[label]) in r.json["items"]
+        # assert categories[label].as_dict(depth=1) in r.json["items"][0]
+        
 
     def test_get_sites(self, sites):
         r = self.client.get(url_for("monitorings.get_sites"))
