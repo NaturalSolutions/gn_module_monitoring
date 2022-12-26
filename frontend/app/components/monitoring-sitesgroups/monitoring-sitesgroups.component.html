@@ -1,4 +1,5 @@
-<div id="geometry" class="monitoring-map-container">
+<div class="flex-container" id="object">
+<div id="geometry" class="monitoring-map-container" class="cadre">
   <pnx-map height="80vh">
     <pnx-geojson
       [geojson]="sitesGroups"
@@ -6,4 +7,119 @@
       [zoomOnFirstTime]="true"
     ></pnx-geojson>
   </pnx-map>
+</div>
+<div id="monitoring-elem-container" class="cadre scroll">
+  <!-- <pnx-monitoring-lists-new
+  [(bEdit)]="bEdit"
+></pnx-monitoring-lists-new> -->
+  <ngx-datatable
+      *ngIf="rows"
+      #table
+      class="material striped custom-dt"
+      [columnMode]="'force'"
+      [headerHeight]="'auto'"
+      [footerHeight]="50"
+      [rowHeight]="40"
+      [limit]="10"
+      [rows]="rows"
+      [columns]="columns"
+      [selected]="selected"
+      (activate)="onActivate($event)"
+      (select)="onSelect($event)"
+      [messages]= "{
+        emptyMessage: 'Pas de données disponibles',
+        totalMessage: 'total',
+        selectedMessage: 'selection'
+      }"
+    ></ngx-datatable>
+  <!-- <div *ngIf="child0 && row_save">
+    ///// A commenter
+    <input
+      type="text"
+      style="padding:8px;margin:15px auto;width:30%;"
+      placeholder="Entrer une valeur pour filtrer les colonnes"
+      (keyup)="updateFilter($event)"
+    /> 
+    //////
+  
+    <ngx-datatable
+      *ngIf="rows"
+      #table
+      class="material striped custom-dt"
+      [columnMode]="'force'"
+      [headerHeight]="'auto'"
+      [footerHeight]="50"
+      [rowHeight]="40"
+      [limit]="10"
+      [rows]="rows"
+      [columns]="columns"
+      [selected]="selected"
+      (activate)="onRowClick($event)"
+      [sorts]="sorts"
+      [messages]= "{
+        emptyMessage: 'Pas de données disponibles',
+        totalMessage: 'total',
+        selectedMessage: 'selection'
+      }"
+    >
+      <ngx-datatable-column
+        [cellClass]="'cell-link'"
+        prop="Action"
+        class="object-link"
+      >
+        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+          <a
+            class="nav-link link cell-link"
+            (click)="child0.navigateToDetail(row.id)"
+            matTooltip="Consulter {{child0.template.label_art_def}}"
+          >
+            <i class="fa fa-eye" aria-hidden="true"></i>
+          </a>
+          <a
+            *ngIf="child0.child0()"
+            class="nav-link link cell-link"
+            (click)="child0.navigateToAddChildren(null, row.id)"
+            matTooltip="Ajouter {{child0.child0().labelArtUndef(true)}}"
+          >
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </a>
+        </ng-template>
+      </ngx-datatable-column>
+  
+      <ngx-datatable-column
+        *ngFor="let col of columns"
+        [name]="col.name"
+        [prop]="col.prop"
+        [comparator]="customColumnComparator"
+        [headerTemplate]="hdrTpl"
+      ></ngx-datatable-column>
+    </ngx-datatable>
+  
+    <ng-template #hdrTpl let-column="column" let-sortDir="sortDir" let-sortFn="sortFn">
+      <div class="header-sort-span" (click)="sortFn()">
+        {{column.definition}}
+        <i class="material-icons icon-sort" [innerText]="sortDir ? (sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward') : ''"></i>
+        <i 
+          *ngIf="child0.template.fieldDefinitions[column.prop]"
+          class="material-icons icon-sort" 
+          [matTooltip]="tooltip(column)"
+          matTooltipPosition="above"
+          >help</i>
+        <span
+          [matTooltip]="tooltip(column)"
+          matTooltipPosition="above"
+          > {{ column.name }}</span>
+      </div>
+      <div class="header-filter-span">
+        <input
+          *ngIf="child0.config['display_filter']"
+          [(ngModel)]="filters[column.prop]"
+          (input)="filterInput($event)"
+          type="text"
+        />
+      </div>
+    </ng-template>
+  </div>
+   -->
+</div>
 </div>
