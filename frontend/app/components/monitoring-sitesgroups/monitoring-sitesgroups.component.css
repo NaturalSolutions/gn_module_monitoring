@@ -62,3 +62,16 @@
 .header-sort-span:hover {
   background-color: rgb(245, 245, 245);
 }
+
+.icon-sort {
+    font-size: 1.2em;
+    float: right;
+}
+
+:host::ng-deep .sort-btn {
+    display: none !important;
+}
+
+.custom-dt {
+    box-shadow: none !important;
+}

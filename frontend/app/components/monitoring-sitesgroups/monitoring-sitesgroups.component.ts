@@ -12,6 +12,7 @@ import { GeoJSON } from "leaflet";
 
 import { DatatableComponent } from "@swimlane/ngx-datatable";
 import { Subject } from "rxjs";
+import {debounceTime } from "rxjs/operators";
 interface SitesGroups {
   comments?: string;
   data?: any;
@@ -56,11 +57,22 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   private filterSubject: Subject<string> = new Subject();
   selected = [];
   filters = {};
+  row_save;
 
-  listAllColName: { name: string; prop: string }[] = [];
+
+  listAllColName: { name: string; prop: string,description?:string }[] = [];
   dataTable;
   rows;
   columns;
+
+  // child0 = {
+  //   "config":{
+  //     "display_filter":false
+  //   }
+  // }
+
+  // Est ce qu'un simple boolean ne convient pas ?
+  displayFilter:boolean = false;
 
   sitesGroups: GeoJSON;
 
@@ -88,8 +100,10 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         console.log("columns", this.columns);
         this.groupSiteId = this.sitesGroups.features[0].id;
         console.log("this.groupSiteId", this.groupSiteId);
+        this.initDatatable();
         this.initObjectsStatus();
       });
+      
   }
 
   getDataTable() {
@@ -119,6 +133,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
             ? element
             : columnNameSiteGroup[element],
         prop: element,
+        description: undefined
       });
     });
     return this.listAllColName;
@@ -165,16 +180,15 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   }
 
   // ICI le select renvoyé correspond directement aux valeurs de la ligne sélectionné et non à l'event
-  // permet de simplifier la fonction et pas besoin de checke si l'event est un "click" ou non
+  // permet de simplifier la fonction et pas besoin de check si l'event est un "click" ou non
   onSelect({ selected }) {
-    console.log("Select Event", selected, this.selected);
+    console.log("Select Row", selected, this.selected);
     console.log("this.table", this.table);
     console.log(this.table._internalRows);
 
-    console.log("event.id", selected.id);
+    console.log("selected[0].id", selected[0].id);
     const id = selected[0].id;
 
-    console.log("event.row after check event.type", selected);
     if (!this.rowStatus) {
       return;
     }
@@ -233,6 +247,19 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     }
   }
 
+  //  TEST
+  // onSelect({ selected }) {
+  //   console.log('Select Event', selected, this.selected);
+  // }
+
+  // onActivate(event) {
+  //   console.log("Activate Event", event);
+  // }
+
+  //   if (!this.rowStatus) {
+  //     return;
+  //   }
+
   //////////////////////////////////////
   // NON utilisé car le databinding (selected)=onSelect($event) suffit par rapport au but recherché
   /////////////////////////////////////////////////
@@ -256,4 +283,81 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   //   this.setSelected();
   //   this.rowStatusChange.emit(this.rowStatus);
   // }
+
+  ////////////////////////////////////:
+  // WIP : fonctions liés à des classes basées sur ce qui se faisait anciennement avec le module code en parent de tout
+  // A l'adapter pour coller avec l'architecture actuelle
+  /////////////////////// 
+
+  initDatatable() {
+    console.log("Inside initDatatable")
+    this.filters = {};
+    this.filterSubject.pipe(debounceTime(500)).subscribe(() => {
+      this.filter();
+    });
+
+    // this.customColumnComparator = this.customColumnComparator_();
+    this.row_save = this.rows.map((e) => e);
+    // on declenche les filtres (si filtre par defaut)
+    setTimeout(() => {
+      this.filter(true);
+    }, 500);
+  }
+
+  filterInput($event) {
+    this.filterSubject.next();
+  }
+
+  sort() {}
+
+  filter(bInitFilter = false) {
+    // filter all
+
+    let bChange = false;
+    const temp = this.row_save.filter((row, index) => {
+      let bCondVisible = true;
+      for (const key of Object.keys(this.filters)) {
+        let val = this.filters[key];
+        if ([null, undefined].includes(val)) {
+          continue;
+        }
+        val = String(val).toLowerCase();
+        const vals = val.split(" ");
+        for (const v of vals) {
+          bCondVisible =
+            bCondVisible && (String(row[key]) || "").toLowerCase().includes(v);
+        }
+      }
+
+      if (!this.rowStatus) {
+        return bCondVisible;
+      }
+      bChange = bChange || bCondVisible !== this.rowStatus[index].visible;
+      this.rowStatus[index]["visible"] = bCondVisible;
+      this.rowStatus[index]["selected"] =
+        this.rowStatus[index]["selected"] && bCondVisible;
+      return bCondVisible;
+    });
+
+    if (bChange || bInitFilter) {
+      this.rowStatusChange.emit(this.rowStatus);
+    }
+    // update the rows
+    this.rows = temp;
+    // Whenever the filter changes, always go back to the first page
+    this.table.offset = 0;
+    this.setSelected();
+  }
+
+// TODO: TO REPLACE WITH EFFECTIVE FUNCTION
+navigateToDetail(row){
+  console.log("Inside navigateToDetail on eye icon",row)
+}
+
+navigateToAddChildren(_,rowId){
+  console.log("Inside navigateToAddChildren:",rowId)
+}
+
+
+
 }
