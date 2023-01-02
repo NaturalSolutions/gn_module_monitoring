@@ -7,7 +7,7 @@ from werkzeug.datastructures import MultiDict
 
 
 def get_limit_offset(params: MultiDict) -> Tuple[int]:
-    return params.pop("limit", 50), params.pop("offset", 1)
+    return int(params.pop("limit", 50)), int(params.pop("offset", 1))
 
 
 def paginate(query: Query, object_name: str, limit: int, page: int, depth: int = 0) -> Response:
