@@ -36,7 +36,10 @@
       [headerHeight]="'auto'"
       [footerHeight]="50"
       [rowHeight]="40"
-      [limit]="10"
+      [externalPaging]="true"
+      [count]="page.count"
+      [offset]="page.offset"
+      [limit]="page.limit"
       [rows]="rows"
       [columns]="columns"
       [selected]="selected"
@@ -47,6 +50,7 @@
         totalMessage: 'total',
         selectedMessage: 'selection'
       }"
+      (page)="setPage($event)"
     > <ngx-datatable-column
     [cellClass]="'cell-link'"
     prop="Action"

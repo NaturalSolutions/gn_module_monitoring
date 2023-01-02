@@ -13,6 +13,10 @@ import { GeoJSON } from "leaflet";
 import { DatatableComponent } from "@swimlane/ngx-datatable";
 import { Subject } from "rxjs";
 import {debounceTime } from "rxjs/operators";
+
+const LIMIT = 10
+
+
 interface SitesGroups {
   comments?: string;
   data?: any;
@@ -26,10 +30,13 @@ interface SitesGroups {
   uuid_sites_group: string;
 }
 
-interface PaginatedSitesGroup {
+interface Page {
   count: number;
   limit: number;
   offset: number;
+}
+
+interface PaginatedSitesGroup extends Page{
   items: SitesGroups[];
 }
 
@@ -38,6 +45,12 @@ enum columnNameSiteGroup {
   nb_visits = "Nb. visites",
   sites_group_code = "Code",
   sites_group_name = "Nom",
+}
+
+interface ColName {
+  name: string,
+  prop: string,
+  description?: string,
 }
 
 @Component({
@@ -59,8 +72,8 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   filters = {};
   row_save;
 
-
-  listAllColName: { name: string; prop: string,description?:string }[] = [];
+  public page: Page = {count: 0, limit: 0, offset: 0}; 
+  listAllColName: ColName[] = [];
   dataTable;
   rows;
   columns;
@@ -78,10 +91,15 @@ export class MonitoringSitesGroupsComponent implements OnInit {
 
   constructor(private _sites_service: SitesService) {}
   ngOnInit() {
-    console.log("yolo");
+    this.getSites()
+    this.initDatatable();
+  }
+
+  getSites(offset=1, params={}) {
     this._sites_service
-      .getSitesGroups()
+      .getSitesGroups(offset, LIMIT, params)
       .subscribe((data: PaginatedSitesGroup) => {
+        this.page = {count: data.count, limit: data.limit, offset: data.offset - 1}
         this.sitesGroups = {
           features: data.items.map((group) => {
             group["id"] = group.id_sites_group;
@@ -92,7 +110,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         };
         // console.log(this.sitesGroups);
         this.getDataTable();
-        this.colsTable();
+        this.listAllColName = this.colsTable();
         // console.log(this.listAllColName)
         this.columns = this.listAllColName;
         this.rows = this.dataTable;
@@ -100,10 +118,13 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         console.log("columns", this.columns);
         this.groupSiteId = this.sitesGroups.features[0].id;
         console.log("this.groupSiteId", this.groupSiteId);
-        this.initDatatable();
         this.initObjectsStatus();
       });
       
+  }
+
+  setPage(e) {
+    this.getSites(e.offset + 1)
   }
 
   getDataTable() {
@@ -126,8 +147,9 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   colsTable() {
     const arr = Object.keys(this.dataTable[0]);
     console.log("arr", arr);
+    const allColName: ColName[] = []
     arr.forEach((element) => {
-      this.listAllColName.push({
+      allColName.push({
         name:
           element in ["id", "id_group_site"]
             ? element
@@ -136,7 +158,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         description: undefined
       });
     });
-    return this.listAllColName;
+    return allColName;
   }
 
   initObjectsStatus() {
@@ -312,41 +334,48 @@ export class MonitoringSitesGroupsComponent implements OnInit {
 
   filter(bInitFilter = false) {
     // filter all
+    const oldFilters = this.filters
+    this.filters = Object.keys(oldFilters).reduce(function(r, e) {
+      if (![undefined, "", null].includes(oldFilters[e])) r[e] = oldFilters[e]
+      return r;
+    }, {})
+    
+    //offset = 1
+    this.getSites(1, this.filters)
+    // let bChange = false;
+    // const temp = this.row_save.filter((row, index) => {
+    //   let bCondVisible = true;
+    //   for (const key of Object.keys(this.filters)) {
+    //     let val = this.filters[key];
+    //     if ([null, undefined].includes(val)) {
+    //       continue;
+    //     }
+    //     val = String(val).toLowerCase();
+    //     const vals = val.split(" ");
+    //     for (const v of vals) {
+    //       bCondVisible =
+    //         bCondVisible && (String(row[key]) || "").toLowerCase().includes(v);
+    //     }
+    //   }
 
-    let bChange = false;
-    const temp = this.row_save.filter((row, index) => {
-      let bCondVisible = true;
-      for (const key of Object.keys(this.filters)) {
-        let val = this.filters[key];
-        if ([null, undefined].includes(val)) {
-          continue;
-        }
-        val = String(val).toLowerCase();
-        const vals = val.split(" ");
-        for (const v of vals) {
-          bCondVisible =
-            bCondVisible && (String(row[key]) || "").toLowerCase().includes(v);
-        }
-      }
+    //   if (!this.rowStatus) {
+    //     return bCondVisible;
+    //   }
+    //   bChange = bChange || bCondVisible !== this.rowStatus[index].visible;
+    //   this.rowStatus[index]["visible"] = bCondVisible;
+    //   this.rowStatus[index]["selected"] =
+    //     this.rowStatus[index]["selected"] && bCondVisible;
+    //   return bCondVisible;
+    //});
 
-      if (!this.rowStatus) {
-        return bCondVisible;
-      }
-      bChange = bChange || bCondVisible !== this.rowStatus[index].visible;
-      this.rowStatus[index]["visible"] = bCondVisible;
-      this.rowStatus[index]["selected"] =
-        this.rowStatus[index]["selected"] && bCondVisible;
-      return bCondVisible;
-    });
-
-    if (bChange || bInitFilter) {
-      this.rowStatusChange.emit(this.rowStatus);
-    }
-    // update the rows
-    this.rows = temp;
-    // Whenever the filter changes, always go back to the first page
-    this.table.offset = 0;
-    this.setSelected();
+    // if (bChange || bInitFilter) {
+    //   this.rowStatusChange.emit(this.rowStatus);
+    // }
+    // // update the rows
+    // this.rows = temp;
+    // // Whenever the filter changes, always go back to the first page
+    // this.table.offset = 0;
+    // this.setSelected();
   }
 
 // TODO: TO REPLACE WITH EFFECTIVE FUNCTION

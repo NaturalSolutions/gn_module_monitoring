@@ -11,7 +11,7 @@ export class SitesService {
     private _cacheService: CacheService
   ) {}
 
-  getSitesGroups() {
-    return this._cacheService.request("get", `sites_groups`);
+  getSitesGroups(offset=1, limit=10, params={}) {
+    return this._cacheService.request("get", `sites_groups`, {queryParams: {offset, limit, ...params}});
   }
 }
