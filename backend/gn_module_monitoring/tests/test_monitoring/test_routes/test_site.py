@@ -1,6 +1,8 @@
 import pytest
 from flask import url_for
-from gn_module_monitoring.monitoring.schemas import BibCategorieSiteSchema
+
+from gn_module_monitoring.monitoring.schemas import MonitoringSitesSchema, BibCategorieSiteSchema
+
 
 @pytest.mark.usefixtures("client_class", "temporary_transaction")
 class TestSite:
@@ -37,9 +39,10 @@ class TestSite:
 
     def test_get_sites(self, sites):
         r = self.client.get(url_for("monitorings.get_sites"))
+        schema = MonitoringSitesSchema()
 
         assert r.json["count"] >= len(sites)
-        assert any([site.as_dict() in r.json["sites"] for site in sites.values()])
+        assert any([schema.dump(site) in r.json["items"] for site in sites.values()])
 
     def test_get_module_sites(self):
         module_code = "TEST"
