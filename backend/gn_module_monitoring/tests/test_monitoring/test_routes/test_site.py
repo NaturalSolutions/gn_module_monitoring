@@ -17,11 +17,13 @@ class TestSite:
             assert r.json["label"] == cat.label
 
     def test_get_categories(self, categories):
+        schema = BibCategorieSiteSchema()
+
         r = self.client.get(url_for("monitorings.get_categories"))
 
         assert r.json["count"] >= len(categories)
         assert all(
-            [BibCategorieSiteSchema().dump(cat) in r.json["items"] for cat in categories.values()]
+            [schema.dump(cat) in r.json["items"] for cat in categories.values()]
         )
 
         # assert all([cat.as_dict(depth=1) in r.json["items"] for cat in categories.values()])
@@ -34,8 +36,9 @@ class TestSite:
         # assert categories[label].as_dict(depth=1) in r.json["items"][0]
 
     def test_get_sites(self, sites):
-        r = self.client.get(url_for("monitorings.get_sites"))
         schema = MonitoringSitesSchema()
+        
+        r = self.client.get(url_for("monitorings.get_sites"))
 
         assert r.json["count"] >= len(sites)
         assert any([schema.dump(site) in r.json["items"] for site in sites.values()])
