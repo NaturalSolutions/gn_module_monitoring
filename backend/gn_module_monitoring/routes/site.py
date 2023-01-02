@@ -24,8 +24,6 @@ def get_categories():
         page=page,
     )
 
-    # return paginate(query=query, object_name="categories", limit=limit, page=page, depth=1)
-
 
 @blueprint.route("/sites/categories/<int:id_categorie>", methods=["GET"])
 def get_categories_by_id(id_categorie):
@@ -50,8 +48,6 @@ def get_sites():
         limit=limit,
         page=page,
     )
-
-    # return paginate(query=query, object_name="sites", limit=limit, page=page)
 
 
 @blueprint.route("/sites/module/<string:module_code>", methods=["GET"])

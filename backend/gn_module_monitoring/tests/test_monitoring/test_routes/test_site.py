@@ -26,18 +26,15 @@ class TestSite:
             [schema.dump(cat) in r.json["items"] for cat in categories.values()]
         )
 
-        # assert all([cat.as_dict(depth=1) in r.json["items"] for cat in categories.values()])
-
     def test_get_categories_label(self, categories):
         label = list(categories.keys())[0]
         schema = BibCategorieSiteSchema()
         r = self.client.get(url_for("monitorings.get_categories"), query_string={"label": label})
         assert schema.dump(categories[label]) in r.json["items"]
-        # assert categories[label].as_dict(depth=1) in r.json["items"][0]
 
     def test_get_sites(self, sites):
         schema = MonitoringSitesSchema()
-        
+
         r = self.client.get(url_for("monitorings.get_sites"))
 
         assert r.json["count"] >= len(sites)

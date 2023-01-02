@@ -37,7 +37,6 @@ class MonitoringSitesGroupsSchema(SQLAlchemyAutoSchema):
 class MonitoringSitesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = TMonitoringSites
-        # load_instance = True
         exclude = ("geom_geojson", "geom")
 
     geometry = fields.Method("serialize_geojson", dump_only=True)
