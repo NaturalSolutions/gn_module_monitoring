@@ -11,7 +11,7 @@ def get_limit_offset(params: MultiDict) -> Tuple[int]:
 
 
 def paginate(query: Query, object_name: str, limit: int, page: int, depth: int = 0) -> Response:
-    result = query.paginate(page=page, error_out=False, max_per_page=limit)
+    result = query.paginate(page=page, error_out=False, per_page=limit)
     data = {
         object_name: [res.as_dict(depth=depth) for res in result.items],
         "count": result.total,
