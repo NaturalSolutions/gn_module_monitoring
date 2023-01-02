@@ -1,33 +1,19 @@
 import pytest
 from geoalchemy2.shape import from_shape
-from geonature.core.gn_monitoring.models import TBaseSites
 from geonature.utils.env import db
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
-from pypnnomenclature.schemas import NomenclatureSchema
 from shapely.geometry import Point
-from sqlalchemy.orm import load_only
 
-from gn_module_monitoring.monitoring.schemas import BibCategorieSiteSchema
 from gn_module_monitoring.monitoring.models import BibCategorieSite, TMonitoringSites
 from gn_module_monitoring.tests.fixtures.sites_groups import sites_groups
 
 
 @pytest.fixture()
 def site_type():
-    # query_test = db.session.query(TNomenclatures).options(load_only("label_fr","id_nomenclature"))
-    # query=query_test.filter(
-    #         BibNomenclaturesTypes.mnemonique == "TYPE_SITE", TNomenclatures.mnemonique == "Grotte"
-    #     ).one()
-    # query=query_test.filter(
-    #         TNomenclatures.id_type == 116, TNomenclatures.mnemonique == "Grotte"
-    #     ).one()
     return TNomenclatures.query.filter(
             BibNomenclaturesTypes.mnemonique == "TYPE_SITE", TNomenclatures.mnemonique == "Grotte"
         ).one()
-# @pytest.fixture()
-# def site_type_schema_nomenclature(site_type):
-#     schema = NomenclatureSchema(only=("label_fr","id_nomenclature"))
-#     return schema.dump(site_type)
+
 
 @pytest.fixture()
 def categories(site_type):
