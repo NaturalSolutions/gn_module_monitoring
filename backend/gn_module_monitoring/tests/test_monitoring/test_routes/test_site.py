@@ -1,7 +1,7 @@
 import pytest
 from flask import url_for
 
-from gn_module_monitoring.monitoring.schemas import MonitoringSitesSchema, BibCategorieSiteSchema
+from gn_module_monitoring.monitoring.schemas import BibCategorieSiteSchema, MonitoringSitesSchema
 
 
 @pytest.mark.usefixtures("client_class", "temporary_transaction")
@@ -21,10 +21,7 @@ class TestSite:
 
         assert r.json["count"] >= len(categories)
         assert all(
-            [
-                BibCategorieSiteSchema().dump(cat) in r.json["items"]
-                for cat in categories.values()
-            ]
+            [BibCategorieSiteSchema().dump(cat) in r.json["items"] for cat in categories.values()]
         )
 
         # assert all([cat.as_dict(depth=1) in r.json["items"] for cat in categories.values()])
@@ -35,7 +32,6 @@ class TestSite:
         r = self.client.get(url_for("monitorings.get_categories"), query_string={"label": label})
         assert schema.dump(categories[label]) in r.json["items"]
         # assert categories[label].as_dict(depth=1) in r.json["items"][0]
-        
 
     def test_get_sites(self, sites):
         r = self.client.get(url_for("monitorings.get_sites"))
