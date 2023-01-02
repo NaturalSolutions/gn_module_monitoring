@@ -169,7 +169,7 @@ class TMonitoringVisits(TBaseVisits):
     )
 
 
-@geoserializable
+@geoserializable(geoCol="geom", idCol="id_base_site")
 class TMonitoringSites(TBaseSites):
 
     __tablename__ = 't_site_complements'

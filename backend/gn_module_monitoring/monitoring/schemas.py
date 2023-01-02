@@ -1,8 +1,9 @@
 import json
+
+import geojson
+
 from marshmallow import Schema, fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-
-
 from pypnnomenclature.schemas import NomenclatureSchema
 
 from gn_module_monitoring.monitoring.models import TMonitoringSitesGroups,TMonitoringSites,BibCategorieSite,cor_site_type_categorie
@@ -34,13 +35,13 @@ class MonitoringSitesSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = TMonitoringSites
         # load_instance = True
-        exclude = ("geom_geojson","geom")
+        exclude = ("geom_geojson", "geom")
 
-    # geometry = fields.Method("serialize_geojson", dump_only=True)
+    geometry = fields.Method("serialize_geojson", dump_only=True)
 
-    # def serialize_geojson(self, obj):
-    #     if obj.geom is not None :
-    #         return json.loads(obj.geom)
+    def serialize_geojson(self, obj):
+         if obj.geom is not None :
+             return geojson.dumps(obj.as_geofeature().get("geometry"))
 
 
 
