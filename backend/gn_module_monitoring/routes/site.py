@@ -4,17 +4,26 @@ from geonature.core.gn_monitoring.models import TBaseSites
 from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
-from gn_module_monitoring.monitoring.models import BibCategorieSite
-from gn_module_monitoring.utils.routes import filter_params, get_limit_offset, paginate
+from gn_module_monitoring.monitoring.models import BibCategorieSite, TMonitoringSites
+from gn_module_monitoring.utils.routes import (
+    filter_params,
+    get_limit_offset,
+    get_sort,
+    paginate,
+    sort,
+)
 
 
 @blueprint.route("/sites/categories", methods=["GET"])
 def get_categories():
     params = MultiDict(request.args)
     limit, page = get_limit_offset(params=params)
+    sort_label, sort_dir = get_sort(
+        params=params, default_sort="id_categorie", default_direction="desc"
+    )
 
     query = filter_params(query=BibCategorieSite.query, params=params)
-    query = query.order_by(BibCategorieSite.id_categorie)
+    query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
 
     return paginate(query=query, object_name="categories", limit=limit, page=page, depth=1)
 
@@ -32,10 +41,14 @@ def get_sites():
     params = MultiDict(request.args)
     # TODO: add filter support
     limit, page = get_limit_offset(params=params)
-    query = TBaseSites.query.join(
-        BibCategorieSite, TBaseSites.id_categorie == BibCategorieSite.id_categorie
+    sort_label, sort_dir = get_sort(
+        params=params, default_sort="id_base_site", default_direction="desc"
+    )
+    query = TMonitoringSites.query.join(
+        BibCategorieSite, TMonitoringSites.id_categorie == BibCategorieSite.id_categorie
     )
     query = filter_params(query=query, params=params)
+    query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
     return paginate(query=query, object_name="sites", limit=limit, page=page)
 
 
