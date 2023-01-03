@@ -5,6 +5,8 @@ from flask.json import jsonify
 from sqlalchemy.orm import Query
 from werkzeug.datastructures import MultiDict
 
+from gn_module_monitoring.monitoring.queries import Query as MonitoringQuery
+
 
 def get_limit_offset(params: MultiDict) -> Tuple[int]:
     return params.pop("limit", 50), params.pop("offset", 1)
@@ -21,7 +23,7 @@ def paginate(query: Query, object_name: str, limit: int, page: int, depth: int =
     return jsonify(data)
 
 
-def filter_params(query: Query, params: MultiDict) -> Query:
+def filter_params(query: MonitoringQuery, params: MultiDict) -> MonitoringQuery:
     if len(params) != 0:
-        query = query.filter_by(**params)
+        query = query.filter_by_params(params)
     return query
