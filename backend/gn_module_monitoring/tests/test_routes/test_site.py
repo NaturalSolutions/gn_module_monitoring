@@ -57,6 +57,12 @@ class TestSite:
         assert len(r.json["items"]) == 1
         assert r.json["items"][0]["id_base_site"] == id_base_site
 
+    def test_get_all_site_geometries(self, sites):
+        r = self.client.get(url_for("monitorings.get_all_site_geometries"))
+
+        assert r.content_type == "application/protobuf"
+        assert len(r.data) > 0
+
     def test_get_module_sites(self):
         module_code = "TEST"
         r = self.client.get(url_for("monitorings.get_module_sites", module_code=module_code))
