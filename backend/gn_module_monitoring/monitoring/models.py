@@ -1,6 +1,7 @@
 """
     Modèles SQLAlchemy pour les modules de suivi
 """
+from geoalchemy2 import Geometry
 from sqlalchemy import select, func, and_
 from sqlalchemy.orm import column_property
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -268,6 +269,8 @@ class TMonitoringSitesGroups(DB.Model):
     comments = DB.Column(DB.Unicode)
 
     data = DB.Column(JSONB)
+
+    geom = DB.Column(Geometry("GEOMETRY", 4326))
 
     medias = DB.relationship(
         TMedias,
