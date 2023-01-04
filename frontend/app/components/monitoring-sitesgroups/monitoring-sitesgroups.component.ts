@@ -102,7 +102,6 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         this.page = {count: data.count, limit: data.limit, offset: data.offset - 1}
         this.sitesGroups = {
           features: data.items.map((group) => {
-            group["id"] = group.id_sites_group;
             group["type"] = "Feature";
             return group;
           }),
@@ -124,7 +123,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   }
 
   setPage(e) {
-    this.getSites(e.offset + 1)
+    this.getSites(e.offset + 1, this.filters)
   }
 
   getDataTable() {
@@ -330,7 +329,10 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     this.filterSubject.next();
   }
 
-  sort() {}
+  onSort($event) {
+    this.filters = {...this.filters, sort: $event.column.prop, sort_dir: $event.newValue}
+    this.getSites(1, this.filters)
+  }
 
   filter(bInitFilter = false) {
     // filter all

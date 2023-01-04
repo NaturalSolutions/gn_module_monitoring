@@ -51,6 +51,7 @@
         selectedMessage: 'selection'
       }"
       (page)="setPage($event)"
+      (sort)="onSort($event)"
     > <ngx-datatable-column
     [cellClass]="'cell-link'"
     prop="Action"
