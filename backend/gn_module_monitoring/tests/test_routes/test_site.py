@@ -45,7 +45,7 @@ class TestSite:
 
         r = self.client.get(url_for("monitorings.get_sites", limit=limit))
 
-        assert len(r.json["sites"]) == limit
+        assert len(r.json["items"]) == limit
 
     def test_get_module_sites(self):
         module_code = "TEST"
