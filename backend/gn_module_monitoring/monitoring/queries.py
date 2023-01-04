@@ -1,6 +1,6 @@
 from flask_sqlalchemy import BaseQuery
+from sqlalchemy import Integer, and_
 from werkzeug.datastructures import MultiDict
-from sqlalchemy import and_
 
 
 class Query(BaseQuery):
@@ -18,7 +18,14 @@ class Query(BaseQuery):
 
     def filter_by_params(self, params: MultiDict = None):
         model = self._get_model()
-        and_query = and_(*tuple(getattr(model, key).ilike(f"%{value}%") for key, value in params.items()))
+        and_list = []
+        for key, value in params.items():
+            column = getattr(model, key)
+            if isinstance(column.type, Integer):
+                and_list.append(column == value)
+            else:
+                and_list.append(column.ilike(f"%{value}%"))
+        and_query = and_(*and_list)
         return self.filter(and_query)
 
     def sort(self, label: str, direction: str):
