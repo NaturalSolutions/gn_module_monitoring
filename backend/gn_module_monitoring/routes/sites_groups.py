@@ -10,6 +10,7 @@ from gn_module_monitoring.utils.routes import (
     paginate,
     sort,
 )
+from gn_module_monitoring.monitoring.schemas import MonitoringSitesGroupsSchema
 
 
 @blueprint.route("/sites_groups", methods=["GET"])
@@ -22,4 +23,9 @@ def get_sites_groups():
     query = filter_params(query=TMonitoringSitesGroups.query, params=params)
 
     query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
-    return paginate(query=query, object_name="sites_groups", limit=limit, page=page)
+    return paginate(
+        query=query,
+        schema=MonitoringSitesGroupsSchema,
+        limit=limit,
+        page=page,
+    )
