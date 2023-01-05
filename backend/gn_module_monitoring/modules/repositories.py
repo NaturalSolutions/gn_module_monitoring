@@ -4,6 +4,7 @@
     get_modules
 """
 
+from sqlalchemy.orm import Load, joinedload
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from geonature.utils.env import DB
@@ -87,7 +88,16 @@ def get_modules():
 
     try:
         res = (
-            DB.session.query(TMonitoringModules).order_by(TMonitoringModules.module_label)
+            DB.session.query(TMonitoringModules)
+            .options(
+                # Raise load not to load any other thing than
+                # medias and categories
+                # datasets are not required
+                Load(TMonitoringModules).raiseload("*"),
+                joinedload("medias"),
+                joinedload("categories"),
+            )
+            .order_by(TMonitoringModules.module_label)
             .all()
         )
 
