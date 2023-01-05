@@ -47,8 +47,8 @@ def downgrade():
          update {monitorings_schema}.t_sites_groups
          set id_module = (select id_module 
                           from gn_commons.t_modules tm 
-                          where module_code = '\:module_code');
+                          where module_code = :module_code);
         """
-    )
-    op.execute(statement, module_code=MODULE_CODE)
-    op.alter_column("t_sites_groups", "id_module", nullable=False)
+    ).bindparams(module_code=MODULE_CODE)
+    op.execute(statement)
+    op.alter_column("t_sites_groups", "id_module", nullable=False, schema=monitorings_schema)
