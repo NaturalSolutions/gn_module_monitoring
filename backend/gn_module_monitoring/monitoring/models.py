@@ -22,8 +22,9 @@ from geonature.core.gn_monitoring.models import corVisitObserver
 
 from gn_module_monitoring.monitoring.queries import Query as MonitoringQuery
 
-cor_module_categorie = DB.Table(
-    "cor_module_categorie",
+
+cor_module_type = DB.Table(
+    "cor_module_type",
     DB.Column(
         "id_module",
         DB.Integer,
@@ -31,26 +32,28 @@ cor_module_categorie = DB.Table(
         primary_key=True,
     ),
         DB.Column(
-        "id_categorie",
+        "id_type_site",
         DB.Integer,
-        DB.ForeignKey("gn_monitoring.bib_categorie_site.id_categorie"),
+        DB.ForeignKey("gn_monitoring.bib_type_site.id_nomenclature"),
         primary_key=True,
     ), schema="gn_monitoring")
 
-cor_site_type_categorie = DB.Table(
-    "cor_site_type_categorie",
+
+cor_type_site = DB.Table(
+    "cor_type_site",
     DB.Column(
-        "id_nomenclature",
+        "id_base_site",
         DB.Integer,
-        DB.ForeignKey("ref_nomenclatures.t_nomenclatures.id_nomenclature"),
+        DB.ForeignKey("gn_monitoring.t_base_sites.id_base_site"),
         primary_key=True,
     ),
         DB.Column(
-        "id_categorie",
+        "id_type_site",
         DB.Integer,
-        DB.ForeignKey("gn_monitoring.bib_categorie_site.id_categorie"),
+        DB.ForeignKey("gn_monitoring.bib_type_site.id_nomenclature"),
         primary_key=True,
     ), schema="gn_monitoring")
+
 
 @serializable
 class BibCategorieSite(DB.Model):
@@ -351,9 +354,9 @@ class TMonitoringModules(TModules):
         lazy="joined",
     )
 
-    categories = DB.relationship(
-        "BibCategorieSite",
-        secondary=cor_module_categorie,
+    types = DB.relationship(
+        "BibTypeSite",
+        secondary=cor_type_site,
         lazy="joined"
     )
 
