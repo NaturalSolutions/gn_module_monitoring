@@ -32,7 +32,7 @@ def upgrade():
             ),
             nullable=False,
         ),
-        sa.Column("id_base_sites", sa.Integer(),sa.ForeignKey(
+        sa.Column("id_base_site", sa.Integer(),sa.ForeignKey(
                 f"{referent_schema}.t_base_sites.id_base_site",
                 name="fk_cor_type_site_id_base_site",
                 ondelete="CASCADE",
