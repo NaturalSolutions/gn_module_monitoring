@@ -1,7 +1,7 @@
 import pytest
 from flask import url_for
 
-from gn_module_monitoring.monitoring.schemas import BibCategorieSiteSchema, MonitoringSitesSchema
+from gn_module_monitoring.monitoring.schemas import BibTypeSiteSchema, MonitoringSitesSchema
 
 
 @pytest.mark.usefixtures("client_class", "temporary_transaction")
@@ -17,7 +17,7 @@ class TestSite:
             assert r.json["label"] == cat.label
 
     def test_get_categories(self, categories):
-        schema = BibCategorieSiteSchema()
+        schema = BibTypeSiteSchema()
 
         r = self.client.get(url_for("monitorings.get_categories"))
 
@@ -26,7 +26,7 @@ class TestSite:
 
     def test_get_categories_label(self, categories):
         label = list(categories.keys())[0]
-        schema = BibCategorieSiteSchema()
+        schema = BibTypeSiteSchema()
         r = self.client.get(url_for("monitorings.get_categories"), query_string={"label": label})
         assert schema.dump(categories[label]) in r.json["items"]
 

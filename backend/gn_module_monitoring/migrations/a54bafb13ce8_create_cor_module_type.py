@@ -1,4 +1,4 @@
-"""create_cor_module_category
+"""create_cor_module_type
 
 Revision ID: a54bafb13ce8
 Revises: 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "a54bafb13ce8"
-down_revision = "f24adb481f54"
+down_revision = "b53bafb13ce8"
 branch_labels = None
 depends_on = None
 
@@ -20,13 +20,13 @@ referent_schema = "gn_commons"
 
 def upgrade():
     op.create_table(
-        "cor_module_categorie",
+        "cor_module_type",
         sa.Column(
-            "id_categorie",
+            "id_type_site",
             sa.Integer(),
             sa.ForeignKey(
-                f"{monitorings_schema}.bib_categorie_site.id_categorie",
-                name="fk_cor_module_categorie_id_categorie",
+                f"{monitorings_schema}.bib_type_site.id_type_site",
+                name="fk_cor_module_type_id_type_site",
                 ondelete="CASCADE",
                 onupdate="CASCADE",
             ),
@@ -34,14 +34,14 @@ def upgrade():
         ),
         sa.Column("id_module", sa.Integer(),sa.ForeignKey(
                 f"{referent_schema}.t_modules.id_module",
-                name="fk_cor_module_categorie_id_module",
+                name="fk_cor_module_type_id_module",
                 ondelete="CASCADE",
                 onupdate="CASCADE",
             ), nullable=False),
-        sa.PrimaryKeyConstraint("id_categorie", "id_module", name="pk_cor_module_categorie"),
+        sa.PrimaryKeyConstraint("id_nomenclature", "id_module", name="pk_cor_module_type"),
         schema=monitorings_schema,
     )
 
 
 def downgrade():
-    op.drop_table("cor_module_categorie", schema=monitorings_schema)
+    op.drop_table("cor_module_type", schema=monitorings_schema)

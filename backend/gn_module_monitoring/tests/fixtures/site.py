@@ -4,7 +4,7 @@ from geonature.utils.env import db
 from pypnnomenclature.models import BibNomenclaturesTypes, TNomenclatures
 from shapely.geometry import Point
 
-from gn_module_monitoring.monitoring.models import BibCategorieSite, TMonitoringSites
+from gn_module_monitoring.monitoring.models import BibTypeSite, TMonitoringSites
 from gn_module_monitoring.tests.fixtures.sites_groups import sites_groups
 
 
@@ -22,7 +22,7 @@ def categories(site_type):
         {"label": "eolienne", "config": {}, "site_type": [site_type]},
     ]
 
-    categories = {cat["label"]: BibCategorieSite(**cat) for cat in categories}
+    categories = {cat["label"]: BibTypeSite(**cat) for cat in categories}
 
     with db.session.begin_nested():
         db.session.add_all(categories.values())
