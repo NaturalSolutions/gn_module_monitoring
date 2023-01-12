@@ -14,7 +14,7 @@ def monitoring_module(types_site):
         active_frontend=True,
         active_backend=False,
         module_path="test",
-        type_site=list(types_site.values()),
+        types_site=list(types_site.values()),
     )
 
     with db.session.begin_nested():

@@ -240,7 +240,7 @@ class TMonitoringSites(TBaseSites):
             where(TBaseSites.id_base_site==id_base_site).\
                 correlate_except(TBaseSites)
     )
-    type_site = DB.relationship(
+    types_site = DB.relationship(
         "BibTypeSite",
         secondary=cor_type_site,
         lazy="joined"
@@ -356,7 +356,7 @@ class TMonitoringModules(TModules):
         lazy="joined",
     )
 
-    type_site = DB.relationship(
+    types_site = DB.relationship(
         "BibTypeSite",
         secondary=cor_module_type,
         lazy="joined"

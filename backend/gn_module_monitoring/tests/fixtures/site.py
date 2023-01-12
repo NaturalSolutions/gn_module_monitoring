@@ -20,7 +20,7 @@ def sites(users, types_site, sites_groups):
             base_site_code=f"Code{i}",
             geom=geom_4326,
             id_nomenclature_type_site=types_site[key].id_nomenclature,
-            type_site=[types_site[key]],
+            types_site=[types_site[key]],
             id_sites_group=sites_groups["Site_Groupe"].id_sites_group,
         )
     with db.session.begin_nested():

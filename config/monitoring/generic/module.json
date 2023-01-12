@@ -130,7 +130,7 @@
       "definition": "Afficher le module dans le menu de GéoNature. (Recharger la page pour voir les modifications)."
     },
 
-    "type_site": {
+    "types_site": {
       "type_widget": "datalist",
       "attribut_label": "Types de sites",
       "type_util": "types_site",
