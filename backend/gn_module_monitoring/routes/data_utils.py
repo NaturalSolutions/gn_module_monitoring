@@ -40,7 +40,7 @@ model_dict = {
     "user": User,
     "taxonomy": Taxref,
     "dataset": TDatasets,
-    "categorie": BibTypeSite,
+    "site_types": BibTypeSite,
     "observer_list": UserList,
     "taxonomy_list": BibListes,
     "sites_group": TMonitoringSitesGroups,

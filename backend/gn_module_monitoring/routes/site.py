@@ -1,6 +1,5 @@
 from flask import request
 from flask.json import jsonify
-from geonature.core.gn_monitoring.models import TBaseSites
 from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
