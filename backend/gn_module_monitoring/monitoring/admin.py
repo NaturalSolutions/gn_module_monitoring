@@ -21,7 +21,7 @@ class BibTypeSiteView(CruvedProtectedMixin, ModelView):
         # Référence au model utilisé
         super(BibTypeSiteView, self).__init__(BibTypeSite, session, **kwargs)
 
-    def get_only_type_site_asc():
+    def get_only_nomenclature_asc():
         subquery = DB.session.query(BibTypeSite.id_nomenclature).subquery()
         return (
             DB.session.query(TNomenclatures)
@@ -34,19 +34,19 @@ class BibTypeSiteView(CruvedProtectedMixin, ModelView):
     def get_label_fr_nomenclature(x):
         return x.label_fr
 
-    def list_label_site_type_formatter(view, _context, model, _name):
-        return model.site_type.label_fr
+    def list_label_nomenclature_formatter(view, _context, model, _name):
+        return model.nomenclature.label_fr
 
     # Nom de colonne user friendly
-    column_labels = dict(site_type="Type de site")
+    column_labels = dict(nomenclature="Types de site")
     # Description des colonnes
-    column_descriptions = dict(site_type="Nomenclature de Type de site à choisir")
+    column_descriptions = dict(nomenclature="Nomenclature de Type de site à choisir")
 
     column_hide_backrefs = False
 
     form_args = dict(
-        site_type=dict(query_factory=get_only_type_site_asc, get_label=get_label_fr_nomenclature)
+        nomenclature=dict(query_factory=get_only_nomenclature_asc, get_label=get_label_fr_nomenclature)
     )
 
-    column_list = ("site_type","config")
-    column_formatters = dict(site_type=list_label_site_type_formatter)
+    column_list = ("nomenclature","config")
+    column_formatters = dict(nomenclature=list_label_nomenclature_formatter)

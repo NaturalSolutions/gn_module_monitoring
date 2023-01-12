@@ -47,12 +47,12 @@ class MonitoringSitesSchema(SQLAlchemyAutoSchema):
 
 
 class BibTypeSiteSchema(SQLAlchemyAutoSchema):
-    label = fields.Method("get_label_from_site_type")
+    label = fields.Method("get_label_from_type_site")
     # See if useful in the future:
-    # site_type = fields.Nested(NomenclatureSchema(only=("label_fr",)), dump_only=True)
+    # type_site = fields.Nested(NomenclatureSchema(only=("label_fr",)), dump_only=True)
 
-    def get_label_from_site_type(self, obj):
-        return obj.site_type.label_fr
+    def get_label_from_type_site(self, obj):
+        return obj.nomenclature.label_fr
 
     class Meta:
         model = BibTypeSite

@@ -15,7 +15,7 @@ from gn_module_monitoring.monitoring.schemas import MonitoringSitesSchema,BibTyp
 
 
 @blueprint.route("/sites/types", methods=["GET"])
-def get_site_types():
+def get_types_site():
     params = MultiDict(request.args)
     limit, page = get_limit_offset(params=params)
     sort_label, sort_dir = get_sort(
@@ -33,9 +33,9 @@ def get_site_types():
     )
 
 
-@blueprint.route("/sites/types/<int:id_site_type>", methods=["GET"])
-def get_site_types_by_id(id_site_type):
-    query = BibTypeSite.query.filter_by(id_nomenclature=id_site_type)
+@blueprint.route("/sites/types/<int:id_type_site>", methods=["GET"])
+def get_type_site_by_id(id_type_site):
+    query = BibTypeSite.query.filter_by(id_nomenclature=id_type_site)
     res = query.first()
     schema = BibTypeSiteSchema()
     return schema.dump(res)

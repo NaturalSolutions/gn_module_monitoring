@@ -62,7 +62,7 @@ class BibTypeSite(DB.Model):
                                 nullable=False,
                                 primary_key=True)
     config = DB.Column(JSONB)
-    site_type = DB.relationship(
+    nomenclature = DB.relationship(
         TNomenclatures,
         uselist=False,
         backref=DB.backref('bib_type_site', uselist=False)

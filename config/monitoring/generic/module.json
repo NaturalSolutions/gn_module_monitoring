@@ -133,7 +133,7 @@
     "type_site": {
       "type_widget": "datalist",
       "attribut_label": "Types de sites",
-      "type_util": "site_types",
+      "type_util": "types_site",
       "keyValue": "id_nomenclature",
       "keyLabel": "label",
       "multiple": true,

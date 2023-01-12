@@ -6,20 +6,20 @@ from gn_module_monitoring.monitoring.schemas import BibTypeSiteSchema, Monitorin
 
 @pytest.mark.usefixtures("client_class", "temporary_transaction")
 class TestSite:
-    def test_get_site_types_by_id(self, types_site):
+    def test_get_type_site_by_id(self, types_site):
         for type_site in types_site.values():
             r = self.client.get(
                 url_for(
-                    "monitorings.get_site_types_by_id",
-                    id_site_type=type_site.id_nomenclature,
+                    "monitorings.get_type_site_by_id",
+                    id_type_site=type_site.id_nomenclature,
                 )
             )
             assert r.json["id_nomenclature"] == type_site.id_nomenclature
 
-    def test_get_site_types(self, types_site):
+    def test_get_types_site(self, types_site):
         schema = BibTypeSiteSchema()
 
-        r = self.client.get(url_for("monitorings.get_site_types"))
+        r = self.client.get(url_for("monitorings.get_types_site"))
 
         assert r.json["count"] >= len(types_site)
         assert all([schema.dump(cat) in r.json["items"] for cat in types_site.values()])
