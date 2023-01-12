@@ -4,7 +4,7 @@ from geonature.core.gn_monitoring.models import TBaseSites
 from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
-from gn_module_monitoring.monitoring.models import BibCategorieSite, TMonitoringSites
+from gn_module_monitoring.monitoring.models import BibTypeSite, TMonitoringSites
 from gn_module_monitoring.utils.routes import (
     filter_params,
     get_limit_offset,
@@ -12,33 +12,33 @@ from gn_module_monitoring.utils.routes import (
     paginate,
     sort,
 )
-from gn_module_monitoring.monitoring.schemas import MonitoringSitesSchema,BibCategorieSiteSchema
+from gn_module_monitoring.monitoring.schemas import MonitoringSitesSchema,BibTypeSiteSchema
 
 
-@blueprint.route("/sites/categories", methods=["GET"])
-def get_categories():
+@blueprint.route("/sites/types", methods=["GET"])
+def get_site_types():
     params = MultiDict(request.args)
     limit, page = get_limit_offset(params=params)
     sort_label, sort_dir = get_sort(
-        params=params, default_sort="id_categorie", default_direction="desc"
+        params=params, default_sort="id_nomenclature", default_direction="desc"
     )
 
-    query = filter_params(query=BibCategorieSite.query, params=params)
+    query = filter_params(query=BibTypeSite.query, params=params)
     query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
 
     return paginate(
         query=query,
-        schema=BibCategorieSiteSchema,
+        schema=BibTypeSiteSchema,
         limit=limit,
         page=page,
     )
 
 
-@blueprint.route("/sites/categories/<int:id_categorie>", methods=["GET"])
-def get_categories_by_id(id_categorie):
-    query = BibCategorieSite.query.filter_by(id_categorie=id_categorie)
+@blueprint.route("/sites/types/<int:id_site_type>", methods=["GET"])
+def get_site_types_by_id(id_site_type):
+    query = BibTypeSite.query.filter_by(id_nomenclature=id_site_type)
     res = query.first()
-    schema = BibCategorieSiteSchema()
+    schema = BibTypeSiteSchema()
     return schema.dump(res)
 
 
@@ -50,9 +50,7 @@ def get_sites():
     sort_label, sort_dir = get_sort(
         params=params, default_sort="id_base_site", default_direction="desc"
     )
-    query = TMonitoringSites.query.join(
-        BibCategorieSite, TMonitoringSites.id_categorie == BibCategorieSite.id_categorie
-    )
+    query = TMonitoringSites.query
     query = filter_params(query=query, params=params)
     query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
     return paginate(
