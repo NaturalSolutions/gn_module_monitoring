@@ -3,15 +3,15 @@ from geonature.core.admin.admin import CruvedProtectedMixin
 from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures, BibNomenclaturesTypes
 
-from gn_module_monitoring.monitoring.models import BibCategorieSite
+from gn_module_monitoring.monitoring.models import BibTypeSite
 
 
 SITE_TYPE = "TYPE_SITE"
 
 
-class BibCategorieSiteView(CruvedProtectedMixin, ModelView):
+class BibTypeSiteView(CruvedProtectedMixin, ModelView):
     """
-    Surcharge de l'administration des catégories de sites
+    Surcharge de l'administration des types de sites
     """
 
     module_code = "MONITORINGS"
@@ -19,7 +19,7 @@ class BibCategorieSiteView(CruvedProtectedMixin, ModelView):
 
     def __init__(self, session, **kwargs):
         # Référence au model utilisé
-        super(BibCategorieSiteView, self).__init__(BibCategorieSite, session, **kwargs)
+        super(BibTypeSiteView, self).__init__(BibTypeSite, session, **kwargs)
 
     def get_only_type_site_asc():
         return (
