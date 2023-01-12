@@ -2,6 +2,7 @@ from flask_admin.contrib.sqla import ModelView
 from geonature.core.admin.admin import CruvedProtectedMixin
 from geonature.utils.env import DB
 from pypnnomenclature.models import TNomenclatures, BibNomenclaturesTypes
+from wtforms.validators import ValidationError
 
 from gn_module_monitoring.monitoring.models import BibTypeSite
 
@@ -22,11 +23,9 @@ class BibTypeSiteView(CruvedProtectedMixin, ModelView):
         super(BibTypeSiteView, self).__init__(BibTypeSite, session, **kwargs)
 
     def get_only_nomenclature_asc():
-        subquery = DB.session.query(BibTypeSite.id_nomenclature).subquery()
         return (
             DB.session.query(TNomenclatures)
             .join(TNomenclatures.nomenclature_type)
-            .filter(TNomenclatures.id_nomenclature.notin_(subquery))
             .filter(BibNomenclaturesTypes.mnemonique == SITE_TYPE)
             .order_by(TNomenclatures.label_fr.asc())
         )
@@ -37,6 +36,10 @@ class BibTypeSiteView(CruvedProtectedMixin, ModelView):
     def list_label_nomenclature_formatter(view, _context, model, _name):
         return model.nomenclature.label_fr
 
+    def unique(form, field):
+        if BibTypeSite.query.filter_by(id_nomenclature=field.data.id_nomenclature).first() is not None:
+            raise ValidationError("The same nomenclature cannot be used twice")
+
     # Nom de colonne user friendly
     column_labels = dict(nomenclature="Types de site")
     # Description des colonnes
@@ -45,7 +48,7 @@ class BibTypeSiteView(CruvedProtectedMixin, ModelView):
     column_hide_backrefs = False
 
     form_args = dict(
-        nomenclature=dict(query_factory=get_only_nomenclature_asc, get_label=get_label_fr_nomenclature)
+        nomenclature=dict(query_factory=get_only_nomenclature_asc, get_label=get_label_fr_nomenclature, validators=[unique])
     )
 
     column_list = ("nomenclature","config")
