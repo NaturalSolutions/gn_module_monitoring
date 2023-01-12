@@ -10,6 +10,22 @@ from gn_module_monitoring.monitoring.models import BibTypeSite
 SITE_TYPE = "TYPE_SITE"
 
 
+class Unique:
+    """ validator that checks field uniqueness """
+    def __init__(self, model, field, message=None):
+        self.model = model
+        self.field = field
+        if not message:
+            message = u'A type is already created with this nomenclature'
+        self.message = message
+
+    def __call__(self, form, field):
+        if field.object_data == field.data:
+            return
+        if self.model.query.filter(getattr(self.model, self.field) == getattr(field.data, self.field)).first():
+            raise ValidationError(self.message)
+
+
 class BibTypeSiteView(CruvedProtectedMixin, ModelView):
     """
     Surcharge de l'administration des types de sites
@@ -36,19 +52,16 @@ class BibTypeSiteView(CruvedProtectedMixin, ModelView):
     def list_label_nomenclature_formatter(view, _context, model, _name):
         return model.nomenclature.label_fr
 
-    def unique(form, field):
-        if BibTypeSite.query.filter_by(id_nomenclature=field.data.id_nomenclature).first() is not None:
-            raise ValidationError("The same nomenclature cannot be used twice")
-
     # Nom de colonne user friendly
     column_labels = dict(nomenclature="Types de site")
     # Description des colonnes
-    column_descriptions = dict(nomenclature="Nomenclature de Type de site à choisir")
+    column_descriptions = dict(nomenclature="Nomenclature de type de site à choisir")
 
     column_hide_backrefs = False
 
     form_args = dict(
-        nomenclature=dict(query_factory=get_only_nomenclature_asc, get_label=get_label_fr_nomenclature, validators=[unique])
+        nomenclature=dict(query_factory=get_only_nomenclature_asc, get_label=get_label_fr_nomenclature,
+        validators=[Unique(BibTypeSite, "id_nomenclature")])
     )
 
     column_list = ("nomenclature","config")
