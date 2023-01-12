@@ -7,10 +7,24 @@ from gn_module_monitoring.monitoring.models import BibTypeSite
 
 @pytest.fixture
 def nomenclature_types_site():
-    return TNomenclatures.query.filter(
-        BibNomenclaturesTypes.mnemonique == "TYPE_SITE",
-        TNomenclatures.mnemonique.in_(("Grotte", "Mine")),
-    ).all()
+    mnemoniques = ("Test_Grotte", "Test_Mine")
+    nomenclatures = []
+    type_site = BibNomenclaturesTypes.query.filter(
+        BibNomenclaturesTypes.mnemonique == "TYPE_SITE"
+    ).first()
+    for mnemo in mnemoniques:
+        nomenclatures.append(
+            TNomenclatures(
+                id_type=type_site.id_type,
+                cd_nomenclature=mnemo,
+                label_default=mnemo,
+                label_fr=mnemo,
+                active=True,
+            )
+        )
+    with db.session.begin_nested():
+        db.session.add_all(nomenclatures)
+    return nomenclatures
 
 
 @pytest.fixture
