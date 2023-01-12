@@ -47,9 +47,7 @@ class MonitoringSitesSchema(SQLAlchemyAutoSchema):
 
 
 class BibTypeSiteSchema(SQLAlchemyAutoSchema):
-    site_type = fields.Nested(
-        NomenclatureSchema(only=("id_nomenclature", "label_fr")), many=True, dump_only=True
-    )
+    site_type = fields.Nested(NomenclatureSchema(only=("label_fr",)), dump_only=True)
 
     class Meta:
         model = BibTypeSite
