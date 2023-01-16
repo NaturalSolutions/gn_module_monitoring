@@ -60,8 +60,19 @@ class TestSite:
     def test_get_all_site_geometries(self, sites):
         r = self.client.get(url_for("monitorings.get_all_site_geometries"))
 
-        assert r.content_type == "application/protobuf"
-        assert len(r.data) > 0
+        json_resp = r.json
+        features = json_resp.get("features")
+        sites_values = list(sites.values())
+        assert r.content_type == "application/json"
+        assert json_resp.get("type") == "FeatureCollection"
+        assert len(features) >= len(sites_values)
+        for site in sites_values:
+            id_ = [
+                obj["properties"]
+                for obj in features
+                if obj["properties"]["base_site_name"] == site.base_site_name
+            ][0]["id_base_site"]
+            assert id_ == site.id_base_site
 
     def test_get_module_sites(self):
         module_code = "TEST"
