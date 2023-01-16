@@ -40,7 +40,9 @@ def upgrade():
         "ck_bib_type_site_id_nomenclature",
         "bib_type_site",
         f"{nomenclature_schema}.check_nomenclature_type_by_mnemonique(id_nomenclature,'TYPE_SITE')",
-        schema=monitorings_schema)
+        schema=monitorings_schema,
+    )
+
 
 def downgrade():
     op.drop_table("bib_type_site", schema=monitorings_schema)
