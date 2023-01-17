@@ -6,7 +6,7 @@ from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.monitoring.models import BibTypeSite, TMonitoringSites
 from gn_module_monitoring.utils.routes import (
     filter_params,
-    get_limit_offset,
+    get_limit_page,
     get_sort,
     paginate,
     sort,
@@ -17,7 +17,7 @@ from gn_module_monitoring.monitoring.schemas import MonitoringSitesSchema,BibTyp
 @blueprint.route("/sites/types", methods=["GET"])
 def get_types_site():
     params = MultiDict(request.args)
-    limit, page = get_limit_offset(params=params)
+    limit, page = get_limit_page(params=params)
     sort_label, sort_dir = get_sort(
         params=params, default_sort="id_nomenclature", default_direction="desc"
     )
@@ -45,7 +45,7 @@ def get_type_site_by_id(id_type_site):
 def get_sites():
     params = MultiDict(request.args)
     # TODO: add filter support
-    limit, page = get_limit_offset(params=params)
+    limit, page = get_limit_page(params=params)
     sort_label, sort_dir = get_sort(
         params=params, default_sort="id_base_site", default_direction="desc"
     )
