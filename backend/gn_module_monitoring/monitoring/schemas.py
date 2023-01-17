@@ -22,28 +22,24 @@ def paginate_schema(schema):
     return PaginationSchema
 
 
-class MonitoringSitesGroupsSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = TMonitoringSitesGroups
-        exclude = ("geom_geojson",)
-
-    geometry = fields.Method("serialize_geojson", dump_only=True)
-
-    def serialize_geojson(self, obj):
-        if obj.geom_geojson is not None:
-            return json.loads(obj.geom_geojson)
-
-
-class MonitoringSitesSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = TMonitoringSites
-        exclude = ("geom_geojson", "geom")
-
+class MonitoringGeometrySchema:
     geometry = fields.Method("serialize_geojson", dump_only=True)
 
     def serialize_geojson(self, obj):
         if obj.geom is not None:
             return geojson.dumps(obj.as_geofeature().get("geometry"))
+
+
+class MonitoringSitesGroupsSchema(SQLAlchemyAutoSchema, MonitoringGeometrySchema):
+    class Meta:
+        model = TMonitoringSitesGroups
+        exclude = ("geom_geojson", "geom")
+
+
+class MonitoringSitesSchema(SQLAlchemyAutoSchema, MonitoringGeometrySchema):
+    class Meta:
+        model = TMonitoringSites
+        exclude = ("geom_geojson", "geom")
 
 
 class BibTypeSiteSchema(SQLAlchemyAutoSchema):

@@ -247,7 +247,7 @@ class TMonitoringSites(TBaseSites):
         lazy="joined"
     )
 
-@serializable
+@geoserializable(geoCol="geom", idCol="id_sites_group")
 class TMonitoringSitesGroups(DB.Model):
     __tablename__ = 't_sites_groups'
     __table_args__ = {'schema': 'gn_monitoring'}
