@@ -116,29 +116,17 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     this._sites_service
       .getSitesGroups(offset, LIMIT, params)
       .subscribe((data: PaginatedSitesGroup) => {
+        // console.log(data)
         this.page = {count: data.count, limit: data.limit, offset: data.offset - 1}
-        this.sitesGroups = {
-          features: data.items.map((group) => {
-            let {
-              geometry,
-              properties,
-              ...others
-            } = group;
-            let result = {"geometry":geometry,"properties":properties,"type":"Feature"}
-            console.log("result",result)
-            console.log(group)
-            return result;
-          }),
-          type: "FeatureCollection",
-        };
+        this.sitesGroups = this._sites_service.setFormatToGeoJson(data)
         // console.log(this.sitesGroups);
-        this.getDataTable();
+        this.dataTable = this._sites_service.getDataTable(this.sitesGroups);
         this.listAllColName = this.colsTable();
         // console.log(this.listAllColName)
         this.columns = this.listAllColName;
         this.rows = this.dataTable;
-        console.log("rows", this.rows);
-        console.log("columns", this.columns);
+        // console.log("rows", this.rows);
+        // console.log("columns", this.columns);
         this.groupSiteId = this.sitesGroups.features[0].properties.id_sites_group;
         console.log("this.groupSiteId", this.groupSiteId);
         this.initObjectsStatus();
@@ -150,22 +138,6 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     this.getSites(e.offset + 1, this.filters)
   }
 
-  getDataTable() {
-    this.dataTable = this.sitesGroups.features.map((groupSite) => {
-      let {
-        comments,
-        data,
-        // geometry,
-        uuid_sites_group,
-        // type,
-        id_sites_group,
-        sites_group_description,
-        ...dataTable
-      } = groupSite.properties;
-      return dataTable;
-    });
-    //  console.log(this.dataTable)
-  }
 
   colsTable() {
     console.log(this.dataTable)
