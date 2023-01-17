@@ -61,7 +61,7 @@ class BibTypeSiteView(CruvedProtectedMixin, ModelView):
 
     form_args = dict(
         nomenclature=dict(query_factory=get_only_nomenclature_asc, get_label=get_label_fr_nomenclature,
-        validators=[Unique(BibTypeSite, "id_nomenclature")])
+        validators=[Unique(BibTypeSite, "id_nomenclature_type_site")])
     )
 
     column_list = ("nomenclature","config")
