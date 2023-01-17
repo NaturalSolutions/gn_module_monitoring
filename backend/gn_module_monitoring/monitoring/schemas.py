@@ -27,7 +27,12 @@ class MonitoringSitesGroupsSchema(SQLAlchemyAutoSchema):
         model = TMonitoringSitesGroups
         exclude = ("geom_geojson",)
 
+
     geometry = fields.Method("serialize_geojson", dump_only=True)
+    properties = fields.Method("group_properties_geojson")
+
+    def group_properties_geojson(self, obj):
+        return {field: getattr(obj,field) for field in self.fields.keys() if field not in ("geometry","properties")}
 
     def serialize_geojson(self, obj):
         if obj.geom_geojson is not None:

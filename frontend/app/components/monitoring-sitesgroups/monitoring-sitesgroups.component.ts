@@ -13,14 +13,13 @@ import { GeoJSON } from "leaflet";
 import { DatatableComponent } from "@swimlane/ngx-datatable";
 import { Subject } from "rxjs";
 import {debounceTime } from "rxjs/operators";
+import { Feature, FeatureCollection } from "geojson";
 
 const LIMIT = 10
-
-
-interface SitesGroups {
+interface SitesGroups{
   comments?: string;
   data?: any;
-  geom_geojson: any;
+  // geometry: any;
   id_sites_group: number;
   nb_sites: number;
   nb_visits: number;
@@ -30,6 +29,14 @@ interface SitesGroups {
   uuid_sites_group: string;
 }
 
+
+
+interface SitesGroupsExtended extends Omit<GeoJSON.Feature, "P"|"type"> {
+  // properties:Omit<SitesGroups,"geometry">;
+  properties:SitesGroups
+  type:string;
+}
+
 interface Page {
   count: number;
   limit: number;
@@ -37,7 +44,7 @@ interface Page {
 }
 
 interface PaginatedSitesGroup extends Page{
-  items: SitesGroups[];
+  items: SitesGroupsExtended[];
 }
 
 enum columnNameSiteGroup {
@@ -52,6 +59,13 @@ interface ColName {
   prop: string,
   description?: string,
 }
+
+
+interface CustomGeoJson {
+  type: "FeatureCollection";
+  features: SitesGroupsExtended[];
+}
+
 
 @Component({
   selector: "monitoring-sitesgroups",
@@ -87,7 +101,10 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   // Est ce qu'un simple boolean ne convient pas ?
   displayFilter:boolean = false;
 
-  sitesGroups: GeoJSON;
+  // sitesGroups: GeoJSON;
+
+  sitesGroups:CustomGeoJson;
+  // sitesGroups: any;
 
   constructor(private _sites_service: SitesService) {}
   ngOnInit() {
@@ -102,8 +119,15 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         this.page = {count: data.count, limit: data.limit, offset: data.offset - 1}
         this.sitesGroups = {
           features: data.items.map((group) => {
-            group["type"] = "Feature";
-            return group;
+            let {
+              geometry,
+              properties,
+              ...others
+            } = group;
+            let result = {"geometry":geometry,"properties":properties,"type":"Feature"}
+            console.log("result",result)
+            console.log(group)
+            return result;
           }),
           type: "FeatureCollection",
         };
@@ -115,7 +139,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         this.rows = this.dataTable;
         console.log("rows", this.rows);
         console.log("columns", this.columns);
-        this.groupSiteId = this.sitesGroups.features[0].id;
+        this.groupSiteId = this.sitesGroups.features[0].properties.id_sites_group;
         console.log("this.groupSiteId", this.groupSiteId);
         this.initObjectsStatus();
       });
@@ -131,19 +155,20 @@ export class MonitoringSitesGroupsComponent implements OnInit {
       let {
         comments,
         data,
-        geometry,
+        // geometry,
         uuid_sites_group,
-        type,
+        // type,
         id_sites_group,
         sites_group_description,
         ...dataTable
-      } = groupSite;
+      } = groupSite.properties;
       return dataTable;
     });
     //  console.log(this.dataTable)
   }
 
   colsTable() {
+    console.log(this.dataTable)
     const arr = Object.keys(this.dataTable[0]);
     console.log("arr", arr);
     const allColName: ColName[] = []
@@ -166,7 +191,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     objectsStatus["sites_groups"] = this.sitesGroups.features.map(
       (groupSite) => {
         return {
-          id: groupSite.id,
+          id: groupSite.properties.id_sites_group,
           selected: false,
           visible: true,
           current: false,
@@ -182,12 +207,12 @@ export class MonitoringSitesGroupsComponent implements OnInit {
       this.sitesGroups.features.forEach((f) => {
         // determination du site courrant
         let cur = false;
-        if (f.id == this.groupSiteId) {
+        if (f.properties.id_sites_group == this.groupSiteId) {
           cur = true;
         }
 
         objectsStatus["sites_groups"].push({
-          id: f.id,
+          id: f.properties.id_sites_group,
           selected: false,
           visible: true,
           current: cur,
@@ -207,8 +232,8 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     console.log("this.table", this.table);
     console.log(this.table._internalRows);
 
-    console.log("selected[0].id", selected[0].id);
-    const id = selected[0].id;
+    console.log("selected[0].id", selected[0].id_group_site);
+    const id = selected[0].id_group_site;
 
     if (!this.rowStatus) {
       return;
