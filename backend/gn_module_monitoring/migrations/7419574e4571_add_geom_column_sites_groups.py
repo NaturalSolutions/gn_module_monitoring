@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "7419574e4571"
-down_revision = "e64bafb13ce8"
+down_revision = "f24adb481f54"
 branch_labels = None
 depends_on = None
 
@@ -49,7 +49,6 @@ def upgrade():
         """
     )
     op.execute(statement)
-    op.alter_column("t_sites_groups", "geom", nullable=False, schema=monitorings_schema)
 
 
 def downgrade():
