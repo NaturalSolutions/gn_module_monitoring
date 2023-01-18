@@ -25,6 +25,8 @@ import { MonitoringFormComponent } from "./components/monitoring-form/monitoring
 import { MonitoringListComponent } from "./components/monitoring-lists/monitoring-lists.component";
 import { MonitoringPropertiesComponent } from "./components/monitoring-properties/monitoring-properties.component";
 import { MonitoringDatatableComponent } from "./components/monitoring-datatable/monitoring-datatable.component";
+import { MonitoringDatatableGComponent } from "./components/monitoring-datatable-g/monitoring-datatable-g.component";
+
 
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -33,6 +35,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatInputModule } from "@angular/material/input";
 import { MonitoringSitesGroupsComponent } from "./components/monitoring-sitesgroups/monitoring-sitesgroups.component";
 import { SitesService } from "./services/sites.service";
+import { DataTableService } from "./services/data-table.service";
 
 // my module routing
 const routes: Routes = [
@@ -73,6 +76,7 @@ const routes: Routes = [
     MonitoringPropertiesComponent,
     MonitoringDatatableComponent,
     MonitoringSitesGroupsComponent,
+    MonitoringDatatableGComponent
   ],
   imports: [
     GN2CommonModule,
@@ -97,6 +101,7 @@ const routes: Routes = [
     ConfigService,
     MonitoringObjectService,
     SitesService,
+    DataTableService
   ],
   bootstrap: [ModulesComponent],
   schemas: [
