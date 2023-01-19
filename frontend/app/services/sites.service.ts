@@ -26,7 +26,7 @@ interface SitesGroupsExtended extends Omit<GeoJSON.Feature, "P"|"type"> {
 interface Page {
   count: number;
   limit: number;
-  offset: number;
+  page: number;
 }
 
 interface PaginatedSitesGroup extends Page{
@@ -43,8 +43,8 @@ export class SitesService {
     private _cacheService: CacheService
   ) {}
 
-  getSitesGroups(offset=1, limit=10, params={}) {
-    return this._cacheService.request("get", `sites_groups`, {queryParams: {offset, limit, ...params}});
+  getSitesGroups(page=1, limit=10, params={}) {
+    return this._cacheService.request("get", `sites_groups`, {queryParams: {page, limit, ...params}});
   }
 
   setFormatToGeoJson(data:PaginatedSitesGroup):CustomGeoJson{

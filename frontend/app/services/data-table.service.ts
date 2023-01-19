@@ -5,7 +5,7 @@ import { Observable} from "rxjs";
 interface Page {
   count: number;
   limit: number;
-  offset: number;
+  page: number;
 }
 
 interface ColName {
@@ -31,13 +31,13 @@ objectsStatus:ItemsObjectTable;
 rowStatus:ItemObjectTable;
 idObj:number;
 
-public page: Page = {count: 0, limit: 0, offset: 0}; 
+public page: Page = {count: 0, limit: 0, page: 0}; 
   constructor(
   ) {}
 
   
-  setPaginationConfig(count:number=0,limit:number=0, offset:number=0):Page{
-    return {"count":count,"limit":limit,"offset":offset}
+  setPaginationConfig(count:number=0,limit:number=0, page:number=0):Page{
+    return {"count":count,"limit":limit,"page":page}
   }
 //   setPage(e){
 //     this.obj

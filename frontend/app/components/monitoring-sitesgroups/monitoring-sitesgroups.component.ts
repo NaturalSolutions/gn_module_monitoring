@@ -41,7 +41,7 @@ interface SitesGroupsExtended extends Omit<GeoJSON.Feature, "P"|"type"> {
 interface Page {
   count: number;
   limit: number;
-  offset: number;
+  page: number;
 }
 
 interface PaginatedSitesGroup extends Page{
@@ -69,7 +69,7 @@ interface CustomGeoJson {
 })
 export class MonitoringSitesGroupsComponent implements OnInit {
   @ViewChild(DatatableComponent) table: DatatableComponent;
-  @Input() page: Page = {count: 0, limit: 0, offset: 0}; 
+  @Input() page: Page = {count: 0, limit: 0, page: 0}; 
   @Input() dataTable;
   @Input() sitesGroups:CustomGeoJson;
   @Input() columnNameSiteGroup: typeof columnNameSiteGroup = columnNameSiteGroup;
@@ -82,11 +82,11 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     this.getSites()
   }
 
-  getSites(offset=1, params={}) {
+  getSites(page=1, params={}) {
     this._sites_service
-      .getSitesGroups(offset, LIMIT, params)
+      .getSitesGroups(page, LIMIT, params)
       .subscribe((data: PaginatedSitesGroup) => {
-        this.page = {count: data.count, limit: data.limit, offset: data.offset - 1}
+        this.page = {count: data.count, limit: data.limit, page: data.page - 1}
         this.sitesGroups = this._sites_service.setFormatToGeoJson(data)
         this.dataTable = this._sites_service.getDataTable(this.sitesGroups);
       });
@@ -95,7 +95,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
 
   setPage($event) {
     console.log('setPage Sitesgroups Components')
-    this.getSites($event.offset + 1, this.filters)
+    this.getSites($event.page + 1, this.filters)
   }
 
   onSortEvent(filters) {
