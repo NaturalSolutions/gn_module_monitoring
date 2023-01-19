@@ -1,39 +1,25 @@
 <div class="flex-container" id="object">
-<div id="geometry" class="monitoring-map-container" class="cadre">
-  <pnx-map height="80vh">
-    <pnx-geojson
-      [geojson]="sitesGroups"
-      [zoomOnLayer]="true"
-      [zoomOnFirstTime]="true"
-    ></pnx-geojson>
-  </pnx-map>
-</div>
-<div id="monitoring-elem-container" class="cadre scroll">
-  <!-- <pnx-monitoring-lists-new
+  <div id="geometry" class="monitoring-map-container" class="cadre">
+    <pnx-map height="80vh">
+      <pnx-geojson
+        [geojson]="sitesGroups"
+        [zoomOnLayer]="true"
+        [zoomOnFirstTime]="true"
+      ></pnx-geojson>
+    </pnx-map>
+  </div>
+  <div id="monitoring-elem-container" class="cadre scroll">
+    <!-- <pnx-monitoring-lists-new
   [(bEdit)]="bEdit"
 ></pnx-monitoring-lists-new> -->
-<pnx-monitoring-datatable-g
-[rows]="dataTable"
-[colsname]="columnNameSiteGroup"
-(onSort)="onSortEvent($event)"
-[page]="page"
-(onFilter)="onFilterEvent($event)"
-(onSetPage)="setPage($event)"
-[obj]="sitesGroups"
-></pnx-monitoring-datatable-g>
+    <pnx-monitoring-datatable-g
+      [rows]="sitesGroups"
+      [colsname]="columnNameSiteGroup"
+      (onSort)="onSortEvent($event)"
+      [page]="page"
+      (onFilter)="onFilterEvent($event)"
+      (onSetPage)="setPage($event)"
+      [obj]="sitesGroups"
+    ></pnx-monitoring-datatable-g>
+  </div>
 </div>
-</div>
-
-<!-- <pnx-monitoring-datatable-g
-*ngIf="childrenDataTable && childrenDataTable[childrenType]"
-(bEditChanged)="onbEditChanged($event)"
-[rows]="childrenDataTable[childrenType]['rows']"
-[columns]="childrenDataTable[childrenType]['columns']"
-[rowStatus]="objectsStatus[childrenType]"
-[frontendModuleMonitoringUrl]="frontendModuleMonitoringUrl"
-(rowStatusChange)="onSelectedChildren(childrenType, $event)"
-[child0]="child0"
-[obj]="obj"
-[sorts]="child0.configParam('sorts')"
-[currentUser]="currentUser"
-></pnx-monitoring-datatable-g> -->

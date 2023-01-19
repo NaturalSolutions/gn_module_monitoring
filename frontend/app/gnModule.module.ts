@@ -34,8 +34,8 @@ import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatSelectModule } from "@angular/material/select";
 import { MatInputModule } from "@angular/material/input";
 import { MonitoringSitesGroupsComponent } from "./components/monitoring-sitesgroups/monitoring-sitesgroups.component";
-import { SitesService } from "./services/sites.service";
 import { DataTableService } from "./services/data-table.service";
+import { SitesGroupService } from "./services/sites_group.service";
 
 // my module routing
 const routes: Routes = [
@@ -100,8 +100,8 @@ const routes: Routes = [
     DataUtilsService,
     ConfigService,
     MonitoringObjectService,
-    SitesService,
-    DataTableService
+    DataTableService,
+    SitesGroupService,
   ],
   bootstrap: [ModulesComponent],
   schemas: [

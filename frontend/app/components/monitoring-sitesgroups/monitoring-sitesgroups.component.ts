@@ -1,113 +1,62 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  ViewChild,
-  SimpleChanges,
-} from "@angular/core";
-import { SitesService } from "../../services/sites.service";
-import { GeoJSON } from "leaflet";
+import { Component, OnInit, Input } from "@angular/core";
+import { SitesGroupService } from "../../services/sites_group.service";
+import { MonitoringSitesGroup } from "../../class/monitoring-sites-group";
+import { Page, Paginated } from "../../interfaces/page";
 
-import { DatatableComponent } from "@swimlane/ngx-datatable";
-import { Subject } from "rxjs";
-import {debounceTime } from "rxjs/operators";
-import { Feature, FeatureCollection } from "geojson";
-import { DataTableService } from "../../services/data-table.service";
-
-const LIMIT = 10
-interface SitesGroups{
-  comments?: string;
-  data?: any;
-  // geometry: any;
-  id_sites_group: number;
-  nb_sites: number;
-  nb_visits: number;
-  sites_group_code: string;
-  sites_group_description?: string;
-  sites_group_name: string;
-  uuid_sites_group: string;
-}
-
-
-
-interface SitesGroupsExtended extends Omit<GeoJSON.Feature, "P"|"type"> {
-  // properties:Omit<SitesGroups,"geometry">;
-  properties:SitesGroups
-  type:string;
-}
-
-interface Page {
-  count: number;
-  limit: number;
-  page: number;
-}
-
-interface PaginatedSitesGroup extends Page{
-  items: SitesGroupsExtended[];
-}
+const LIMIT = 10;
 
 enum columnNameSiteGroup {
+  sites_group_name = "Nom",
   nb_sites = "Nb. sites",
   nb_visits = "Nb. visites",
   sites_group_code = "Code",
-  sites_group_name = "Nom",
 }
 
-interface CustomGeoJson {
-  type: "FeatureCollection";
-  features: SitesGroupsExtended[];
-}
-
-
-
- @Component({
+@Component({
   selector: "monitoring-sitesgroups",
   templateUrl: "./monitoring-sitesgroups.component.html",
   styleUrls: ["./monitoring-sitesgroups.component.css"],
 })
 export class MonitoringSitesGroupsComponent implements OnInit {
-  @ViewChild(DatatableComponent) table: DatatableComponent;
-  @Input() page: Page = {count: 0, limit: 0, page: 0}; 
-  @Input() dataTable;
-  @Input() sitesGroups:CustomGeoJson;
-  @Input() columnNameSiteGroup: typeof columnNameSiteGroup = columnNameSiteGroup;
+  @Input() page: Page;
+  @Input() sitesGroups: MonitoringSitesGroup[];
+  @Input() columnNameSiteGroup: typeof columnNameSiteGroup =
+    columnNameSiteGroup;
 
- 
   filters = {};
 
-  constructor(private _sites_service: SitesService, private _dataTableService: DataTableService) {}
+  constructor(private _sites_group_service: SitesGroupService) {}
   ngOnInit() {
-    this.getSites()
+    this.getSitesGroups();
   }
 
-  getSites(page=1, params={}) {
-    this._sites_service
-      .getSitesGroups(page, LIMIT, params)
-      .subscribe((data: PaginatedSitesGroup) => {
-        this.page = {count: data.count, limit: data.limit, page: data.page - 1}
-        this.sitesGroups = this._sites_service.setFormatToGeoJson(data)
-        this.dataTable = this._sites_service.getDataTable(this.sitesGroups);
+  getSitesGroups(page = 1, params = {}) {
+    this._sites_group_service
+      .get(page, LIMIT, params)
+      .subscribe((data: Paginated<MonitoringSitesGroup>) => {
+        this.page = {
+          count: data.count,
+          limit: data.limit,
+          page: data.page - 1,
+        };
+        this.sitesGroups = data.items;
       });
-      
   }
 
   setPage($event) {
-    console.log('setPage Sitesgroups Components')
-    this.getSites($event.page + 1, this.filters)
+    console.log("setPage Sitesgroups Components");
+    this.getSitesGroups($event.page + 1, this.filters);
   }
 
   onSortEvent(filters) {
-    console.log("onSortEvent sitegroups component, filters",filters)
-    this.filters = filters
-    this.getSites(1, this.filters)
+    console.log("onSortEvent sitegroups component, filters", filters);
+    this.filters = filters;
+    this.getSitesGroups(1, this.filters);
   }
 
-  onFilterEvent(filters){
-    console.log("onFilterEvent sitegroups component, filters",filters)
-    this.filters = filters
-    this.getSites(1, this.filters)
+  onFilterEvent(filters) {
+    console.log("onFilterEvent sitegroups component, filters", filters);
+    this.filters = filters;
+    this.getSitesGroups(1, this.filters);
   }
-
 }

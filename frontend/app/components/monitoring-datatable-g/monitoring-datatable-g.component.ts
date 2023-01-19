@@ -9,16 +9,14 @@ import {
   SimpleChanges,
   TemplateRef,
 } from "@angular/core";
-import { Router } from "@angular/router";
-import { MonitoringObjectService } from "./../../services/monitoring-object.service";
 import { Subject } from "rxjs";
-import { catchError, map, tap, take, debounceTime } from "rxjs/operators";
+import { debounceTime } from "rxjs/operators";
 import { DataTableService } from "../../services/data-table.service";
 
 interface ColName {
-  name: string,
-  prop: string,
-  description?: string,
+  name: string;
+  prop: string;
+  description?: string;
 }
 
 interface Page {
@@ -28,13 +26,12 @@ interface Page {
 }
 
 interface ItemObjectTable {
-  id:number|null;
-  selected:boolean;
-  visible:boolean;
-  current:boolean;
-  }
-  type ItemsObjectTable = { [key: string]: ItemObjectTable }
-
+  id: number | null;
+  selected: boolean;
+  visible: boolean;
+  current: boolean;
+}
+type ItemsObjectTable = { [key: string]: ItemObjectTable };
 
 @Component({
   selector: "pnx-monitoring-datatable-g",
@@ -43,8 +40,8 @@ interface ItemObjectTable {
 })
 export class MonitoringDatatableGComponent implements OnInit {
   @Input() rows;
-  @Input() colsname:ColName[];
-  @Input() page: Page = {count: 0, limit: 0, offset: 0}; ;
+  @Input() colsname: ColName[];
+  @Input() page: Page = { count: 0, limit: 0, offset: 0 };
   @Input() obj;
 
   @Input() rowStatus: Array<any>;
@@ -55,19 +52,18 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Input() currentUser;
 
   @Output() onSort = new EventEmitter<any>();
-  @Output() onFilter= new EventEmitter<any>();
-  @Output() onSetPage= new EventEmitter<any>();
+  @Output() onFilter = new EventEmitter<any>();
+  @Output() onSetPage = new EventEmitter<any>();
 
   private filterSubject: Subject<string> = new Subject();
   private subscription: any;
-  displayFilter:boolean = false;
-  objectsStatus:ItemsObjectTable;
+  displayFilter: boolean = false;
+  objectsStatus: ItemsObjectTable;
 
   columns;
   row_save;
   selected = [];
   filters = {};
-  customColumnComparator;
 
   @ViewChild(DatatableComponent) table: DatatableComponent;
   @ViewChild("actionsTemplate") actionsTemplate: TemplateRef<any>;
@@ -76,52 +72,51 @@ export class MonitoringDatatableGComponent implements OnInit {
   constructor(private _dataTableService: DataTableService) {}
 
   ngOnInit() {
-    console.log('DataTableComponent colname',this.colsname)
-    console.log('DataTableComponent rows',this.rows)
-    // console.log('DataTableComponent obj',this.obj)
+    console.log("DataTableComponent colname", this.colsname);
+    console.log("DataTableComponent rows", this.rows);
     this.initDatatable();
   }
 
   initDatatable() {
-    console.log("Inside initDatatable")
-    console.log("this.rows",this.rows)
+    console.log("Inside initDatatable");
+    console.log("this.rows", this.rows);
     this.filters = {};
     this.filterSubject.pipe(debounceTime(500)).subscribe(() => {
       this.filter();
     });
   }
 
-
   onSortEvent($event) {
-    console.log("onSortEvent, $event",$event)
-    this.filters = {...this.filters, sort: $event.column.prop, sort_dir: $event.newValue}
-    console.log("onSortEvent, this.filters", this.filters)
-    this.onSort.emit(this.filters)
+    console.log("onSortEvent, $event", $event);
+    this.filters = {
+      ...this.filters,
+      sort: $event.column.prop,
+      sort_dir: $event.newValue,
+    };
+    console.log("onSortEvent, this.filters", this.filters);
+    this.onSort.emit(this.filters);
   }
 
   setPage($event) {
-    this.onSetPage.emit($event)  
-    // this.getSites(e.offset + 1, this.filters)
+    this.onSetPage.emit($event);
   }
 
   filterInput($event) {
-    console.log("filterInput, $event",$event)
+    console.log("filterInput, $event", $event);
     this.filterSubject.next();
   }
 
-  // sort() {}
-
   filter(bInitFilter = false) {
     // filter all
-    console.log("Inside DataTable-G , filter()", this.filters)
-    const oldFilters = this.filters
-    this.filters = Object.keys(oldFilters).reduce(function(r, e) {
-      if (![undefined, "", null].includes(oldFilters[e])) r[e] = oldFilters[e]
+    console.log("Inside DataTable-G , filter()", this.filters);
+    const oldFilters = this.filters;
+    this.filters = Object.keys(oldFilters).reduce(function (r, e) {
+      if (![undefined, "", null].includes(oldFilters[e])) r[e] = oldFilters[e];
       return r;
-    }, {})
-    this.onFilter.emit(this.filters)
+    }, {});
+    this.onFilter.emit(this.filters);
   }
-    
+
   onSelectEvent({ selected }) {
     console.log("Select Row", selected, this.selected);
     console.log("this.table", this.table);
@@ -180,17 +175,23 @@ export class MonitoringDatatableGComponent implements OnInit {
   //     : column.name;
   // }
 
-
   ngOnChanges(changes: SimpleChanges) {
     console.log("inside ngOnChanges");
-    console.log("changes",changes)
-    if (changes['rows'] && this.rows) {
-    this.columns = this._dataTableService.colsTable(this.colsname,this.rows);
+    console.log("changes", changes);
+    if (changes["rows"] && this.rows) {
+      this.columns = this._dataTableService.colsTable(
+        this.colsname,
+        this.rows[0]
+      );
     }
 
-    if (changes['obj'] && this.obj) {
-      this.objectsStatus,this.rowStatus=this._dataTableService.initObjectsStatus(this.obj,"sites_groups")
-      }
+    if (changes["obj"] && this.obj) {
+      this.objectsStatus,
+        (this.rowStatus = this._dataTableService.initObjectsStatus(
+          this.obj,
+          "sites_groups"
+        ));
+    }
     for (const propName of Object.keys(changes)) {
       const chng = changes[propName];
       const cur = chng.currentValue;
@@ -198,11 +199,11 @@ export class MonitoringDatatableGComponent implements OnInit {
       switch (propName) {
         case "rowStatus":
           this.setSelected();
-          break
+          break;
       }
     }
   }
-  navigateToAddChildren(_,rowId){
-    console.log("Inside navigateToAddChildren:",rowId)
+  navigateToAddChildren(_, rowId) {
+    console.log("Inside navigateToAddChildren:", rowId);
   }
 }
