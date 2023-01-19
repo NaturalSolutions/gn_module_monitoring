@@ -1,6 +1,20 @@
 import { ISitesGroup, JsonData } from "../interfaces/geom";
 import { GeoJSON } from "geojson";
 
+export enum columnNameSiteGroup {
+  sites_group_name = "Nom",
+  nb_sites = "Nb. sites",
+  nb_visits = "Nb. visites",
+  sites_group_code = "Code",
+}
+
+export const extendedDetailsSiteGroup = {
+  ...columnNameSiteGroup,
+  comments: "Commentaires",
+  sites_group_description: "Description",
+};
+// export type detailsSiteGroups = columnNameSiteGroup | extendedDetailsSiteGroup
+
 export class MonitoringSitesGroup implements ISitesGroup {
   id_sites_group: number;
   sites_group_name: string;

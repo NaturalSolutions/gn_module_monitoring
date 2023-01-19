@@ -1,16 +1,16 @@
 import { Component, OnInit, Input } from "@angular/core";
+import { LocationStrategy } from "@angular/common";
 import { SitesGroupService } from "../../services/sites_group.service";
-import { MonitoringSitesGroup } from "../../class/monitoring-sites-group";
+import {
+  MonitoringSitesGroup,
+  columnNameSiteGroup,
+} from "../../class/monitoring-sites-group";
 import { Page, Paginated } from "../../interfaces/page";
+import {
+  Router
+} from "@angular/router";
 
 const LIMIT = 10;
-
-enum columnNameSiteGroup {
-  sites_group_name = "Nom",
-  nb_sites = "Nb. sites",
-  nb_visits = "Nb. visites",
-  sites_group_code = "Code",
-}
 
 @Component({
   selector: "monitoring-sitesgroups",
@@ -22,10 +22,21 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   @Input() sitesGroups: MonitoringSitesGroup[];
   @Input() columnNameSiteGroup: typeof columnNameSiteGroup =
     columnNameSiteGroup;
-
+  @Input() sitesGroupsSelected: MonitoringSitesGroup;
   filters = {};
+  displayDetails: boolean = false;
+  path: string;
 
-  constructor(private _sites_group_service: SitesGroupService) {}
+  constructor(
+    private _sites_group_service: SitesGroupService,
+    private router: Router,
+    private location: LocationStrategy
+  ) {
+    this.path = this.router.url;
+    this.location.onPopState(() => {
+      if (this.location.path() === this.path) this.displayDetails = false;
+    });
+  }
   ngOnInit() {
     this.getSitesGroups();
   }
@@ -58,5 +69,18 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     console.log("onFilterEvent sitegroups component, filters", filters);
     this.filters = filters;
     this.getSitesGroups(1, this.filters);
+  }
+
+  seeDetails($event) {
+    console.log("seeDetails", $event);
+    if ($event) {
+      this.displayDetails = true;
+      this.sitesGroupsSelected = $event;
+      this.router.navigate([
+        "/monitorings/sites_groups",
+        $event.id_sites_group,
+      ]);
+      console.log(this.sitesGroupsSelected);
+    }
   }
 }

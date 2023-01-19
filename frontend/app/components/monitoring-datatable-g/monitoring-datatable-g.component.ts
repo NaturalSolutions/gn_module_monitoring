@@ -54,6 +54,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Output() onSort = new EventEmitter<any>();
   @Output() onFilter = new EventEmitter<any>();
   @Output() onSetPage = new EventEmitter<any>();
+  @Output() onDetailsRow = new EventEmitter<any>();
 
   private filterSubject: Subject<string> = new Subject();
   private subscription: any;
@@ -205,5 +206,9 @@ export class MonitoringDatatableGComponent implements OnInit {
   }
   navigateToAddChildren(_, rowId) {
     console.log("Inside navigateToAddChildren:", rowId);
+  }
+  navigateToDetail(row) {
+    console.log("Inside navigateToDetail:", row);
+    this.onDetailsRow.emit(row);
   }
 }

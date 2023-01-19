@@ -12,14 +12,21 @@
     <!-- <pnx-monitoring-lists-new
   [(bEdit)]="bEdit"
 ></pnx-monitoring-lists-new> -->
-    <pnx-monitoring-datatable-g
-      [rows]="sitesGroups"
-      [colsname]="columnNameSiteGroup"
-      (onSort)="onSortEvent($event)"
-      [page]="page"
-      (onFilter)="onFilterEvent($event)"
-      (onSetPage)="setPage($event)"
-      [obj]="sitesGroups"
-    ></pnx-monitoring-datatable-g>
+    <div *ngIf="displayDetails">
+      <pnx-monitoring-properties-g [selectedObj]="sitesGroupsSelected">
+      </pnx-monitoring-properties-g>
+    </div>
+    <div *ngIf="!displayDetails">
+      <pnx-monitoring-datatable-g
+        [rows]="sitesGroups"
+        [colsname]="columnNameSiteGroup"
+        (onSort)="onSortEvent($event)"
+        [page]="page"
+        (onFilter)="onFilterEvent($event)"
+        (onSetPage)="setPage($event)"
+        [obj]="sitesGroups"
+        (onDetailsRow)="seeDetails($event)"
+      ></pnx-monitoring-datatable-g>
+    </div>
   </div>
 </div>

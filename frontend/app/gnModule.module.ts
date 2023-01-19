@@ -27,7 +27,6 @@ import { MonitoringPropertiesComponent } from "./components/monitoring-propertie
 import { MonitoringDatatableComponent } from "./components/monitoring-datatable/monitoring-datatable.component";
 import { MonitoringDatatableGComponent } from "./components/monitoring-datatable-g/monitoring-datatable-g.component";
 
-
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
@@ -36,6 +35,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MonitoringSitesGroupsComponent } from "./components/monitoring-sitesgroups/monitoring-sitesgroups.component";
 import { DataTableService } from "./services/data-table.service";
 import { SitesGroupService } from "./services/sites_group.service";
+import { MonitoringPropertiesGComponent } from "./components/monitoring-properties-g/monitoring-properties-g.component";
 
 // my module routing
 const routes: Routes = [
@@ -60,6 +60,12 @@ const routes: Routes = [
   {
     path: "sites_groups",
     component: MonitoringSitesGroupsComponent,
+    children: [
+      {
+        path: ":id",
+        component: MonitoringPropertiesGComponent,
+      },
+    ],
   },
 ];
 
@@ -76,7 +82,8 @@ const routes: Routes = [
     MonitoringPropertiesComponent,
     MonitoringDatatableComponent,
     MonitoringSitesGroupsComponent,
-    MonitoringDatatableGComponent
+    MonitoringDatatableGComponent,
+    MonitoringPropertiesGComponent,
   ],
   imports: [
     GN2CommonModule,
