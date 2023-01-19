@@ -1,12 +1,11 @@
 import { GeoJSON } from "geojson";
 import { Observable } from "rxjs";
-import { Paginated } from "./page";
-
-export type JsonData = { [key: string]: any };
+import { JsonData } from "../types/jsondata";
+import { IPaginated } from "./page";
 
 export interface IGeomObject {
   data: JsonData;
-  geometry: GeoJSON.FeatureCollection;
+  geometry: GeoJSON.Geometry;
 }
 
 export interface ISitesGroup extends IGeomObject {
@@ -41,7 +40,7 @@ export interface IGeomService {
     limit: number,
     page: number,
     params: JsonData
-  ): Observable<Paginated<IGeomObject>>;
+  ): Observable<IPaginated<IGeomObject>>;
   // get_geometries(): GeoJson
   // create(obj: IGeomObject)
   // patch(obj: IGeomObject)

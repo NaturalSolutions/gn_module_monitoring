@@ -1,9 +1,9 @@
-export interface Page {
+export interface IPage {
   count: number;
   limit: number;
   page: number;
 }
 
-export interface Paginated<T> extends Page {
+export interface IPaginated<T> extends IPage {
   items: T[];
 }

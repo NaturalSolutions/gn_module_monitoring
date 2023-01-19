@@ -8,9 +8,9 @@ import {
 } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import {
-  MonitoringSitesGroup,
   extendedDetailsSiteGroup,
 } from "../../class/monitoring-sites-group";
+import { ISitesGroup } from "../../interfaces/geom";
 
 @Component({
   selector: "pnx-monitoring-properties-g",
@@ -18,7 +18,7 @@ import {
   styleUrls: ["./monitoring-properties-g.component.css"],
 })
 export class MonitoringPropertiesGComponent implements OnInit {
-  @Input() selectedObj: MonitoringSitesGroup;
+  @Input() selectedObj: ISitesGroup;
   @Input() bEdit: boolean;
   @Output() bEditChange = new EventEmitter<boolean>();
 
@@ -28,7 +28,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   infosColsSiteGroups: typeof extendedDetailsSiteGroup =
     extendedDetailsSiteGroup;
   color: string = "white";
-  dataDetails: MonitoringSitesGroup;
+  dataDetails: ISitesGroup;
 
   datasetForm = new FormControl();
   bUpdateSyntheseSpinner = false;

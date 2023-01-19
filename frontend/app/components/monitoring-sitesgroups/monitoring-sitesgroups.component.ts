@@ -1,10 +1,9 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { SitesGroupService } from "../../services/sites_group.service";
 import {
-  MonitoringSitesGroup,
   columnNameSiteGroup,
 } from "../../class/monitoring-sites-group";
-import { Page, Paginated } from "../../interfaces/page";
+import { IPaginated, IPage } from "../../interfaces/page";
 import {
   Router,
   Event,
@@ -13,8 +12,9 @@ import {
   NavigationError,
   ActivatedRoute,
 } from "@angular/router";
-import { MonitoringSite, columnNameSite } from "../../class/monitoring-site";
+import { columnNameSite } from "../../class/monitoring-site";
 import { Subscription } from "rxjs";
+import { ISite, ISitesGroup } from "../../interfaces/geom";
 
 const LIMIT = 10;
 
@@ -24,13 +24,13 @@ const LIMIT = 10;
   styleUrls: ["./monitoring-sitesgroups.component.css"],
 })
 export class MonitoringSitesGroupsComponent implements OnInit {
-  @Input() page: Page;
-  @Input() sitesGroups: MonitoringSitesGroup[];
-  @Input() sitesChild: MonitoringSite[];
+  @Input() page: IPage;
+  @Input() sitesGroups: ISitesGroup[];
+  @Input() sitesChild: ISite[];
   @Input() columnNameSiteGroup: typeof columnNameSiteGroup =
     columnNameSiteGroup;
   @Input() columnNameSite: typeof columnNameSite = columnNameSite;
-  @Input() sitesGroupsSelected: MonitoringSitesGroup;
+  @Input() sitesGroupsSelected: ISitesGroup;
 
   @Input() rows;
   @Input() colsname;
@@ -108,7 +108,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   getSitesGroups(page = 1, params = {}) {
     this._sites_group_service
       .get(page, LIMIT, params)
-      .subscribe((data: Paginated<MonitoringSitesGroup>) => {
+      .subscribe((data: IPaginated<ISitesGroup>) => {
         this.page = {
           count: data.count,
           limit: data.limit,
@@ -125,7 +125,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   getSitesGroupsById(page = 1, params = {}) {
     this._sites_group_service
       .get(page, LIMIT, params)
-      .subscribe((data: Paginated<MonitoringSitesGroup>) => {
+      .subscribe((data: IPaginated<ISitesGroup>) => {
         this.page = {
           count: data.count,
           limit: data.limit,
@@ -140,7 +140,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     console.log(params);
     this._sites_group_service
       .getSitesChild(page, LIMIT, params)
-      .subscribe((data: Paginated<MonitoringSite>) => {
+      .subscribe((data: IPaginated<ISite>) => {
         this.page = {
           count: data.count,
           limit: data.limit,

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Column } from "../interfaces/column";
+import { IColumn } from "../interfaces/column";
 
 interface ItemObjectTable {
   id: number | null;
@@ -19,9 +19,9 @@ export class DataTableService {
 
   constructor() {}
 
-  colsTable(colName, dataTable): Column[] {
+  colsTable(colName, dataTable): IColumn[] {
     const arr = Object.keys(colName);
-    const allColumn: Column[] = arr
+    const allColumn: IColumn[] = arr
       .filter((item) => Object.keys(dataTable).includes(item))
       .map((elm) => ({
         name: colName[elm],
