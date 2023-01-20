@@ -36,6 +36,8 @@ import { MonitoringSitesGroupsComponent } from "./components/monitoring-sitesgro
 import { DataTableService } from "./services/data-table.service";
 import { SitesGroupService } from "./services/sites_group.service";
 import { MonitoringPropertiesGComponent } from "./components/monitoring-properties-g/monitoring-properties-g.component";
+import { SitesService } from "./services/sites.service";
+// import { RoutingService } from "./services/routing.service";
 
 // my module routing
 const routes: Routes = [
@@ -109,6 +111,8 @@ const routes: Routes = [
     MonitoringObjectService,
     DataTableService,
     SitesGroupService,
+    SitesService,
+    // RoutingService
   ],
   bootstrap: [ModulesComponent],
   schemas: [

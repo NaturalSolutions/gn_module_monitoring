@@ -1,81 +1,31 @@
 import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+// import { GeoJSON } from "geojson";
 
 import { CacheService } from "./cache.service";
-import { ConfigService } from "./config.service";
-import { HttpClient } from "@angular/common/http";
-import { GeoJSON } from "leaflet";
-interface SitesGroups{
-  comments?: string;
-  data?: any;
-  // geometry: any;
-  id_sites_group: number;
-  nb_sites: number;
-  nb_visits: number;
-  sites_group_code: string;
-  sites_group_description?: string;
-  sites_group_name: string;
-  uuid_sites_group: string;
-}
-
-interface SitesGroupsExtended extends Omit<GeoJSON.Feature, "P"|"type"> {
-  // properties:Omit<SitesGroups,"geometry">;
-  properties:SitesGroups
-  type:string;
-}
-
-interface Page {
-  count: number;
-  limit: number;
-  page: number;
-}
-
-interface PaginatedSitesGroup extends Page{
-  items: SitesGroupsExtended[];
-}
-interface CustomGeoJson {
-  type: "FeatureCollection";
-  features: SitesGroupsExtended[];
-}
+import { IGeomService, JsonData, ISite } from "../interfaces/geom";
+import { Paginated } from "../interfaces/page";
+import { MonitoringSite } from "../class/monitoring-site";
 
 @Injectable()
-export class SitesService {
-  constructor(
-    private _cacheService: CacheService
-  ) {}
+export class SitesService implements IGeomService {
+  constructor(private _cacheService: CacheService) {}
 
-  getSitesGroups(page=1, limit=10, params={}) {
-    return this._cacheService.request("get", `sites_groups`, {queryParams: {page, limit, ...params}});
+  get(
+    page: number = 1,
+    limit: number = 10,
+    params: JsonData = {}
+  ): Observable<Paginated<MonitoringSite>> {
+    return this._cacheService
+      .request<Observable<Paginated<ISite>>>("get", `sites`, {
+        queryParams: { page, limit, ...params },
+      })
+      .pipe(
+        map((response: Paginated<ISite>) => ({
+          ...response,
+          items: response.items.map((item: ISite) => item as MonitoringSite),
+        }))
+      );
   }
-
-  setFormatToGeoJson(data:PaginatedSitesGroup):CustomGeoJson{
-    return {
-      features: data.items.map((group) => {
-        let {
-          geometry,
-          properties,
-          ..._
-        } = group;
-        let result = {"geometry":geometry,"properties":properties,"type":"Feature"}
-        console.log("result",result)
-        console.log(group)
-        return result;
-      }),
-      type: "FeatureCollection",
-    };
-  }
-
-  getDataTable(data:CustomGeoJson) {
-    return data.features.map((groupSite) => {
-      let {
-        comments,
-        data,
-        uuid_sites_group,
-        id_sites_group,
-        sites_group_description,
-        ...dataTable
-      } = groupSite.properties;
-      return dataTable;
-    });
-  }
-
 }

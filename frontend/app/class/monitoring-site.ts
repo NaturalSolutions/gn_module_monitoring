@@ -1,6 +1,19 @@
 import { ISite, JsonData } from "../interfaces/geom";
 import { GeoJSON } from "geojson";
 
+export enum columnNameSite{
+  base_site_name = "Nom",
+  last_visit = "Dernière visite",
+  nb_visits = "Nb. visites",
+  base_site_code = "Code",
+  altitude_max = "Alt.max",
+  altitude_min = "Alt.min"
+}
+
+export const extendedDetailsSite= {
+  ...columnNameSite,
+  base_site_description: "Description",
+};
 export class MonitoringSite implements ISite {
   altitude_max: number;
   altitude_min: number;
