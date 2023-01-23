@@ -63,9 +63,17 @@ def get_sites():
 
 @blueprint.route("/sites/geometries", methods=["GET"])
 def get_all_site_geometries():
-    subquery = TMonitoringSites.query.with_entities(
-        TMonitoringSites.id_base_site, TMonitoringSites.base_site_name, TMonitoringSites.geom
-    ).subquery()
+    params = MultiDict(request.args)
+    subquery = (
+        TMonitoringSites.query.with_entities(
+            TMonitoringSites.id_base_site,
+            TMonitoringSites.base_site_name,
+            TMonitoringSites.geom,
+            TMonitoringSites.id_sites_group,
+        )
+        .filter_by_params(params)
+        .subquery()
+    )
 
     result = geojson_query(subquery)
 
