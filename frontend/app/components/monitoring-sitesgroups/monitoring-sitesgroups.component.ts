@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
+import { GeoJSON } from "geojson";
 import { SitesGroupService } from "../../services/sites_group.service";
 import {
   columnNameSiteGroup,
@@ -15,6 +16,7 @@ import {
 import { columnNameSite } from "../../class/monitoring-site";
 import { Subscription } from "rxjs";
 import { ISite, ISitesGroup } from "../../interfaces/geom";
+import { SitesService } from "../../services/sites.service";
 
 const LIMIT = 10;
 
@@ -41,11 +43,13 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   path: string;
   currentRoute: string = "";
   id: string | null;
+  geojson: GeoJSON.FeatureCollection;
 
   private routerSubscription: Subscription;
 
   constructor(
     private _sites_group_service: SitesGroupService,
+    private _sites_service: SitesService,
     private router: Router,
     private _Activatedroute: ActivatedRoute
   ) // private _routingService: RoutingService
@@ -122,6 +126,22 @@ export class MonitoringSitesGroupsComponent implements OnInit {
       });
   }
 
+  getSitesGroupsGeometries(params = {}) {
+    this._sites_group_service
+      .get_geometries(params)
+      .subscribe((data: GeoJSON.FeatureCollection) => {
+        this.geojson = data
+      })
+  }
+
+  getSitesGroupsChildGeometries(params = {}) {
+    this._sites_service
+      .get_geometries(params)
+      .subscribe((data: GeoJSON.FeatureCollection) => {
+        this.geojson = data
+      })
+  }
+
   getSitesGroupsById(page = 1, params = {}) {
     this._sites_group_service
       .get(page, LIMIT, params)
@@ -166,7 +186,9 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         (params = { id_sites_group: this.id })
       );
       this.getSitesGroupsChild(page, params);
+      this.getSitesGroupsChildGeometries({ id_sites_group: this.id})
     } else {
+      this.getSitesGroupsGeometries(params)
       this.getSitesGroups(page, params);
     }
     // });

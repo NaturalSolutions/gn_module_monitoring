@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { GeoJSON } from "geojson"
 
 import { CacheService } from "./cache.service";
 import { IGeomService, ISite } from "../interfaces/geom";
@@ -23,4 +24,15 @@ export class SitesService implements IGeomService {
       }
     );
   }
+
+  get_geometries(params: JsonData = {}): Observable<GeoJSON.FeatureCollection> {
+    return this._cacheService.request<Observable<GeoJSON.FeatureCollection>>(
+      "get",
+      "/sites/geometries",
+      {
+        queryParams: { ...params },
+      }
+    );
+  }
+  
 }
