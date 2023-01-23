@@ -19,3 +19,8 @@ def sites_groups():
 @pytest.fixture
 def site_group_with_sites(sites_groups):
     return sites_groups["Site_Groupe"]
+
+
+@pytest.fixture
+def site_group_without_sites(sites_groups):
+    return sites_groups["Site_eolien"]

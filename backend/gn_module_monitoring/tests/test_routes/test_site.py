@@ -74,6 +74,17 @@ class TestSite:
             ][0]["id_base_site"]
             assert id_ == site.id_base_site
 
+    def test_get_all_site_geometries_filter_site_group(self, sites, site_group_without_sites):
+        r = self.client.get(
+            url_for(
+                "monitorings.get_all_site_geometries",
+                id_sites_group=site_group_without_sites.id_sites_group,
+            )
+        )
+        json_resp = r.json
+        features = json_resp.get("features")
+        assert features is None
+
     def test_get_module_sites(self):
         module_code = "TEST"
         r = self.client.get(url_for("monitorings.get_module_sites", module_code=module_code))
