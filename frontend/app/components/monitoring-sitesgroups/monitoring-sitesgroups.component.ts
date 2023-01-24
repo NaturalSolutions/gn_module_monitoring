@@ -1,9 +1,8 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { GeoJSON } from "geojson";
+import { MapService } from "@geonature_common/map/map.service";
+import { Subscription } from "rxjs";
 import { SitesGroupService } from "../../services/sites_group.service";
-import {
-  columnNameSiteGroup,
-} from "../../class/monitoring-sites-group";
+import { columnNameSiteGroup } from "../../class/monitoring-sites-group";
 import { IPaginated, IPage } from "../../interfaces/page";
 import {
   Router,
@@ -14,9 +13,9 @@ import {
   ActivatedRoute,
 } from "@angular/router";
 import { columnNameSite } from "../../class/monitoring-site";
-import { Subscription } from "rxjs";
 import { ISite, ISitesGroup } from "../../interfaces/geom";
 import { SitesService } from "../../services/sites.service";
+import { GeoJSONService } from "../../services/geojson.service";
 
 const LIMIT = 10;
 
@@ -43,17 +42,16 @@ export class MonitoringSitesGroupsComponent implements OnInit {
   path: string;
   currentRoute: string = "";
   id: string | null;
-  geojson: GeoJSON.FeatureCollection;
 
   private routerSubscription: Subscription;
 
   constructor(
     private _sites_group_service: SitesGroupService,
     private _sites_service: SitesService,
+    public geojson_service: GeoJSONService,
     private router: Router,
-    private _Activatedroute: ActivatedRoute
-  ) // private _routingService: RoutingService
-  {
+    private _Activatedroute: ActivatedRoute // private _routingService: RoutingService
+  ) {
     // TODO: Try to refactor into routingService ?
     // console.log(this.id)
     // this.id = this._routingService.id
@@ -88,6 +86,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
       }
     });
   }
+
   ngOnInit() {
     this.getDataAccordingTopath();
   }
@@ -105,6 +104,10 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     } else {
       this.displayDetails = false;
       this.id = null;
+      this.geojson_service.removeFeatureGroup(
+        this.geojson_service.sitesFeatureGroup
+      );
+      this.geojson_service.getSitesGroupsGeometries();
     }
     // console.log(params);
   }
@@ -124,22 +127,6 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         this.colsname = this.columnNameSiteGroup;
         console.log("Inside getSitesGroups", this.rows);
       });
-  }
-
-  getSitesGroupsGeometries(params = {}) {
-    this._sites_group_service
-      .get_geometries(params)
-      .subscribe((data: GeoJSON.FeatureCollection) => {
-        this.geojson = data
-      })
-  }
-
-  getSitesGroupsChildGeometries(params = {}) {
-    this._sites_service
-      .get_geometries(params)
-      .subscribe((data: GeoJSON.FeatureCollection) => {
-        this.geojson = data
-      })
   }
 
   getSitesGroupsById(page = 1, params = {}) {
@@ -185,10 +172,10 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         (page = 1),
         (params = { id_sites_group: this.id })
       );
+      this.geojson_service.getSitesGroupsChildGeometries(params);
+      this.geojson_service.filterSitesGroups(+this.id);
       this.getSitesGroupsChild(page, params);
-      this.getSitesGroupsChildGeometries({ id_sites_group: this.id})
     } else {
-      this.getSitesGroupsGeometries(params)
       this.getSitesGroups(page, params);
     }
     // });
