@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
+import { ConfigService } from "../../services/config.service";
 import { MapService } from "@geonature_common/map/map.service";
 import { Subscription } from "rxjs";
 import { SitesGroupService } from "../../services/sites_group.service";
@@ -18,6 +19,21 @@ import { SitesService } from "../../services/sites.service";
 import { GeoJSONService } from "../../services/geojson.service";
 
 const LIMIT = 10;
+
+function setPopup(baseUrl: string, id: number, name: string) {
+  const url = `#/${baseUrl}/${id}/`;
+
+  const popup = `
+  <div>
+    <h4>${name}</h4>
+    <a href="${url}">
+        <i class="fa fa-eye" aria-hidden="true"></i>
+      </a>
+  </div>
+  `;
+
+  return popup;
+}
 
 @Component({
   selector: "monitoring-sitesgroups",
@@ -49,6 +65,7 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     private _sites_group_service: SitesGroupService,
     private _sites_service: SitesService,
     public geojson_service: GeoJSONService,
+    private _configService: ConfigService,
     private router: Router,
     private _Activatedroute: ActivatedRoute // private _routingService: RoutingService
   ) {
@@ -95,6 +112,30 @@ export class MonitoringSitesGroupsComponent implements OnInit {
     this.routerSubscription.unsubscribe();
   }
 
+  onEachFeatureSiteGroups() {
+    const baseUrl = this.router.url;
+    return (feature, layer) => {
+      const popup = setPopup(
+        baseUrl,
+        feature.properties.id_sites_group,
+        "Groupe de site :" + feature.properties.sites_group_name
+      );
+      layer.bindPopup(popup);
+    };
+  }
+
+  onEachFeatureSite() {
+    const baseUrl = this.router.url;
+    return (feature, layer) => {
+      const popup = setPopup(
+        baseUrl,
+        feature.properties.id_base_site,
+        "Site :" + feature.properties.base_site_name
+      );
+      layer.bindPopup(popup);
+    };
+  }
+
   checkChildRoute() {
     if (this._Activatedroute.firstChild) {
       this._Activatedroute.firstChild.params.subscribe((params) => {
@@ -107,7 +148,9 @@ export class MonitoringSitesGroupsComponent implements OnInit {
       this.geojson_service.removeFeatureGroup(
         this.geojson_service.sitesFeatureGroup
       );
-      this.geojson_service.getSitesGroupsGeometries();
+      this.geojson_service.getSitesGroupsGeometries(
+        this.onEachFeatureSiteGroups()
+      );
     }
     // console.log(params);
   }
@@ -172,7 +215,10 @@ export class MonitoringSitesGroupsComponent implements OnInit {
         (page = 1),
         (params = { id_sites_group: this.id })
       );
-      this.geojson_service.getSitesGroupsChildGeometries(params);
+      this.geojson_service.getSitesGroupsChildGeometries(
+        this.onEachFeatureSite(),
+        params
+      );
       this.geojson_service.filterSitesGroups(+this.id);
       this.getSitesGroupsChild(page, params);
     } else {
@@ -207,5 +253,9 @@ export class MonitoringSitesGroupsComponent implements OnInit {
       ]);
       console.log(this.sitesGroupsSelected);
     }
+  }
+
+  onSelect($event) {
+    this.geojson_service.selectSitesGroupLayer($event);
   }
 }

@@ -19,6 +19,7 @@
         (onFilter)="onFilterEvent($event)"
         (onSetPage)="setPage($event)"
         [obj]="obj"
+        (rowStatusChange)="onSelect($event)"
         (onDetailsRow)="seeDetails($event)"
       ></pnx-monitoring-datatable-g>
     </div>

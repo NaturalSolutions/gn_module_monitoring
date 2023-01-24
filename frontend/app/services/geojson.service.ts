@@ -32,30 +32,38 @@ export class GeoJSONService {
     private _mapService: MapService
   ) {}
 
-  getSitesGroupsGeometries(params = {}) {
+  getSitesGroupsGeometries(onEachFeature: Function, params = {}) {
     this._sites_group_service
       .get_geometries(params)
       .subscribe((data: GeoJSON.FeatureCollection) => {
         this.geojsonSitesGroups = data;
-        this.sitesGroupFeatureGroup = this.setMapData(data, siteGroupStyle);
+        this.sitesGroupFeatureGroup = this.setMapData(
+          data,
+          onEachFeature,
+          siteGroupStyle
+        );
       });
   }
 
-  getSitesGroupsChildGeometries(params = {}) {
+  getSitesGroupsChildGeometries(onEachFeature: Function, params = {}) {
     this._sites_service
       .get_geometries(params)
       .subscribe((data: GeoJSON.FeatureCollection) => {
         //this.removeFeatureGroup(this.sitesFeatureGroup);
-        this.sitesFeatureGroup = this.setMapData(data);
+        this.sitesFeatureGroup = this.setMapData(data, onEachFeature);
       });
   }
 
-  setMapData(geojson: GeoJSON.FeatureCollection, style?) {
+  setMapData(
+    geojson: GeoJSON.FeatureCollection,
+    onEachFeature: Function,
+    style?
+  ) {
     const map = this._mapService.getMap();
     const layer: L.Layer = this._mapService.createGeojson(
       geojson,
       false,
-      this.onEachFeature(),
+      onEachFeature,
       style
     );
     const featureGroup = new L.FeatureGroup();
@@ -80,7 +88,25 @@ export class GeoJSONService {
       );
       this.geojsonSitesGroups.features = features;
       this.removeFeatureGroup(this.sitesGroupFeatureGroup);
-      this.setMapData(this.geojsonSitesGroups, siteGroupStyle);
+      this.setMapData(
+        this.geojsonSitesGroups,
+        this.onEachFeature,
+        siteGroupStyle
+      );
     }
+  }
+
+  selectSitesGroupLayer(id: number) {
+    this.sitesGroupFeatureGroup.eachLayer((layer) => {
+      if (layer instanceof L.GeoJSON) {
+        layer.eachLayer((sublayer: L.GeoJSON) => {
+          const feature = sublayer.feature as GeoJSON.Feature;
+          if (feature.properties["id_sites_group"] == id) {
+            sublayer.openPopup();
+            return;
+          }
+        });
+      }
+    });
   }
 }
