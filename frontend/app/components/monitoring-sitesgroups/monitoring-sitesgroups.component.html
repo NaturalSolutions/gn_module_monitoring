@@ -1,27 +1,22 @@
-<div class="flex-container" id="object">
-  <div id="geometry" class="monitoring-map-container" class="cadre">
-    <pnx-map height="80vh"> </pnx-map>
-  </div>
-  <div id="monitoring-elem-container" class="cadre scroll">
-    <!-- <pnx-monitoring-lists-new
+<!-- <pnx-monitoring-lists-new
   [(bEdit)]="bEdit"
 ></pnx-monitoring-lists-new> -->
-    <div *ngIf="displayDetails">
+<!-- <div *ngIf="displayDetails">
       <pnx-monitoring-properties-g [selectedObj]="sitesGroupsSelected">
       </pnx-monitoring-properties-g>
-    </div>
-    <div>
-      <pnx-monitoring-datatable-g
-        [rows]="rows"
-        [colsname]="colsname"
-        (onSort)="onSortEvent($event)"
-        [page]="page"
-        (onFilter)="onFilterEvent($event)"
-        (onSetPage)="setPage($event)"
-        [obj]="obj"
-        (rowStatusChange)="onSelect($event)"
-        (onDetailsRow)="seeDetails($event)"
-      ></pnx-monitoring-datatable-g>
-    </div>
-  </div>
+    </div> -->
+<!-- <router-outlet></router-outlet> -->
+
+<div>
+  <pnx-monitoring-datatable-g
+    [rows]="sitesGroups"
+    [colsname]="colsname"
+    (onSort)="setSort($event)"
+    [page]="page"
+    (onFilter)="setFilter($event)"
+    (onSetPage)="setPage($event)"
+    [obj]="sitesGroups"
+    (rowStatusChange)="onSelect($event)"
+    (onDetailsRow)="seeDetails($event)"
+  ></pnx-monitoring-datatable-g>
 </div>

@@ -1,0 +1,14 @@
+<pnx-monitoring-properties-g [selectedObj]="sitesGroup">
+</pnx-monitoring-properties-g>
+
+<pnx-monitoring-datatable-g
+  [rows]="sites"
+  [colsname]="colsName"
+  (onSort)="setSort($event)"
+  [page]="page"
+  (onFilter)="setFilter($event)"
+  (onSetPage)="setPage($event)"
+  [obj]="sites"
+  (rowStatusChange)="onSelect($event)"
+  (onDetailsRow)="seeDetails($event)"
+></pnx-monitoring-datatable-g>

@@ -38,6 +38,8 @@ import { SitesGroupService } from "./services/sites_group.service";
 import { MonitoringPropertiesGComponent } from "./components/monitoring-properties-g/monitoring-properties-g.component";
 import { SitesService } from "./services/sites.service";
 import { GeoJSONService } from "./services/geojson.service";
+import { MonitoringSitesComponent } from "./components/monitoring-sites/monitoring-sites.component";
+import { MonitoringMapListComponent } from "./components/monitoring-map-list/monitoring-map-list.component";
 // import { RoutingService } from "./services/routing.service";
 
 // my module routing
@@ -62,11 +64,15 @@ const routes: Routes = [
   },
   {
     path: "sites_groups",
-    component: MonitoringSitesGroupsComponent,
+    component: MonitoringMapListComponent,
     children: [
       {
+        path: "",
+        component: MonitoringSitesGroupsComponent,
+      },
+      {
         path: ":id",
-        component: MonitoringPropertiesGComponent,
+        component: MonitoringSitesComponent,
       },
     ],
   },
@@ -84,7 +90,9 @@ const routes: Routes = [
     MonitoringListComponent,
     MonitoringPropertiesComponent,
     MonitoringDatatableComponent,
+    MonitoringMapListComponent,
     MonitoringSitesGroupsComponent,
+    MonitoringSitesComponent,
     MonitoringDatatableGComponent,
     MonitoringPropertiesGComponent,
   ],
