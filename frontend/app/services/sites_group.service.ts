@@ -24,29 +24,17 @@ export class SitesGroupService implements IGeomService {
     );
   }
 
-  // getById(
-  //   page: number = 1,
-  //   limit: number = 10,
-  //   params: JsonData = {"id_sites_group":null}
-  // ): Observable<Paginated<MonitoringSitesGroup>> {
-  //   return this._cacheService
-  //     .request<Observable<Paginated<ISitesGroup>>>("get", `sites_groups`, {
-  //       queryParams: { page, limit, ...params },
-  //     })
-  //     .pipe(
-  //       map((response: Paginated<ISitesGroup>) => ({
-  //         ...response,
-  //         items: response.items.map(
-  //           (item: ISitesGroup) => item as MonitoringSitesGroup
-  //         ),
-  //       }))
-  //     );
-  // }
+  getById(id: number): Observable<ISitesGroup> {
+    return this._cacheService.request<Observable<ISitesGroup>>(
+      "get",
+      `sites_groups/${id}`
+    );
+  }
 
   get_geometries(params: JsonData = {}): Observable<GeoJSON.FeatureCollection> {
     return this._cacheService.request<Observable<GeoJSON.FeatureCollection>>(
       "get",
-      "/sites_groups/geometries",
+      "sites_groups/geometries",
       {
         queryParams: { ...params },
       }
