@@ -55,7 +55,7 @@ export class GeoJSONService {
   }
 
   setMapData(
-    geojson: GeoJSON.FeatureCollection,
+    geojson: GeoJSON.Geometry | GeoJSON.FeatureCollection,
     onEachFeature: Function,
     style?
   ) {
