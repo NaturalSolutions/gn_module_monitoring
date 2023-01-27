@@ -39,6 +39,7 @@ export class MonitoringSitesComponent
     super();
     this.getAllItemsCallback = this.getSitesFromSiteGroupId;
   }
+
   ngOnInit() {
     this._Activatedroute.params
       .pipe(
@@ -71,6 +72,7 @@ export class MonitoringSitesComponent
             data.sitesGroup.geometry,
             () => {}
           );
+          this.baseFilters = { id_sites_group: this.sitesGroup.id_sites_group };
         }
       );
   }

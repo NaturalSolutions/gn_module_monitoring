@@ -9,6 +9,7 @@ export class MonitoringGeomComponent {
   protected getAllItemsCallback: callbackFunction;
   protected limit = LIMIT;
   public filters = {};
+  public baseFilters = {};
 
   constructor() {}
 
@@ -17,14 +18,13 @@ export class MonitoringGeomComponent {
   }
 
   setSort(filters: JsonData) {
-    this.filters = filters;
+    this.filters = { ...this.baseFilters, ...filters };
     const pageNumber = 1;
     this.getAllItemsCallback(pageNumber, this.filters);
   }
 
   setFilter(filters) {
-    console.log("onFilterEvent sitegroups component, filters", filters);
-    this.filters = filters;
+    this.filters = { ...this.baseFilters, ...filters };
     this.getAllItemsCallback(1, this.filters);
   }
 }
