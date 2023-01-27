@@ -34,6 +34,14 @@ def get_sites_groups():
     )
 
 
+@blueprint.route("/sites_groups/<int:id_sites_group>", methods=["GET"])
+def get_sites_group_by_id(id_sites_group: int):
+    schema = MonitoringSitesGroupsSchema()
+    result = TMonitoringSitesGroups.query.get_or_404(id_sites_group)
+
+    return jsonify(schema.dump(result))
+
+
 @blueprint.route("/sites_groups/geometries", methods=["GET"])
 def get_sites_group_geometries():
     subquery = (
