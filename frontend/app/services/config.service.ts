@@ -31,6 +31,7 @@ export class ConfigService {
   }
 
   loadConfig(moduleCode) {
+    console.log(moduleCode)
     const urlConfig =
       moduleCode === 'generic'
         ? `${this.backendModuleUrl()}/config`
@@ -128,8 +129,9 @@ export class ConfigService {
   schema(moduleCode, objectType, typeSchema = 'all'): Object {
     moduleCode = moduleCode || 'generic';
 
+    console.log("moduleCode inside config.service",moduleCode)
     const configObject = this._config[moduleCode][objectType];
-
+    console.log("configObject inside config.service",configObject)
     // gerer quand les paramètres ont un fonction comme valeur
 
     for (const typeSchema of ['generic', 'specific']) {

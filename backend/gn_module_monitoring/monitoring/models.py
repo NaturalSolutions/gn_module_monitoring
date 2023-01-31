@@ -21,6 +21,47 @@ from pypnusershub.db.models import User
 from geonature.core.gn_monitoring.models import corVisitObserver
 from gn_module_monitoring.monitoring.queries import Query as MonitoringQuery
 
+import sqlalchemy
+from sqlalchemy.orm import class_mapper
+from sqlalchemy.ext.declarative import declared_attr
+
+
+class GenericModel:
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+
+    @classmethod
+    def attribute_names(cls):
+        return [
+            prop.key
+            for prop in class_mapper(cls).iterate_properties
+            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+        ]
+
+    @classmethod
+    def get_type_fields(cls):
+        structure_data =  {prop.key:type(prop.expression.type).__name__ for prop in class_mapper(cls).iterate_properties
+        if isinstance(prop, sqlalchemy.orm.ColumnProperty)}
+        for prop in class_mapper(cls).iterate_properties:
+            if isinstance(prop, sqlalchemy.orm.RelationshipProperty):
+                structure_data[prop.key] = "Select"
+        return structure_data
+    
+    @classmethod
+    def get_only_field_table(cls):
+        fields_table = [i.name for i in cls.__table__.columns]
+        structure_data =  {prop.key:type(prop.expression.type).__name__ for prop in class_mapper(cls).iterate_properties
+        if isinstance(prop, sqlalchemy.orm.ColumnProperty) and prop.key in fields_table}
+        for prop in class_mapper(cls).iterate_properties:
+            if isinstance(prop, sqlalchemy.orm.RelationshipProperty):
+                structure_data[prop.key] = "Select"
+        return structure_data
+       
+    # __table_args__ = {'mysql_engine': 'InnoDB'}
+    # id =  DB.Column(Integer, primary_key=True)
+
+
 cor_module_type = DB.Table(
     "cor_module_type",
     DB.Column(
@@ -247,7 +288,7 @@ class TMonitoringSites(TBaseSites):
     )
 
 @serializable
-class TMonitoringSitesGroups(DB.Model):
+class TMonitoringSitesGroups(DB.Model,GenericModel):
     __tablename__ = 't_sites_groups'
     __table_args__ = {'schema': 'gn_monitoring'}
     query_class = MonitoringQuery

@@ -1,0 +1,8 @@
+{
+  "item_name_exists": "An item with name '{}' already exists.",
+  "item_error_inserting": "An error occurred while inserting the item.",
+  "item_not_found": "An item <id='{}'> cannot be found.",
+  "item_deleted": "Item deleted.",
+  "item_not_validated" :"Validation fields not pass , message : {}",
+  "field_not_valid":"The field '{}' from request body is not valid see the model {} '"
+}

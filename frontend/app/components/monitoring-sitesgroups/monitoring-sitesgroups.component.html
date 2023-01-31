@@ -1,22 +1,12 @@
-<!-- <pnx-monitoring-lists-new
-  [(bEdit)]="bEdit"
-></pnx-monitoring-lists-new> -->
-<!-- <div *ngIf="displayDetails">
-      <pnx-monitoring-properties-g [selectedObj]="sitesGroupsSelected">
-      </pnx-monitoring-properties-g>
-    </div> -->
-<!-- <router-outlet></router-outlet> -->
-
 <div>
-  <pnx-monitoring-datatable-g
-    [rows]="sitesGroups"
-    [colsname]="colsname"
-    (onSort)="setSort($event)"
-    [page]="page"
-    (onFilter)="setFilter($event)"
-    (onSetPage)="setPage($event)"
-    [obj]="sitesGroups"
-    (rowStatusChange)="onSelect($event)"
-    (onDetailsRow)="seeDetails($event)"
-  ></pnx-monitoring-datatable-g>
+      <pnx-monitoring-datatable-g
+      [rows]="sitesGroups"
+      [colsname]="colsname"
+      (onSort)="setSort($event)"
+      [page]="page"
+      (onFilter)="setFilter($event)"
+      (onSetPage)="setPage($event)"
+      [obj]="sitesGroups"
+      (onDetailsRow)="seeDetails($event)"
+    ></pnx-monitoring-datatable-g>
 </div>

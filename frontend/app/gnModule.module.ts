@@ -40,7 +40,8 @@ import { SitesService } from "./services/sites.service";
 import { GeoJSONService } from "./services/geojson.service";
 import { MonitoringSitesComponent } from "./components/monitoring-sites/monitoring-sites.component";
 import { MonitoringMapListComponent } from "./components/monitoring-map-list/monitoring-map-list.component";
-// import { RoutingService } from "./services/routing.service";
+import { MonitoringFormComponentG } from "./components/monitoring-form-g/monitoring-form.component-g";
+import { EditObjectService } from "./services/edit-object.service";
 
 // my module routing
 const routes: Routes = [
@@ -63,7 +64,7 @@ const routes: Routes = [
     component: MonitoringObjectComponent,
   },
   {
-    path: "sites_groups",
+    path: "sites_group",
     component: MonitoringMapListComponent,
     children: [
       {
@@ -95,6 +96,7 @@ const routes: Routes = [
     MonitoringSitesComponent,
     MonitoringDatatableGComponent,
     MonitoringPropertiesGComponent,
+    MonitoringFormComponentG
   ],
   imports: [
     GN2CommonModule,
@@ -122,6 +124,7 @@ const routes: Routes = [
     SitesGroupService,
     SitesService,
     GeoJSONService,
+    EditObjectService
     // RoutingService
   ],
   bootstrap: [ModulesComponent],

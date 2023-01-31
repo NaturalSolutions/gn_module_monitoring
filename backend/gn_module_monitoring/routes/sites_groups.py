@@ -1,5 +1,6 @@
 from flask import jsonify, request
 from geonature.utils.env import db
+from gn_module_monitoring.utils.strings.strings import gettext
 from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
 
@@ -14,6 +15,9 @@ from gn_module_monitoring.utils.routes import (
     paginate,
     sort,
 )
+from gn_module_monitoring.monitoring.schemas import MonitoringSitesGroupsSchema
+from marshmallow import ValidationError
+from gn_module_monitoring.utils.errors.errorHandler import InvalidUsage
 
 
 @blueprint.route("/sites_groups", methods=["GET"])
@@ -61,3 +65,41 @@ def get_sites_group_geometries():
     result = geojson_query(subquery)
 
     return jsonify(result)
+
+
+@blueprint.route("/sites_groups/<int:_id>", methods=["PATCH"])
+def patch(_id):
+    item_schema = MonitoringSitesGroupsSchema()
+    item_json = request.get_json()
+    item = TMonitoringSitesGroups.query.filter_by(id_sites_group=_id).first()
+    if item:
+        fields = TMonitoringSitesGroups.attribute_names()
+        for field in item_json:
+            if field in (fields):
+                # getattr(Models.NgBase,field)
+                setattr(item, field, item_json[field])
+            else:
+                continue
+                # return {"message": gettext("field_not_valid").format(field,item.__str__())}, 404
+                # return InvalidUsage(
+                #     gettext("field_not_valid").format(field, item.__tablename__),
+                #     status_code=404,
+                #     payload=item_json,
+                # ).to_dict()
+    else:
+        item = item_schema.load(item_json)
+
+# TODO: check why there is no select inside fields
+    # structure_data = TMonitoringSitesGroups.get_only_field_table()
+    try:
+        item_schema.load(item_json)
+        db.session.add(item)
+        db.session.commit()
+    except ValidationError as err:
+        return InvalidUsage(
+            gettext("item_not_validated").format(err.messages), status_code=422, payload=item_json
+        ).to_dict()
+    except:
+        return InvalidUsage("Internal Error", status_code=500).to_dict()
+
+    return item_schema.dump(item), 201

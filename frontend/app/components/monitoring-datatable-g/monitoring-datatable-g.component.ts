@@ -179,11 +179,15 @@ export class MonitoringDatatableGComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges) {
     console.log("inside ngOnChanges");
     console.log("changes", changes);
-    if (changes["rows"] && this.rows) {
+    if (changes["rows"] && this.rows && this.rows.length > 0) {
       this.columns = this._dataTableService.colsTable(
         this.colsname,
         this.rows[0]
       );
+    }
+
+    if (changes["colsname"]) {
+      this.filters = {};
     }
 
     if (changes["obj"] && this.obj) {
@@ -196,7 +200,7 @@ export class MonitoringDatatableGComponent implements OnInit {
     for (const propName of Object.keys(changes)) {
       const chng = changes[propName];
       const cur = chng.currentValue;
-      const pre = chng.currentValue;
+      const pre = chng.previousValue;
       switch (propName) {
         case "rowStatus":
           this.setSelected();

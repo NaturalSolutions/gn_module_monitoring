@@ -1,21 +1,13 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { ConfigService } from "../../services/config.service";
-import { MapService } from "@geonature_common/map/map.service";
-import { Subscription } from "rxjs";
 import { SitesGroupService } from "../../services/sites_group.service";
 import { columnNameSiteGroup } from "../../class/monitoring-sites-group";
 import { IPaginated, IPage } from "../../interfaces/page";
 import {
   Router,
-  Event,
-  NavigationStart,
-  NavigationEnd,
-  NavigationError,
   ActivatedRoute,
 } from "@angular/router";
 import { columnNameSite } from "../../class/monitoring-site";
 import { ISite, ISitesGroup } from "../../interfaces/geom";
-import { SitesService } from "../../services/sites.service";
 import { GeoJSONService } from "../../services/geojson.service";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
@@ -43,20 +35,13 @@ export class MonitoringSitesGroupsComponent
   @Input() colsname;
   @Input() obj;
 
-  filters = {};
-  displayDetails: boolean = false;
-  path: string;
-  currentRoute: string = "";
-  id: string | null;
 
   constructor(
     private _sites_group_service: SitesGroupService,
-    private _sites_service: SitesService,
     public geojsonService: GeoJSONService,
-    private _configService: ConfigService,
     private router: Router,
-    private _Activatedroute: ActivatedRoute // private _routingService: RoutingService
-  ) {
+    private _Activatedroute: ActivatedRoute, // private _routingService: RoutingService
+    ) {
     super();
     this.getAllItemsCallback = this.getSitesGroups;
   }

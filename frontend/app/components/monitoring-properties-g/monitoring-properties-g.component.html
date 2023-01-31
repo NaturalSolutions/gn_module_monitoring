@@ -105,7 +105,8 @@
       Éditer {{ (obj.template['label_art_def'] || "") }}
     </button> -->
 
-      <button class="btn btn-success mr-2" (click)="onEditClick()">
+      <button class="btn btn-success mr-2" (click)="onEditClick()" *ngIf="
+      !bEdit">
         Éditer le groupe de site
       </button>
     </div>

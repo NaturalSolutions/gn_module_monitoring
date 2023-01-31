@@ -1,7 +1,7 @@
 import json
 
 import geojson
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from pypnnomenclature.schemas import NomenclatureSchema
 
@@ -23,6 +23,10 @@ def paginate_schema(schema):
 
 
 class MonitoringSitesGroupsSchema(SQLAlchemyAutoSchema):
+    
+    sites_group_name = fields.String(
+        validate=validate.Length(min=3,error="Length must be greater than 3"),)
+        
     class Meta:
         model = TMonitoringSitesGroups
         exclude = ("geom_geojson",)

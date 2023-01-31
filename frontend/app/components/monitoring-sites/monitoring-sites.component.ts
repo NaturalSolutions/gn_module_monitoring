@@ -10,6 +10,7 @@ import { columnNameSite } from "../../class/monitoring-site";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
 import { GeoJSONService } from "../../services/geojson.service";
+import { FormGroup, FormBuilder } from "@angular/forms";
 
 const LIMIT = 10;
 
@@ -29,18 +30,22 @@ export class MonitoringSitesComponent
   page: IPage;
   filters = {};
   siteGroupLayer: L.FeatureGroup;
+  @Input() bEdit:boolean;
+  objForm: FormGroup;
 
   constructor(
     private _sitesGroupService: SitesGroupService,
     private router: Router,
     private _Activatedroute: ActivatedRoute,
-    private _geojsonService: GeoJSONService
+    private _geojsonService: GeoJSONService,
+    private _formBuilder: FormBuilder,
   ) {
     super();
     this.getAllItemsCallback = this.getSitesFromSiteGroupId;
   }
 
   ngOnInit() {
+    this.objForm = this._formBuilder.group({});
     this._Activatedroute.params
       .pipe(
         map((params) => params["id"] as number),

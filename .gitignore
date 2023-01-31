@@ -10,6 +10,7 @@ config/monitoring/*
 frontend/assets/*.jpg
 *.egg-info
 
+**/contrib
 # Node
 .npm
 node_modules

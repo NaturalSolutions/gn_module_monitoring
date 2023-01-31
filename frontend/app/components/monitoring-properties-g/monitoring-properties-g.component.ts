@@ -7,10 +7,9 @@ import {
   SimpleChanges,
 } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import {
-  extendedDetailsSiteGroup,
-} from "../../class/monitoring-sites-group";
+import { extendedDetailsSiteGroup } from "../../class/monitoring-sites-group";
 import { ISitesGroup } from "../../interfaces/geom";
+import { EditObjectService } from "../../services/edit-object.service";
 
 @Component({
   selector: "pnx-monitoring-properties-g",
@@ -34,7 +33,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   bUpdateSyntheseSpinner = false;
   public modalReference;
 
-  constructor() {}
+  constructor(private _editService: EditObjectService) {}
 
   ngOnInit() {
     console.log("selectedObj", this.selectedObj);
@@ -43,6 +42,15 @@ export class MonitoringPropertiesGComponent implements OnInit {
 
   onEditClick() {
     this.bEditChange.emit(true);
+    console.log("edit");
+    console.log("obj inside PROPERTIES", this.selectedObj);
+    let id_object = this.getId()
+    this.selectedObj["id"] = this.selectedObj[id_object[0]]
+    this._editService.changeDataSub(this.selectedObj);
+  }
+
+  getId(){
+    return Object.keys(this.selectedObj).filter(k => k.startsWith('id'))
   }
 
   // ngOnChanges(changes: SimpleChanges) {

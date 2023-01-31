@@ -6,6 +6,7 @@ import { CacheService } from "./cache.service";
 import { IGeomService, ISitesGroup, ISite } from "../interfaces/geom";
 import { IPaginated } from "../interfaces/page";
 import { JsonData } from "../types/jsondata";
+import { ResponseUpdated } from "../interfaces/response";
 @Injectable()
 export class SitesGroupService implements IGeomService {
   constructor(private _cacheService: CacheService) {}
@@ -53,5 +54,9 @@ export class SitesGroupService implements IGeomService {
         queryParams: { page, limit, ...params },
       }
     );
+  }
+
+  patchGroupSite(id:number,updatedData:JsonData):Observable<ResponseUpdated>{
+    return this._cacheService.request("patch",`sites_groups/${id}`,{postData : updatedData})
   }
 }
