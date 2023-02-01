@@ -65,6 +65,6 @@ export class SitesGroupService implements IGeomService {
   }
 
   editObjectType():string {
-    return "Editer le groupe de site"
+    return "le groupe de site"
   }
 }

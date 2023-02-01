@@ -42,6 +42,7 @@ import { MonitoringSitesComponent } from "./components/monitoring-sites/monitori
 import { MonitoringMapListComponent } from "./components/monitoring-map-list/monitoring-map-list.component";
 import { MonitoringFormComponentG } from "./components/monitoring-form-g/monitoring-form.component-g";
 import { EditObjectService } from "./services/edit-object.service";
+import { ObjectService } from "./services/object.service";
 
 // my module routing
 const routes: Routes = [
@@ -124,7 +125,8 @@ const routes: Routes = [
     SitesGroupService,
     SitesService,
     GeoJSONService,
-    EditObjectService
+    EditObjectService,
+    ObjectService
     // RoutingService
   ],
   bootstrap: [ModulesComponent],

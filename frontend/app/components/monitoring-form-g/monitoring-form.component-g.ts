@@ -66,7 +66,6 @@ export class MonitoringFormComponentG implements OnInit {
     // this.obj.moduleCode = "generic";
     // this.obj.objectType = "sites_group";
     console.log(this.obj);
-
     this._editService.currentData.subscribe(dataToEdit => {
       this.obj = dataToEdit
       console.log("inside subscribe FORM",this.obj)

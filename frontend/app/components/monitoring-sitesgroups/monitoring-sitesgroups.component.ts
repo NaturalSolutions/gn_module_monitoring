@@ -12,6 +12,7 @@ import { GeoJSONService } from "../../services/geojson.service";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
 import { DataTableService } from "../../services/data-table.service";
+import { ObjectService } from "../../services/object.service";
 
 const LIMIT = 10;
 
@@ -35,7 +36,7 @@ export class MonitoringSitesGroupsComponent
   // @Input() rows;
   @Input() colsname;
   @Input() obj;
-  @Input() objectType:string;
+  objectType:string;
 
 
 
@@ -44,6 +45,7 @@ export class MonitoringSitesGroupsComponent
     private _sites_group_service: SitesGroupService,
     public geojsonService: GeoJSONService,
     private router: Router,
+    private _objService:ObjectService,
     // IF prefered observable compare to ngOnChanges uncomment this:
     // private _dataTableService:DataTableService,
     private _Activatedroute: ActivatedRoute, // private _routingService: RoutingService
@@ -53,7 +55,8 @@ export class MonitoringSitesGroupsComponent
   }
 
   ngOnInit() {
-    this.objectType = this._sites_group_service.addObjectType()
+    this._objService.changeObjectTypeParent(this._sites_group_service.editObjectType())
+    this._objService.changeObjectType(this._sites_group_service.addObjectType())
     this.getSitesGroups(1);
     this.geojsonService.getSitesGroupsGeometries(
       this.onEachFeatureSiteGroups()
@@ -96,6 +99,7 @@ export class MonitoringSitesGroupsComponent
 
   seeDetails($event) {
     // TODO: routerLink
+    this._objService.changeObjectTypeParent(this._sites_group_service.editObjectType())
     this.router.navigate([$event.id_sites_group], {
       relativeTo: this._Activatedroute,
     });

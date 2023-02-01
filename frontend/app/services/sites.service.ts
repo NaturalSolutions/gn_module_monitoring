@@ -40,6 +40,6 @@ export class SitesService implements IGeomService {
   }
 
   editObjectType():string {
-    return "Editer le site"
+    return "le site"
   }
 }

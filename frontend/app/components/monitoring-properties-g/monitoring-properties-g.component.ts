@@ -10,6 +10,7 @@ import { FormControl } from "@angular/forms";
 import { extendedDetailsSiteGroup } from "../../class/monitoring-sites-group";
 import { ISitesGroup } from "../../interfaces/geom";
 import { EditObjectService } from "../../services/edit-object.service";
+import { ObjectService } from "../../services/object.service";
 
 @Component({
   selector: "pnx-monitoring-properties-g",
@@ -33,11 +34,12 @@ export class MonitoringPropertiesGComponent implements OnInit {
   bUpdateSyntheseSpinner = false;
   public modalReference;
 
-  constructor(private _editService: EditObjectService) {}
+  constructor(private _editService: EditObjectService,private _objService: ObjectService) {}
 
   ngOnInit() {
     console.log("selectedObj", this.selectedObj);
     console.log("infosColsSiteGroups", this.infosColsSiteGroups);
+    this._objService.currentObjectTypeParent.subscribe(newObjType => { this.objectType = newObjType })
   }
 
   onEditClick() {

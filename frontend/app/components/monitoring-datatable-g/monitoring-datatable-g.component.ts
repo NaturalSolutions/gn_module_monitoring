@@ -14,6 +14,7 @@ import { debounceTime } from "rxjs/operators";
 import { DataTableService } from "../../services/data-table.service";
 import { IColumn } from "../../interfaces/column";
 import { IPage } from "../../interfaces/page";
+import { ObjectService } from "../../services/object.service";
 
 interface ItemObjectTable {
   id: number | null;
@@ -34,8 +35,6 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Input() page: IPage = { count: 0, limit: 0, page: 0 };
   @Input() obj;
 
-  @Input() objectType:string;
-
   @Input() rowStatus: Array<any>;
   @Output() rowStatusChange = new EventEmitter<Object>();
 
@@ -52,6 +51,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   displayFilter: boolean = false;
   objectsStatus: ItemsObjectTable;
 
+  objectType:string ='';
   columns;
   row_save;
   selected = [];
@@ -61,7 +61,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   @ViewChild("actionsTemplate") actionsTemplate: TemplateRef<any>;
   @ViewChild("hdrTpl") hdrTpl: TemplateRef<any>;
 
-  constructor(private _dataTableService: DataTableService) {}
+  constructor(private _dataTableService: DataTableService, private _objService: ObjectService) {}
 
   ngOnInit() {
     console.log("DataTableComponent colname", this.colsname);
@@ -75,7 +75,7 @@ export class MonitoringDatatableGComponent implements OnInit {
     
     // IF prefered  observable compare to ngOnChanges   uncomment this:
     // this._dataTableService.currentCols.subscribe(newCols => { this.columns = newCols })
-    
+    this._objService.currentObjectType.subscribe(newObjType => { this.objectType = newObjType })
     
     this.filters = {};
     this.filterSubject.pipe(debounceTime(500)).subscribe(() => {
