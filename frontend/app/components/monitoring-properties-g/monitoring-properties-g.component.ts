@@ -20,7 +20,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   @Input() selectedObj: ISitesGroup;
   @Input() bEdit: boolean;
   @Output() bEditChange = new EventEmitter<boolean>();
-
+  @Input() objectType:string;
   Object = Object;
 
   // @Input() currentUser;

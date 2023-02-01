@@ -11,6 +11,7 @@ import { ISite, ISitesGroup } from "../../interfaces/geom";
 import { GeoJSONService } from "../../services/geojson.service";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
+import { DataTableService } from "../../services/data-table.service";
 
 const LIMIT = 10;
 
@@ -31,15 +32,20 @@ export class MonitoringSitesGroupsComponent
   @Input() columnNameSite: typeof columnNameSite = columnNameSite;
   @Input() sitesGroupsSelected: ISitesGroup;
 
-  @Input() rows;
+  // @Input() rows;
   @Input() colsname;
   @Input() obj;
+  @Input() objectType:string;
+
+
 
 
   constructor(
     private _sites_group_service: SitesGroupService,
     public geojsonService: GeoJSONService,
     private router: Router,
+    // IF prefered observable compare to ngOnChanges uncomment this:
+    // private _dataTableService:DataTableService,
     private _Activatedroute: ActivatedRoute, // private _routingService: RoutingService
     ) {
     super();
@@ -47,6 +53,7 @@ export class MonitoringSitesGroupsComponent
   }
 
   ngOnInit() {
+    this.objectType = this._sites_group_service.addObjectType()
     this.getSitesGroups(1);
     this.geojsonService.getSitesGroupsGeometries(
       this.onEachFeatureSiteGroups()
@@ -82,6 +89,8 @@ export class MonitoringSitesGroupsComponent
         };
         this.sitesGroups = data.items;
         this.colsname = this.columnNameSiteGroup;
+        // IF prefered observable compare to ngOnChanges uncomment this:
+        // this._dataTableService.changeColsTable(this.colsname,this.sitesGroups[0])
       });
   }
 

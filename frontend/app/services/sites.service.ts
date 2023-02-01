@@ -34,4 +34,12 @@ export class SitesService implements IGeomService {
       }
     );
   }
+
+  addObjectType():string {
+    return " un nouveau site"
+  }
+
+  editObjectType():string {
+    return "Editer le site"
+  }
 }

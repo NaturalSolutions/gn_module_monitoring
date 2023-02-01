@@ -59,4 +59,12 @@ export class SitesGroupService implements IGeomService {
   patchGroupSite(id:number,updatedData:JsonData):Observable<ResponseUpdated>{
     return this._cacheService.request("patch",`sites_groups/${id}`,{postData : updatedData})
   }
+
+  addObjectType():string {
+    return "un nouveau groupe de site"
+  }
+
+  editObjectType():string {
+    return "Editer le groupe de site"
+  }
 }

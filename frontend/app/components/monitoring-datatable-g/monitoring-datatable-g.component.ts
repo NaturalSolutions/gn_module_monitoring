@@ -12,18 +12,8 @@ import {
 import { Subject } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 import { DataTableService } from "../../services/data-table.service";
-
-interface ColName {
-  name: string;
-  prop: string;
-  description?: string;
-}
-
-interface Page {
-  count: number;
-  limit: number;
-  offset: number;
-}
+import { IColumn } from "../../interfaces/column";
+import { IPage } from "../../interfaces/page";
 
 interface ItemObjectTable {
   id: number | null;
@@ -40,9 +30,11 @@ type ItemsObjectTable = { [key: string]: ItemObjectTable };
 })
 export class MonitoringDatatableGComponent implements OnInit {
   @Input() rows;
-  @Input() colsname: ColName[];
-  @Input() page: Page = { count: 0, limit: 0, offset: 0 };
+  @Input() colsname: IColumn[];
+  @Input() page: IPage = { count: 0, limit: 0, page: 0 };
   @Input() obj;
+
+  @Input() objectType:string;
 
   @Input() rowStatus: Array<any>;
   @Output() rowStatusChange = new EventEmitter<Object>();
@@ -57,7 +49,6 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Output() onDetailsRow = new EventEmitter<any>();
 
   private filterSubject: Subject<string> = new Subject();
-  private subscription: any;
   displayFilter: boolean = false;
   objectsStatus: ItemsObjectTable;
 
@@ -81,6 +72,11 @@ export class MonitoringDatatableGComponent implements OnInit {
   initDatatable() {
     console.log("Inside initDatatable");
     console.log("this.rows", this.rows);
+    
+    // IF prefered  observable compare to ngOnChanges   uncomment this:
+    // this._dataTableService.currentCols.subscribe(newCols => { this.columns = newCols })
+    
+    
     this.filters = {};
     this.filterSubject.pipe(debounceTime(500)).subscribe(() => {
       this.filter();
@@ -179,6 +175,8 @@ export class MonitoringDatatableGComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges) {
     console.log("inside ngOnChanges");
     console.log("changes", changes);
+
+    // IF prefered ngOnChanges compare to observable   uncomment this:
     if (changes["rows"] && this.rows && this.rows.length > 0) {
       this.columns = this._dataTableService.colsTable(
         this.colsname,

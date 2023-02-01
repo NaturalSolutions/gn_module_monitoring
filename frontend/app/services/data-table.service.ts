@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { IColumn } from "../interfaces/column";
-
+import { BehaviorSubject} from "rxjs";
 interface ItemObjectTable {
   id: number | null;
   selected: boolean;
@@ -17,9 +17,29 @@ export class DataTableService {
   rowStatus: ItemObjectTable;
   idObj: number;
 
+
+  // IF prefered observable compare to ngOnChanges uncomment this:
+  // dataCol:IColumn[] =[{prop:"",name:"",description:""}]
+  // private dataCols = new BehaviorSubject<object>(this.dataCol);
+  // currentCols = this.dataCols.asObservable();
+
+
   constructor() {}
 
-  colsTable(colName, dataTable): IColumn[] {
+  // IF prefered observable compare to ngOnChanges uncomment this:
+  // changeColsTable(newCols:IColumn[],newRows){
+  //   const arr = Object.keys(newCols);
+  //   const allColumn: IColumn[] = arr
+  //     .filter((item) => Object.keys(newRows).includes(item))
+  //     .map((elm) => ({
+  //       name: newCols[elm],
+  //       prop: elm,
+  //       description: elm,
+  //     }));
+  //   this.dataCols.next(allColumn)
+  // }
+
+  colsTable(colName:IColumn[], dataTable): IColumn[] {
     const arr = Object.keys(colName);
     const allColumn: IColumn[] = arr
       .filter((item) => Object.keys(dataTable).includes(item))

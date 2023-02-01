@@ -1,3 +1,4 @@
+<!-- IF prefered observable compare to ngOnChanges we can remove rows and colsname-->
 <div>
       <pnx-monitoring-datatable-g
       [rows]="sitesGroups"
@@ -8,5 +9,6 @@
       (onSetPage)="setPage($event)"
       [obj]="sitesGroups"
       (onDetailsRow)="seeDetails($event)"
+      [objectType]="objectType"
     ></pnx-monitoring-datatable-g>
 </div>
