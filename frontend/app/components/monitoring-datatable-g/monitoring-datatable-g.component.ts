@@ -213,6 +213,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   }
   navigateToDetail(row) {
     console.log("Inside navigateToDetail:", row);
+    row["id"] = row.pk
     this.onDetailsRow.emit(row);
   }
 }

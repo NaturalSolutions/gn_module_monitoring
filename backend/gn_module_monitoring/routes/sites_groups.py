@@ -41,8 +41,8 @@ def get_sites_groups():
 @blueprint.route("/sites_groups/<int:id_sites_group>", methods=["GET"])
 def get_sites_group_by_id(id_sites_group: int):
     schema = MonitoringSitesGroupsSchema()
-    result = TMonitoringSitesGroups.query.get_or_404(id_sites_group)
-
+    # result = TMonitoringSitesGroups.query.get_or_404(id_sites_group)
+    result = TMonitoringSitesGroups.find_by_id(id_sites_group)
     return jsonify(schema.dump(result))
 
 
@@ -71,7 +71,7 @@ def get_sites_group_geometries():
 def patch(_id):
     item_schema = MonitoringSitesGroupsSchema()
     item_json = request.get_json()
-    item = TMonitoringSitesGroups.query.filter_by(id_sites_group=_id).first()
+    item = TMonitoringSitesGroups.find_by_id(_id)
     if item:
         fields = TMonitoringSitesGroups.attribute_names()
         for field in item_json:
@@ -80,17 +80,8 @@ def patch(_id):
                 setattr(item, field, item_json[field])
             else:
                 continue
-                # return {"message": gettext("field_not_valid").format(field,item.__str__())}, 404
-                # return InvalidUsage(
-                #     gettext("field_not_valid").format(field, item.__tablename__),
-                #     status_code=404,
-                #     payload=item_json,
-                # ).to_dict()
     else:
         item = item_schema.load(item_json)
-
-# TODO: check why there is no select inside fields
-    # structure_data = TMonitoringSitesGroups.get_only_field_table()
     try:
         item_schema.load(item_json)
         db.session.add(item)

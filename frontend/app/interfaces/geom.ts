@@ -9,6 +9,7 @@ export interface IGeomObject {
 }
 
 export interface ISitesGroup extends IGeomObject {
+  pk:number;
   comments?: string;
   id_sites_group: number;
   nb_sites: number;

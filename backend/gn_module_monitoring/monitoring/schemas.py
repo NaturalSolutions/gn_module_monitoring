@@ -1,9 +1,11 @@
 import json
 
 import geojson
-from marshmallow import Schema, fields, validate
+from geonature.utils.env import MA
+from marshmallow import Schema, fields, validate, pre_load
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from pypnnomenclature.schemas import NomenclatureSchema
+from geonature.core.gn_commons.schemas import MediaSchema
 
 from gn_module_monitoring.monitoring.models import (
     BibTypeSite,
@@ -22,7 +24,7 @@ def paginate_schema(schema):
     return PaginationSchema
 
 
-class MonitoringSitesGroupsSchema(SQLAlchemyAutoSchema):
+class MonitoringSitesGroupsSchema(MA.SQLAlchemyAutoSchema):
     
     sites_group_name = fields.String(
         validate=validate.Length(min=3,error="Length must be greater than 3"),)
@@ -31,16 +33,21 @@ class MonitoringSitesGroupsSchema(SQLAlchemyAutoSchema):
         model = TMonitoringSitesGroups
         exclude = ("geom_geojson",)
 
-
+    medias = MA.Nested(MediaSchema)
+    pk = fields.Method("set_pk",dump_only=True)
     geometry = fields.Method("serialize_geojson", dump_only=True)
     # properties = fields.Method("group_properties_geojson")
 
     # def group_properties_geojson(self, obj):
     #     return {field: getattr(obj,field) for field in self.fields.keys() if field not in ("geometry","properties")}
 
+    def set_pk(self,obj):
+        return self.Meta.model.get_id()
+
     def serialize_geojson(self, obj):
         if obj.geom_geojson is not None:
             return json.loads(obj.geom_geojson)
+    
 
 
 class MonitoringSitesSchema(SQLAlchemyAutoSchema):

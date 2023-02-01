@@ -32,6 +32,27 @@ class GenericModel:
         return cls.__name__.lower()
 
     @classmethod
+    def set_id(cls) -> None:
+        pk_string = class_mapper(cls).primary_key[0].name
+        if hasattr(cls,"id_g") ==False:
+            pk_value= getattr(cls,pk_string)
+            setattr(cls,"id_g",pk_value)
+
+    @classmethod
+    def get_id(cls) -> None:
+        pk_string = class_mapper(cls).primary_key[0].name
+        # print('======= ==>', pk_string)
+        if hasattr(cls,"id_g") ==False:
+            pk_value= getattr(cls,pk_string)
+            setattr(cls,"id_g",pk_value)
+        return pk_string
+
+    @classmethod
+    def find_by_id(cls, _id: int) -> "GenericModel":
+        cls.set_id()
+        return cls.query.get_or_404(_id)
+
+    @classmethod
     def attribute_names(cls):
         return [
             prop.key
@@ -94,7 +115,7 @@ cor_type_site = DB.Table(
 
 
 @serializable
-class BibTypeSite(DB.Model):
+class BibTypeSite(DB.Model,GenericModel):
     __tablename__ = "bib_type_site"
     __table_args__ = {"schema": "gn_monitoring"}
     query_class = MonitoringQuery

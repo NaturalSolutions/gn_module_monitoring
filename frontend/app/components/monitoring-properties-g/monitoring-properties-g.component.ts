@@ -44,15 +44,9 @@ export class MonitoringPropertiesGComponent implements OnInit {
     this.bEditChange.emit(true);
     console.log("edit");
     console.log("obj inside PROPERTIES", this.selectedObj);
-    let id_object = this.getId()
-    this.selectedObj["id"] = this.selectedObj[id_object[0]]
+    this.selectedObj["id"] = this.selectedObj[this.selectedObj.pk]
     this._editService.changeDataSub(this.selectedObj);
   }
-
-  getId(){
-    return Object.keys(this.selectedObj).filter(k => k.startsWith('id'))
-  }
-
   // ngOnChanges(changes: SimpleChanges) {
   //   console.log("inside ngOnChanges");
   //   console.log("changes", changes);

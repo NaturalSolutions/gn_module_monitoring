@@ -46,6 +46,10 @@ export class MonitoringSitesComponent
 
   ngOnInit() {
     this.objForm = this._formBuilder.group({});
+    this.initSite()
+  }
+
+  initSite(){
     this._Activatedroute.params
       .pipe(
         map((params) => params["id"] as number),
@@ -81,7 +85,6 @@ export class MonitoringSitesComponent
         }
       );
   }
-
   ngOnDestroy() {
     this._geojsonService.removeFeatureGroup(
       this._geojsonService.sitesFeatureGroup
@@ -122,4 +125,8 @@ export class MonitoringSitesComponent
   }
 
   onSelect($event) {}
+
+  onObjChanged($event) {
+    this.initSite()
+  }
 }

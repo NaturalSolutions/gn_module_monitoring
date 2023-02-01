@@ -87,7 +87,6 @@ export class MonitoringSitesGroupsComponent
 
   seeDetails($event) {
     // TODO: routerLink
-    console.log("seeDetails");
     this.router.navigate([$event.id_sites_group], {
       relativeTo: this._Activatedroute,
     });

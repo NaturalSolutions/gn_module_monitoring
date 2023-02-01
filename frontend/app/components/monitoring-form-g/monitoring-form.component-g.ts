@@ -22,7 +22,7 @@ export class MonitoringFormComponentG implements OnInit {
   @Input() objForm: FormGroup;
 
   // @Input() obj: any;
-  @Output() objChanged = new EventEmitter<MonitoringObject>();
+  @Output() objChanged = new EventEmitter<Object>();
 
   @Input() objectsStatus;
   @Output() objectsStatusChange = new EventEmitter<Object>();
@@ -278,7 +278,7 @@ export class MonitoringFormComponentG implements OnInit {
   /**
    * Valider et aller à la page de l'objet
    */
-  navigateToDetail(id,moduleCode,objectType,queryParams) {
+  navigateToDetail(id,objectType,queryParams) {
  // patch bug navigation
     this._router.navigate(
       [
@@ -308,10 +308,12 @@ export class MonitoringFormComponentG implements OnInit {
 
   /** TODO améliorer site etc.. */
   onSubmit() {
+    console.log(this.obj)
+    const {patch_update, ...sendValue} = this.dataForm
     const action = this.obj.id
       // ? this.obj.patch(this.objForm.value)
       // : this.obj.post(this.objForm.value);
-      ? this._siteGpService.patchGroupSite(this.obj.id,this.dataForm)
+      ? this._siteGpService.patchGroupSite(this.obj.id,sendValue)
       : this.obj.post(this.objForm.value);
     const actionLabel = this.obj.id ? "Modification" : "Création";
     action.subscribe((objData) => {
@@ -335,7 +337,7 @@ export class MonitoringFormComponentG implements OnInit {
         if (this._configService.configModuleObjectParam(this.obj.moduleCode,this.obj.objectType,"redirect_to_parent")) {
           this.navigateToParent();
         } else {
-          this.navigateToDetail(this.obj.id,this.obj.moduleCode,this.obj.objectType,this.queryParams);
+          this.navigateToDetail(this.obj.id,this.obj.objectType,this.queryParams);
         }
       }
     });
@@ -365,8 +367,9 @@ export class MonitoringFormComponentG implements OnInit {
   }
 
   onObjFormValueChange(event) {
-    let {id_module,medias, ...rest} = this.objForm.value;
-    this.dataForm = rest
+    // let {id_module,medias, ...rest} = this.objForm.value;
+    // this.dataForm = rest
+    this.dataForm = this.objForm.value
     console.log(this.dataForm)
     const change = this._configService.change(this.obj.moduleCode ,this.obj.objectType );
     if (!change) {
