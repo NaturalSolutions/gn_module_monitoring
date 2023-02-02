@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { SitesGroupService } from "../../services/sites_group.service";
+import { SitesGroupService } from "../../services/api-geom.service";
 import { columnNameSiteGroup } from "../../class/monitoring-sites-group";
 import { IPaginated, IPage } from "../../interfaces/page";
 import {
@@ -11,7 +11,6 @@ import { ISite, ISitesGroup } from "../../interfaces/geom";
 import { GeoJSONService } from "../../services/geojson.service";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
-import { DataTableService } from "../../services/data-table.service";
 import { ObjectService } from "../../services/object.service";
 
 const LIMIT = 10;

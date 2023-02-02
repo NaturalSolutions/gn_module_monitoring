@@ -5,13 +5,13 @@ import { tap, map, mergeMap } from "rxjs/operators";
 import * as L from "leaflet";
 import { ISite, ISitesGroup } from "../../interfaces/geom";
 import { IPage, IPaginated } from "../../interfaces/page";
-import { SitesGroupService } from "../../services/sites_group.service";
+// import {  } from "../../services/sites_group.service";
 import { columnNameSite } from "../../class/monitoring-site";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
 import { GeoJSONService } from "../../services/geojson.service";
 import { FormGroup, FormBuilder } from "@angular/forms";
-import { SitesService } from "../../services/sites.service";
+import { SitesService ,SitesGroupService} from "../../services/api-geom.service";
 import { ObjectService } from "../../services/object.service";
 
 const LIMIT = 10;

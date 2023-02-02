@@ -5,8 +5,8 @@ import { map } from "rxjs/operators";
 import { GeoJSON } from "geojson";
 import { MapService } from "@geonature_common/map/map.service";
 
-import { SitesGroupService } from "./sites_group.service";
-import { SitesService } from "./sites.service";
+import { SitesService,SitesGroupService } from "./api-geom.service";
+
 
 // This service will be used for sites and sites groups
 

@@ -1,6 +1,7 @@
 import { GeoJSON } from "geojson";
 import { Observable } from "rxjs";
 import { JsonData } from "../types/jsondata";
+import { Resp } from "../types/response";
 import { IPaginated } from "./page";
 
 export interface IGeomObject {
@@ -9,7 +10,7 @@ export interface IGeomObject {
 }
 
 export interface ISitesGroup extends IGeomObject {
-  pk:number;
+  pk: number;
   comments?: string;
   id_sites_group: number;
   nb_sites: number;
@@ -42,8 +43,8 @@ export interface IGeomService {
     page: number,
     params: JsonData
   ): Observable<IPaginated<IGeomObject>>;
-  get_geometries(): Observable<GeoJSON.FeatureCollection>;
+  get_geometries(params: JsonData): Observable<GeoJSON.FeatureCollection>;
   // create(obj: IGeomObject)
-  // patch(obj: IGeomObject)
+  patch(id: number, updatedData: IGeomObject): Observable<Resp>;
   // delete(obj: IGeomObject)
 }

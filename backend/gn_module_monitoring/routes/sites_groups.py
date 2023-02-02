@@ -1,8 +1,10 @@
-from flask import jsonify, request
+from flask import jsonify, request,json
 from geonature.utils.env import db
 from gn_module_monitoring.utils.strings.strings import gettext
 from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
+
+from werkzeug.exceptions import HTTPException
 
 from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.monitoring.models import TMonitoringSites, TMonitoringSitesGroups
@@ -82,15 +84,28 @@ def patch(_id):
                 continue
     else:
         item = item_schema.load(item_json)
-    try:
-        item_schema.load(item_json)
-        db.session.add(item)
-        db.session.commit()
-    except ValidationError as err:
-        return InvalidUsage(
-            gettext("item_not_validated").format(err.messages), status_code=422, payload=item_json
-        ).to_dict()
-    except:
-        return InvalidUsage("Internal Error", status_code=500).to_dict()
-
+    item_schema.load(item_json)
+    db.session.add(item)
+    db.session.commit()
     return item_schema.dump(item), 201
+
+
+@blueprint.errorhandler(ValidationError)
+def handle_validation_error(error):
+    return InvalidUsage(
+            gettext("item_not_validated").format(error.messages), status_code=422, payload=error.data
+        ).to_dict()
+
+# @blueprint.errorhandler(HTTPException)
+# def handle_exception(e):
+#     """Return JSON instead of HTML for HTTP errors."""
+#     # start with the correct headers and status code from the error
+#     response = e.get_response()
+#     # replace the body with JSON
+#     response.data = json.dumps({
+#         "code": e.code,
+#         "name": e.name,
+#         "description": e.description,
+#     })
+#     response.content_type = "application/json"
+#     return response

@@ -34,15 +34,16 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatInputModule } from "@angular/material/input";
 import { MonitoringSitesGroupsComponent } from "./components/monitoring-sitesgroups/monitoring-sitesgroups.component";
 import { DataTableService } from "./services/data-table.service";
-import { SitesGroupService } from "./services/sites_group.service";
+// import {  } from "./services/sites_group.service";
 import { MonitoringPropertiesGComponent } from "./components/monitoring-properties-g/monitoring-properties-g.component";
-import { SitesService } from "./services/sites.service";
+// import {  } from "./services/sites.service";
 import { GeoJSONService } from "./services/geojson.service";
 import { MonitoringSitesComponent } from "./components/monitoring-sites/monitoring-sites.component";
 import { MonitoringMapListComponent } from "./components/monitoring-map-list/monitoring-map-list.component";
 import { MonitoringFormComponentG } from "./components/monitoring-form-g/monitoring-form.component-g";
 import { EditObjectService } from "./services/edit-object.service";
 import { ObjectService } from "./services/object.service";
+import { SitesGroupService,SitesService,ApiGeomService } from "./services/api-geom.service";
 
 // my module routing
 const routes: Routes = [
@@ -126,8 +127,8 @@ const routes: Routes = [
     SitesService,
     GeoJSONService,
     EditObjectService,
-    ObjectService
-    // RoutingService
+    ObjectService,
+    ApiGeomService
   ],
   bootstrap: [ModulesComponent],
   schemas: [

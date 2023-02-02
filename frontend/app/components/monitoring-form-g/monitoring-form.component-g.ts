@@ -1,16 +1,21 @@
-import { Component, OnInit, Input, Output, EventEmitter,SimpleChanges, } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  SimpleChanges,
+} from "@angular/core";
+import { FormGroup, FormBuilder } from "@angular/forms";
 import { MonitoringObject } from "../../class/monitoring-object";
-// import { Router } from "@angular/router";
 import { ConfigService } from "../../services/config.service";
-import { DataUtilsService } from "../../services/data-utils.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { DynamicFormService } from "@geonature_common/form/dynamic-form-generator/dynamic-form.service";
 import { ActivatedRoute } from "@angular/router";
 import { EditObjectService } from "../../services/edit-object.service";
-import { SitesGroupService } from "../../services/sites_group.service";
 import { Router } from "@angular/router";
-import { JsonData } from "../../types/jsondata";
+import { IDataForm } from "../../interfaces/form";
+import { ApiGeomService } from "../../services/api-geom.service";
 @Component({
   selector: "pnx-monitoring-form-g",
   templateUrl: "./monitoring-form.component-g.html",
@@ -31,10 +36,10 @@ export class MonitoringFormComponentG implements OnInit {
   @Output() bEditChange = new EventEmitter<boolean>();
 
   @Input() sites: {};
-  dataForm:JsonData;
+  dataForm: IDataForm;
   searchSite = "";
 
-  obj:any;
+  obj: any;
   objFormsDefinition;
 
   meta: {};
@@ -54,10 +59,9 @@ export class MonitoringFormComponentG implements OnInit {
     private _route: ActivatedRoute,
     private _configService: ConfigService,
     private _commonService: CommonService,
-    private _dataUtilsService: DataUtilsService,
     private _dynformService: DynamicFormService,
     private _editService: EditObjectService,
-    private _siteGpService: SitesGroupService,
+    private _apiGeomService: ApiGeomService,
     private _router: Router
   ) {}
 
@@ -66,100 +70,99 @@ export class MonitoringFormComponentG implements OnInit {
     // this.obj.moduleCode = "generic";
     // this.obj.objectType = "sites_group";
     console.log(this.obj);
-    this._editService.currentData.subscribe(dataToEdit => {
-      this.obj = dataToEdit
-      console.log("inside subscribe FORM",this.obj)
-    // this.obj.moduleCode = "generic";
-    // this.obj.objectType = "sites_group";
-    this.obj.bIsInitialized = true
-    this._configService
-      .init(this.obj.moduleCode)
-      .pipe()
-      .subscribe(() => {
-        // return this._route.queryParamMap;
-        // })
-        // .subscribe((queryParams) => {
-        this.queryParams = this._route.snapshot.queryParams || {};
-        this.bChainInput = this._configService.frontendParams()["bChainInput"];
+    this._editService.currentData.subscribe((dataToEdit) => {
+      this.obj = dataToEdit;
+      console.log("inside subscribe FORM", this.obj);
+      // this.obj.moduleCode = "generic";
+      // this.obj.objectType = "sites_group";
+      this.obj.bIsInitialized = true;
+      this._configService
+        .init(this.obj.moduleCode)
+        .pipe()
+        .subscribe(() => {
+          // return this._route.queryParamMap;
+          // })
+          // .subscribe((queryParams) => {
+          this.queryParams = this._route.snapshot.queryParams || {};
+          this.bChainInput =
+            this._configService.frontendParams()["bChainInput"];
 
-        const schema = this._configService.schema(
-          this.obj.moduleCode,
-          this.obj.objectType
-        );
-        console.log(schema);
-        this.obj[this.obj.moduleCode] = schema
-        // const schema = this.obj.schema();
-
-        // init objFormsDefinition
-
-        // meta pour les parametres dynamiques
-        // ici pour avoir acces aux nomenclatures
-        this.meta = {
-          // nomenclatures: this._dataUtilsService.getDataUtil('nomenclature'),
-          // dataset: this._dataUtilsService.getDataUtil('dataset'),
-          // id_role: this.currentUser.id_role,
-          bChainInput: this.bChainInput,
-          parents: this.obj.parents,
-        };
-
-        console.log(this.meta);
-        this.objFormsDefinition = this._dynformService
-          .formDefinitionsdictToArray(schema, this.meta)
-          .filter((formDef) => formDef.type_widget)
-          .sort((a, b) => {
-            // medias à la fin
-            return a.attribut_name === "medias"
-              ? +1
-              : b.attribut_name === "medias"
-              ? -1
-              : 0;
-          });
-
-        // display_form pour customiser l'ordre dans le formulaire
-        // les éléments de display form sont placé en haut dans l'ordre du tableau
-        // tous les éléments non cachés restent affichés
-
-        let displayProperties = [
-          ...(this._configService.configModuleObjectParam(
+          const schema = this._configService.schema(
             this.obj.moduleCode,
-            this.obj.objectType,
-            "display_properties"
-          ) || []),
-        ];
-        if (displayProperties && displayProperties.length) {
-          displayProperties.reverse();
-          this.objFormsDefinition.sort((a, b) => {
-            let indexA = displayProperties.findIndex(
-              (e) => e == a.attribut_name
-            );
-            let indexB = displayProperties.findIndex(
-              (e) => e == b.attribut_name
-            );
-            return indexB - indexA;
-          });
-        }
+            this.obj.objectType
+          );
+          console.log(schema);
+          this.obj[this.obj.moduleCode] = schema;
+          // const schema = this.obj.schema();
 
-        // champs patch pour simuler un changement de valeur et déclencher le recalcul des propriété
-        // par exemple quand bChainInput change
-        this.objForm.addControl("patch_update", this._formBuilder.control(0));
+          // init objFormsDefinition
 
-        // this._configService.configModuleObject(this.obj.moduleCode, this.obj.objectType);
-        // set geometry
-        // if (this.obj.config["geometry_type"]) {
-        //   this.objForm.addControl(
-        //     "geometry",
-        //     this._formBuilder.control("", Validators.required)
-        //   );
-        // }
+          // meta pour les parametres dynamiques
+          // ici pour avoir acces aux nomenclatures
+          this.meta = {
+            // nomenclatures: this._dataUtilsService.getDataUtil('nomenclature'),
+            // dataset: this._dataUtilsService.getDataUtil('dataset'),
+            // id_role: this.currentUser.id_role,
+            bChainInput: this.bChainInput,
+            parents: this.obj.parents,
+          };
 
-        // pour donner la valeur de idParent
+          console.log(this.meta);
+          this.objFormsDefinition = this._dynformService
+            .formDefinitionsdictToArray(schema, this.meta)
+            .filter((formDef) => formDef.type_widget)
+            .sort((a, b) => {
+              // medias à la fin
+              return a.attribut_name === "medias"
+                ? +1
+                : b.attribut_name === "medias"
+                ? -1
+                : 0;
+            });
 
-        this.initForm();
-      });
-    })
+          // display_form pour customiser l'ordre dans le formulaire
+          // les éléments de display form sont placé en haut dans l'ordre du tableau
+          // tous les éléments non cachés restent affichés
 
+          let displayProperties = [
+            ...(this._configService.configModuleObjectParam(
+              this.obj.moduleCode,
+              this.obj.objectType,
+              "display_properties"
+            ) || []),
+          ];
+          if (displayProperties && displayProperties.length) {
+            displayProperties.reverse();
+            this.objFormsDefinition.sort((a, b) => {
+              let indexA = displayProperties.findIndex(
+                (e) => e == a.attribut_name
+              );
+              let indexB = displayProperties.findIndex(
+                (e) => e == b.attribut_name
+              );
+              return indexB - indexA;
+            });
+          }
+
+          // champs patch pour simuler un changement de valeur et déclencher le recalcul des propriété
+          // par exemple quand bChainInput change
+          this.objForm.addControl("patch_update", this._formBuilder.control(0));
+
+          // this._configService.configModuleObject(this.obj.moduleCode, this.obj.objectType);
+          // set geometry
+          // if (this.obj.config["geometry_type"]) {
+          //   this.objForm.addControl(
+          //     "geometry",
+          //     this._formBuilder.control("", Validators.required)
+          //   );
+          // }
+
+          // pour donner la valeur de idParent
+
+          this.initForm();
+        });
+    });
   }
-
 
   /** pour réutiliser des paramètres déjà saisis */
   keepDefinitions() {
@@ -187,13 +190,13 @@ export class MonitoringFormComponentG implements OnInit {
     }
 
     this.setQueryParams();
-    console.log("Init Form" , this.obj)
+    console.log("Init Form", this.obj);
     // pour donner la valeur de l'objet au formulaire
     this._editService.formValues(this.obj).subscribe((formValue) => {
-      console.log(formValue)
+      console.log(formValue);
       this.objForm.patchValue(formValue);
       this.setDefaultFormValue();
-      this.dataForm = formValue
+      this.dataForm = formValue;
       // reset geom ?
     });
   }
@@ -277,14 +280,10 @@ export class MonitoringFormComponentG implements OnInit {
   /**
    * Valider et aller à la page de l'objet
    */
-  navigateToDetail(id,objectType,queryParams) {
- // patch bug navigation
+  navigateToDetail(id, objectType, queryParams) {
+    // patch bug navigation
     this._router.navigate(
-      [
-        "monitorings",
-        objectType,
-        id,
-      ].filter((s) => !!s),
+      ["monitorings", objectType, id].filter((s) => !!s),
       {
         queryParams,
       }
@@ -307,12 +306,12 @@ export class MonitoringFormComponentG implements OnInit {
 
   /** TODO améliorer site etc.. */
   onSubmit() {
-    console.log(this.obj)
-    const {patch_update, ...sendValue} = this.dataForm
+    console.log(this.obj);
+    const { patch_update, ...sendValue } = this.dataForm;
     const action = this.obj.id
-      // ? this.obj.patch(this.objForm.value)
-      // : this.obj.post(this.objForm.value);
-      ? this._siteGpService.patchGroupSite(this.obj.id,sendValue)
+      ? // ? this.obj.patch(this.objForm.value)
+        // : this.obj.post(this.objForm.value);
+        this._apiGeomService.patch(this.obj.id, sendValue)
       : this.obj.post(this.objForm.value);
     const actionLabel = this.obj.id ? "Modification" : "Création";
     action.subscribe((objData) => {
@@ -333,10 +332,20 @@ export class MonitoringFormComponentG implements OnInit {
       } else if (this.bAddChildren) {
         this.navigateToAddChildren();
       } else {
-        if (this._configService.configModuleObjectParam(this.obj.moduleCode,this.obj.objectType,"redirect_to_parent")) {
+        if (
+          this._configService.configModuleObjectParam(
+            this.obj.moduleCode,
+            this.obj.objectType,
+            "redirect_to_parent"
+          )
+        ) {
           this.navigateToParent();
         } else {
-          this.navigateToDetail(this.obj.id,this.obj.objectType,this.queryParams);
+          this.navigateToDetail(
+            this.obj.id,
+            this.obj.objectType,
+            this.queryParams
+          );
         }
       }
     });
@@ -368,9 +377,12 @@ export class MonitoringFormComponentG implements OnInit {
   onObjFormValueChange(event) {
     // let {id_module,medias, ...rest} = this.objForm.value;
     // this.dataForm = rest
-    this.dataForm = this.objForm.value
-    console.log(this.dataForm)
-    const change = this._configService.change(this.obj.moduleCode ,this.obj.objectType );
+    this.dataForm = this.objForm.value;
+    console.log(this.dataForm);
+    const change = this._configService.change(
+      this.obj.moduleCode,
+      this.obj.objectType
+    );
     if (!change) {
       return;
     }
@@ -399,7 +411,7 @@ export class MonitoringFormComponentG implements OnInit {
     console.log("inside ngOnChanges");
     console.log("changes", changes);
     if (changes["obj"] && this.obj) {
-      console.log(this.obj)
+      console.log(this.obj);
     }
   }
 }
