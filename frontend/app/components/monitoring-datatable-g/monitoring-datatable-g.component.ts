@@ -9,6 +9,7 @@ import {
   SimpleChanges,
   TemplateRef,
 } from "@angular/core";
+import { Router, ActivatedRoute } from "@angular/router";
 import { Subject } from "rxjs";
 import { debounceTime } from "rxjs/operators";
 import { DataTableService } from "../../services/data-table.service";
@@ -46,12 +47,13 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Output() onFilter = new EventEmitter<any>();
   @Output() onSetPage = new EventEmitter<any>();
   @Output() onDetailsRow = new EventEmitter<any>();
+  @Output() addEvent = new EventEmitter<any>();
 
   private filterSubject: Subject<string> = new Subject();
   displayFilter: boolean = false;
   objectsStatus: ItemsObjectTable;
 
-  objectType:string ='';
+  objectType: string = "";
   columns;
   row_save;
   selected = [];
@@ -61,7 +63,12 @@ export class MonitoringDatatableGComponent implements OnInit {
   @ViewChild("actionsTemplate") actionsTemplate: TemplateRef<any>;
   @ViewChild("hdrTpl") hdrTpl: TemplateRef<any>;
 
-  constructor(private _dataTableService: DataTableService, private _objService: ObjectService) {}
+  constructor(
+    private _dataTableService: DataTableService,
+    private _objService: ObjectService,
+    private router: Router,
+    private _Activatedroute: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     console.log("DataTableComponent colname", this.colsname);
@@ -72,11 +79,13 @@ export class MonitoringDatatableGComponent implements OnInit {
   initDatatable() {
     console.log("Inside initDatatable");
     console.log("this.rows", this.rows);
-    
+
     // IF prefered  observable compare to ngOnChanges   uncomment this:
     // this._dataTableService.currentCols.subscribe(newCols => { this.columns = newCols })
-    this._objService.currentObjectType.subscribe(newObjType => { this.objectType = newObjType })
-    
+    this._objService.currentObjectType.subscribe((newObjType) => {
+      this.objectType = newObjType;
+    });
+
     this.filters = {};
     this.filterSubject.pipe(debounceTime(500)).subscribe(() => {
       this.filter();
@@ -208,10 +217,14 @@ export class MonitoringDatatableGComponent implements OnInit {
   }
   navigateToAddChildren(_, rowId) {
     console.log("Inside navigateToAddChildren:", rowId);
+    this.addEvent.emit(rowId);
+    this.router.navigate(["create"], {
+      relativeTo: this._Activatedroute,
+    });
   }
   navigateToDetail(row) {
     console.log("Inside navigateToDetail:", row);
-    row["id"] = row.pk
+    row["id"] = row.pk;
     this.onDetailsRow.emit(row);
   }
 }

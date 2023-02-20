@@ -73,6 +73,8 @@ const routes: Routes = [
         path: "",
         component: MonitoringSitesGroupsComponent,
       },
+      {path:"create",
+      component:MonitoringSitesGroupsComponent},
       {
         path: ":id",
         component: MonitoringSitesComponent,

@@ -32,6 +32,7 @@ class MonitoringSitesGroupsSchema(MA.SQLAlchemyAutoSchema):
     class Meta:
         model = TMonitoringSitesGroups
         exclude = ("geom_geojson",)
+        load_instance = True
 
     medias = MA.Nested(MediaSchema)
     pk = fields.Method("set_pk",dump_only=True)

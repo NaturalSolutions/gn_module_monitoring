@@ -296,6 +296,8 @@ export class MonitoringFormComponentG implements OnInit {
    */
   navigateToParent() {
     this.bEditChange.emit(false); // patch bug navigation
+    this._router.navigateByUrl('/monitorings/sites_group')
+   
     // this.obj.navigateToParent();
   }
 
@@ -312,7 +314,7 @@ export class MonitoringFormComponentG implements OnInit {
       ? // ? this.obj.patch(this.objForm.value)
         // : this.obj.post(this.objForm.value);
         this._apiGeomService.patch(this.obj.id, sendValue)
-      : this.obj.post(this.objForm.value);
+      : this._apiGeomService.create(sendValue)
     const actionLabel = this.obj.id ? "Modification" : "Création";
     action.subscribe((objData) => {
       this._commonService.regularToaster(
@@ -328,10 +330,13 @@ export class MonitoringFormComponentG implements OnInit {
       }
 
       if (this.bChainInput) {
+        console.log('bChainInput')
         this.resetObjForm();
       } else if (this.bAddChildren) {
+        console.log('bAddChildren')
         this.navigateToAddChildren();
       } else {
+        console.log('this._configService.configModuleObjectParam')
         if (
           this._configService.configModuleObjectParam(
             this.obj.moduleCode,

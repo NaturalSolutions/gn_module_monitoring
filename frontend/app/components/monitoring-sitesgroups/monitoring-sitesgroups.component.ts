@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
+import { Location } from '@angular/common';
 import { SitesGroupService } from "../../services/api-geom.service";
 import { columnNameSiteGroup } from "../../class/monitoring-sites-group";
 import { IPaginated, IPage } from "../../interfaces/page";
@@ -12,6 +13,8 @@ import { GeoJSONService } from "../../services/geojson.service";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
 import { ObjectService } from "../../services/object.service";
+import { EditObjectService } from "../../services/edit-object.service";
+import { FormGroup, FormBuilder } from "@angular/forms";
 
 const LIMIT = 10;
 
@@ -36,9 +39,16 @@ export class MonitoringSitesGroupsComponent
   @Input() colsname;
   @Input() obj;
   objectType:string;
-
-
-
+  @Input() isAddingForm:boolean;
+  objForm: FormGroup;
+  objInitForm:Object= {};
+  // siteGroupEmpty={
+  //   "comments" :'',
+  //   sites_group_code: string;
+  //   sites_group_description: string;
+  //   sites_group_name: string;
+  //   uuid_sites_group: string; //FIXME: see if OK
+  // }
 
   constructor(
     private _sites_group_service: SitesGroupService,
@@ -47,6 +57,9 @@ export class MonitoringSitesGroupsComponent
     private _objService:ObjectService,
     // IF prefered observable compare to ngOnChanges uncomment this:
     // private _dataTableService:DataTableService,
+    private _editService: EditObjectService,
+    private location: Location,
+    private _formBuilder: FormBuilder,
     private _Activatedroute: ActivatedRoute, // private _routingService: RoutingService
     ) {
     super();
@@ -54,6 +67,25 @@ export class MonitoringSitesGroupsComponent
   }
 
   ngOnInit() {
+    console.log(this.router.url)
+    console.log(this.location)
+    if (this.router.url == '/monitorings/sites_group'){
+      this.isAddingForm = false
+      this.initSiteGroup()
+    } else {
+      console.log(this.objInitForm)
+      this._editService.changeDataSub(this.objInitForm);
+      this.isAddingForm = true
+      this.addComponent()
+    }
+
+  }
+
+  addComponent(){
+    this.objForm = this._formBuilder.group({});
+  }
+
+  initSiteGroup(){
     this._objService.changeObjectTypeParent(this._sites_group_service.editObjectType())
     this._objService.changeObjectType(this._sites_group_service.addObjectType())
     this.getSitesGroups(1);
@@ -111,7 +143,14 @@ export class MonitoringSitesGroupsComponent
     // }
   }
 
+  addSiteGp($event){
+    this.isAddingForm = true
+    console.log("ADD Site Groupe", $event)
+  }
   onSelect($event) {
     this.geojsonService.selectSitesGroupLayer($event);
+  }
+  onObjChanged($event) {
+    console.log($event)
   }
 }

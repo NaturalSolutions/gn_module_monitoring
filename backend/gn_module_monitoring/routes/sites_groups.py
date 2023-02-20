@@ -90,6 +90,16 @@ def patch(_id):
     return item_schema.dump(item), 201
 
 
+@blueprint.route("/sites_groups", methods=["POST"])
+def post():
+    item_schema = MonitoringSitesGroupsSchema()
+    item_json = request.get_json()
+    item = item_schema.load(item_json)
+    db.session.add(item)
+    db.session.commit()
+    return item_schema.dump(item), 201
+
+
 @blueprint.errorhandler(ValidationError)
 def handle_validation_error(error):
     return InvalidUsage(

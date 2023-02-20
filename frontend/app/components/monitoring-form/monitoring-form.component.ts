@@ -55,7 +55,7 @@ export class MonitoringFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // console.log(this.obj)
+    console.log(this.obj)
     // this.obj.moduleCode = "generic"
     // this.obj.objectType = "sites_group"
     this._configService

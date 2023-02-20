@@ -59,6 +59,12 @@ export class ApiGeomService implements IGeomService {
       postData: updatedData,
     });
   }
+
+  create( postData: ISitesGroup | ISite): Observable<Resp> {
+    return this._cacheService.request("post", `${this.objectType}`, {
+      postData: postData,
+    });
+  }
 }
 
 @Injectable()
