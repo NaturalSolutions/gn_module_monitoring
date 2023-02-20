@@ -86,9 +86,17 @@ def patch(_id):
         item = item_schema.load(item_json)
     item_schema.load(item_json)
     db.session.add(item)
+    
     db.session.commit()
     return item_schema.dump(item), 201
 
+@blueprint.route("/sites_groups/<int:_id>", methods=["DELETE"])
+def delete(_id):
+    item_schema = MonitoringSitesGroupsSchema()
+    item = TMonitoringSitesGroups.find_by_id(_id)
+    TMonitoringSitesGroups.query.filter_by(id_g=_id).delete()
+    db.session.commit()
+    return item_schema.dump(item), 201
 
 @blueprint.route("/sites_groups", methods=["POST"])
 def post():

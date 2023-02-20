@@ -65,6 +65,11 @@ export class ApiGeomService implements IGeomService {
       postData: postData,
     });
   }
+
+  delete(id: number): Observable<Resp> {
+    return this._cacheService.request("delete", `${this.objectType}/${id}`);
+  }
+  
 }
 
 @Injectable()

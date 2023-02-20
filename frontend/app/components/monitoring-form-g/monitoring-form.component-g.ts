@@ -367,16 +367,26 @@ export class MonitoringFormComponentG implements OnInit {
   onDelete() {
     this.bDeleteSpinner = true;
     this._commonService.regularToaster("info", this.msgToaster("Suppression"));
-
-    this.obj.delete().subscribe((objData) => {
+        // : this.obj.post(this.objForm.value);
+    this._apiGeomService.delete(this.obj.id).subscribe((del)=>{
+      console.log("del obj",del)
       this.bDeleteSpinner = this.bDeleteModal = false;
-      this.obj.deleted = true;
       this.objChanged.emit(this.obj);
-
       setTimeout(() => {
         this.navigateToParent();
       }, 100);
-    });
+    }
+
+    )
+    // this.obj.delete().subscribe((objData) => {
+    //   this.bDeleteSpinner = this.bDeleteModal = false;
+    //   this.obj.deleted = true;
+    //   this.objChanged.emit(this.obj);
+
+    //   setTimeout(() => {
+    //     this.navigateToParent();
+    //   }, 100);
+    // });
   }
 
   onObjFormValueChange(event) {
