@@ -1,6 +1,7 @@
 """
     Modèles SQLAlchemy pour les modules de suivi
 """
+from geoalchemy2 import Geometry
 from sqlalchemy import select, func, and_
 from sqlalchemy.orm import column_property
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -246,7 +247,7 @@ class TMonitoringSites(TBaseSites):
         lazy="joined"
     )
 
-@serializable
+@geoserializable(geoCol="geom", idCol="id_sites_group")
 class TMonitoringSitesGroups(DB.Model):
     __tablename__ = 't_sites_groups'
     __table_args__ = {'schema': 'gn_monitoring'}
@@ -268,6 +269,8 @@ class TMonitoringSitesGroups(DB.Model):
     comments = DB.Column(DB.Unicode)
 
     data = DB.Column(JSONB)
+
+    geom = DB.Column(Geometry("GEOMETRY", 4326))
 
     medias = DB.relationship(
         TMedias,
