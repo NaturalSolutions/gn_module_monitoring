@@ -67,13 +67,10 @@ export class MonitoringSitesGroupsComponent
   }
 
   ngOnInit() {
-    console.log(this.router.url)
-    console.log(this.location)
     if (this.router.url == '/monitorings/sites_group'){
       this.isAddingForm = false
       this.initSiteGroup()
     } else {
-      console.log(this.objInitForm)
       this._editService.changeDataSub(this.objInitForm);
       this.isAddingForm = true
       this.addComponent()
@@ -134,23 +131,14 @@ export class MonitoringSitesGroupsComponent
     this.router.navigate([$event.id_sites_group], {
       relativeTo: this._Activatedroute,
     });
-    // if ($event) {
-    //   this.router.navigate([
-    //     "/monitorings/sites_groups",
-    //     $event.id_sites_group,
-    //   ]);
-    //   console.log(this.sitesGroupsSelected);
-    // }
   }
 
   addSiteGp($event){
     this.isAddingForm = true
-    console.log("ADD Site Groupe", $event)
   }
   onSelect($event) {
     this.geojsonService.selectSitesGroupLayer($event);
   }
   onObjChanged($event) {
-    console.log($event)
   }
 }

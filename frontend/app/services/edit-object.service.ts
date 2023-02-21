@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, of, forkJoin } from "rxjs";
-import { mergeMap, concatMap } from "rxjs/operators";
+import { concatMap } from "rxjs/operators";
 
 import { JsonData } from "../types/jsondata";
 
@@ -43,7 +43,7 @@ export class EditObjectService {
       }
       observables[attribut_name] = this._objService.toForm(elem, properties[attribut_name]);
     }
-    console.log(observables)
+    
     return forkJoin(observables).pipe(
       concatMap((formValues_in) => {
         const formValues = Utils.copy(formValues_in);

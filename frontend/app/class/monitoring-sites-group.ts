@@ -10,4 +10,3 @@ export const extendedDetailsSiteGroup = {
   comments: "Commentaires",
   sites_group_description: "Description",
 };
-// export type detailsSiteGroups = columnNameSiteGroup | extendedDetailsSiteGroup

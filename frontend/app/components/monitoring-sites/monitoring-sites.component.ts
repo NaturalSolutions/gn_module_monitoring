@@ -11,7 +11,10 @@ import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
 import { GeoJSONService } from "../../services/geojson.service";
 import { FormGroup, FormBuilder } from "@angular/forms";
-import { SitesService ,SitesGroupService} from "../../services/api-geom.service";
+import {
+  SitesService,
+  SitesGroupService,
+} from "../../services/api-geom.service";
 import { ObjectService } from "../../services/object.service";
 
 const LIMIT = 10;
@@ -32,18 +35,18 @@ export class MonitoringSitesComponent
   page: IPage;
   filters = {};
   siteGroupLayer: L.FeatureGroup;
-  @Input() bEdit:boolean;
+  @Input() bEdit: boolean;
   objForm: FormGroup;
-  objectType:string;
+  objectType: string;
 
   constructor(
     private _sitesGroupService: SitesGroupService,
     private _siteService: SitesService,
-    private _objService:ObjectService,
+    private _objService: ObjectService,
     private router: Router,
     private _Activatedroute: ActivatedRoute,
     private _geojsonService: GeoJSONService,
-    private _formBuilder: FormBuilder,
+    private _formBuilder: FormBuilder
   ) {
     super();
     this.getAllItemsCallback = this.getSitesFromSiteGroupId;
@@ -51,12 +54,11 @@ export class MonitoringSitesComponent
 
   ngOnInit() {
     this.objForm = this._formBuilder.group({});
-    // this.objectType = this._siteService.addObjectType()
-    this._objService.changeObjectType(this._siteService.addObjectType())
-    this.initSite()
+    this._objService.changeObjectType(this._siteService.addObjectType());
+    this.initSite();
   }
 
-  initSite(){
+  initSite() {
     this._Activatedroute.params
       .pipe(
         map((params) => params["id"] as number),
@@ -126,15 +128,12 @@ export class MonitoringSitesComponent
 
   seeDetails($event) {
     console.log("seeDetails", $event);
-    this._objService.changeObjectTypeParent(this._siteService.editObjectType())
-    // this.router.navigate([$event.id_sites_group], {
-    //   relativeTo: this._Activatedroute,
-    // });
+    this._objService.changeObjectTypeParent(this._siteService.editObjectType());
   }
 
   onSelect($event) {}
 
   onObjChanged($event) {
-    this.initSite()
+    this.initSite();
   }
 }

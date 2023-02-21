@@ -55,9 +55,6 @@ export class MonitoringFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(this.obj)
-    // this.obj.moduleCode = "generic"
-    // this.obj.objectType = "sites_group"
     this._configService
       .init(this.obj.moduleCode)
       .pipe()
@@ -68,8 +65,6 @@ export class MonitoringFormComponent implements OnInit {
         this.queryParams = this._route.snapshot.queryParams || {};
         this.bChainInput = this._configService.frontendParams()['bChainInput'];
         const schema = this.obj.schema();
-
-        console.log("Init Form this.obj.schema()",schema )
         // init objFormsDefinition
 
         // meta pour les parametres dynamiques

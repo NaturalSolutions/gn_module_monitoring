@@ -52,7 +52,6 @@ export class DataTableService {
   }
 
   initObjectsStatus(obj, key) {
-    console.log("obj InitObjectStatus", obj);
     const objectsStatus = {};
     // for (const childrenType of Object.keys(this.obj.children)) {
     objectsStatus[key] = obj.map((groupSite) => {
@@ -63,7 +62,6 @@ export class DataTableService {
         current: false,
       };
     });
-    console.log("objectsStatus", objectsStatus);
     // }
 
     // init site status
@@ -87,7 +85,6 @@ export class DataTableService {
 
     this.objectsStatus = objectsStatus;
     this.rowStatus = this.objectsStatus[key];
-    console.log("datatable service", this.rowStatus);
     return [this.objectsStatus, this.rowStatus];
   }
 }

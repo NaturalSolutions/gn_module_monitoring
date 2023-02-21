@@ -71,15 +71,10 @@ export class MonitoringDatatableGComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log("DataTableComponent colname", this.colsname);
-    console.log("DataTableComponent rows", this.rows);
     this.initDatatable();
   }
 
   initDatatable() {
-    console.log("Inside initDatatable");
-    console.log("this.rows", this.rows);
-
     // IF prefered  observable compare to ngOnChanges   uncomment this:
     // this._dataTableService.currentCols.subscribe(newCols => { this.columns = newCols })
     this._objService.currentObjectType.subscribe((newObjType) => {
@@ -93,13 +88,11 @@ export class MonitoringDatatableGComponent implements OnInit {
   }
 
   onSortEvent($event) {
-    console.log("onSortEvent, $event", $event);
     this.filters = {
       ...this.filters,
       sort: $event.column.prop,
       sort_dir: $event.newValue,
     };
-    console.log("onSortEvent, this.filters", this.filters);
     this.onSort.emit(this.filters);
   }
 
@@ -108,13 +101,11 @@ export class MonitoringDatatableGComponent implements OnInit {
   }
 
   filterInput($event) {
-    console.log("filterInput, $event", $event);
     this.filterSubject.next();
   }
 
   filter(bInitFilter = false) {
     // filter all
-    console.log("Inside DataTable-G , filter()", this.filters);
     const oldFilters = this.filters;
     this.filters = Object.keys(oldFilters).reduce(function (r, e) {
       if (![undefined, "", null].includes(oldFilters[e])) r[e] = oldFilters[e];
@@ -124,17 +115,11 @@ export class MonitoringDatatableGComponent implements OnInit {
   }
 
   onSelectEvent({ selected }) {
-    console.log("Select Row", selected, this.selected);
-    console.log("this.table", this.table);
-    console.log(this.table._internalRows);
-    console.log("selected[0]", selected[0]);
-    console.log("selected[0].id", selected[0].id_group_site);
     const id = selected[0].id_group_site;
 
     if (!this.rowStatus) {
       return;
     }
-    console.log("this.rowStatus after check rowStatus", this.rowStatus);
 
     this.rowStatus.forEach((status) => {
       const bCond = status.id === id;
@@ -143,9 +128,6 @@ export class MonitoringDatatableGComponent implements OnInit {
 
     this.setSelected();
     this.rowStatusChange.emit(this.rowStatus);
-    console.log("after click rowStatus", this.rowStatus);
-    console.log("after click selected", this.selected);
-    console.log("after click table", this.table);
   }
 
   setSelected() {
@@ -182,9 +164,6 @@ export class MonitoringDatatableGComponent implements OnInit {
   // }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log("inside ngOnChanges");
-    console.log("changes", changes);
-
     // IF prefered ngOnChanges compare to observable   uncomment this:
     if (changes["rows"] && this.rows && this.rows.length > 0) {
       this.columns = this._dataTableService.colsTable(
@@ -205,9 +184,6 @@ export class MonitoringDatatableGComponent implements OnInit {
         ));
     }
     for (const propName of Object.keys(changes)) {
-      const chng = changes[propName];
-      const cur = chng.currentValue;
-      const pre = chng.previousValue;
       switch (propName) {
         case "rowStatus":
           this.setSelected();
@@ -216,14 +192,12 @@ export class MonitoringDatatableGComponent implements OnInit {
     }
   }
   navigateToAddChildren(_, rowId) {
-    console.log("Inside navigateToAddChildren:", rowId);
     this.addEvent.emit(rowId);
     this.router.navigate(["create"], {
       relativeTo: this._Activatedroute,
     });
   }
   navigateToDetail(row) {
-    console.log("Inside navigateToDetail:", row);
     row["id"] = row.pk;
     this.onDetailsRow.emit(row);
   }
