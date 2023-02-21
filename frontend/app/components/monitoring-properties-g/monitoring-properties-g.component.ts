@@ -21,39 +21,29 @@ export class MonitoringPropertiesGComponent implements OnInit {
   @Input() selectedObj: ISitesGroup;
   @Input() bEdit: boolean;
   @Output() bEditChange = new EventEmitter<boolean>();
-  @Input() objectType:string;
-  Object = Object;
+  @Input() objectType: string;
 
-  // @Input() currentUser;
   infosColsSiteGroups: typeof extendedDetailsSiteGroup =
     extendedDetailsSiteGroup;
   color: string = "white";
   dataDetails: ISitesGroup;
 
   datasetForm = new FormControl();
-  bUpdateSyntheseSpinner = false;
-  public modalReference;
 
-  constructor(private _editService: EditObjectService,private _objService: ObjectService) {}
+  constructor(
+    private _editService: EditObjectService,
+    private _objService: ObjectService
+  ) {}
 
   ngOnInit() {
-    console.log("selectedObj", this.selectedObj);
-    console.log("infosColsSiteGroups", this.infosColsSiteGroups);
-    this._objService.currentObjectTypeParent.subscribe(newObjType => { this.objectType = newObjType })
+    this._objService.currentObjectTypeParent.subscribe((newObjType) => {
+      this.objectType = newObjType;
+    });
   }
 
   onEditClick() {
     this.bEditChange.emit(true);
-    console.log("edit");
-    console.log("obj inside PROPERTIES", this.selectedObj);
-    this.selectedObj["id"] = this.selectedObj[this.selectedObj.pk]
+    this.selectedObj["id"] = this.selectedObj[this.selectedObj.pk];
     this._editService.changeDataSub(this.selectedObj);
   }
-  // ngOnChanges(changes: SimpleChanges) {
-  //   console.log("inside ngOnChanges");
-  //   console.log("changes", changes);
-  //   if (changes["selectedObj"] && this.selectedObj) {
-  //   console.log(this.selectedObj)
-  //   }
-  // }
 }
