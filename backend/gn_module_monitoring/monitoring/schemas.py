@@ -2,9 +2,7 @@ import json
 
 import geojson
 from geonature.utils.env import MA
-from marshmallow import Schema, fields, validate, pre_load
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from pypnnomenclature.schemas import NomenclatureSchema
+from marshmallow import Schema, fields, validate
 from geonature.core.gn_commons.schemas import MediaSchema
 
 from gn_module_monitoring.monitoring.models import (
@@ -37,11 +35,7 @@ class MonitoringSitesGroupsSchema(MA.SQLAlchemyAutoSchema):
     medias = MA.Nested(MediaSchema)
     pk = fields.Method("set_pk",dump_only=True)
     geometry = fields.Method("serialize_geojson", dump_only=True)
-    # properties = fields.Method("group_properties_geojson")
-
-    # def group_properties_geojson(self, obj):
-    #     return {field: getattr(obj,field) for field in self.fields.keys() if field not in ("geometry","properties")}
-
+    
     def set_pk(self,obj):
         return self.Meta.model.get_id()
 
@@ -51,7 +45,7 @@ class MonitoringSitesGroupsSchema(MA.SQLAlchemyAutoSchema):
     
 
 
-class MonitoringSitesSchema(SQLAlchemyAutoSchema):
+class MonitoringSitesSchema(MA.SQLAlchemyAutoSchema):
     class Meta:
         model = TMonitoringSites
         exclude = ("geom_geojson", "geom")
@@ -63,7 +57,7 @@ class MonitoringSitesSchema(SQLAlchemyAutoSchema):
             return geojson.dumps(obj.as_geofeature().get("geometry"))
 
 
-class BibTypeSiteSchema(SQLAlchemyAutoSchema):
+class BibTypeSiteSchema(MA.SQLAlchemyAutoSchema):
     label = fields.Method("get_label_from_type_site")
     # See if useful in the future:
     # type_site = fields.Nested(NomenclatureSchema(only=("label_fr",)), dump_only=True)

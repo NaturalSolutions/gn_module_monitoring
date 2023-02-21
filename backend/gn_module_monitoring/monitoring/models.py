@@ -2,7 +2,7 @@
     Modèles SQLAlchemy pour les modules de suivi
 """
 from sqlalchemy import select, func, and_
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import column_property, ColumnProperty, RelationshipProperty, class_mapper
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from uuid import uuid4
 
@@ -10,6 +10,7 @@ from utils_flask_sqla.serializers import serializable
 from utils_flask_sqla_geo.serializers import geoserializable
 
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.declarative import declared_attr
 
 from pypnnomenclature.models import TNomenclatures, BibNomenclaturesTypes
 from geonature.core.gn_commons.models import TMedias
@@ -20,10 +21,6 @@ from geonature.core.gn_commons.models import TModules, cor_module_dataset
 from pypnusershub.db.models import User
 from geonature.core.gn_monitoring.models import corVisitObserver
 from gn_module_monitoring.monitoring.queries import Query as MonitoringQuery
-
-import sqlalchemy
-from sqlalchemy.orm import class_mapper
-from sqlalchemy.ext.declarative import declared_attr
 
 
 class GenericModel:
@@ -57,30 +54,8 @@ class GenericModel:
         return [
             prop.key
             for prop in class_mapper(cls).iterate_properties
-            if isinstance(prop, sqlalchemy.orm.ColumnProperty)
+            if isinstance(prop, ColumnProperty)
         ]
-
-    @classmethod
-    def get_type_fields(cls):
-        structure_data =  {prop.key:type(prop.expression.type).__name__ for prop in class_mapper(cls).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty)}
-        for prop in class_mapper(cls).iterate_properties:
-            if isinstance(prop, sqlalchemy.orm.RelationshipProperty):
-                structure_data[prop.key] = "Select"
-        return structure_data
-    
-    @classmethod
-    def get_only_field_table(cls):
-        fields_table = [i.name for i in cls.__table__.columns]
-        structure_data =  {prop.key:type(prop.expression.type).__name__ for prop in class_mapper(cls).iterate_properties
-        if isinstance(prop, sqlalchemy.orm.ColumnProperty) and prop.key in fields_table}
-        for prop in class_mapper(cls).iterate_properties:
-            if isinstance(prop, sqlalchemy.orm.RelationshipProperty):
-                structure_data[prop.key] = "Select"
-        return structure_data
-       
-    # __table_args__ = {'mysql_engine': 'InnoDB'}
-    # id =  DB.Column(Integer, primary_key=True)
 
 
 cor_module_type = DB.Table(
@@ -115,7 +90,7 @@ cor_type_site = DB.Table(
 
 
 @serializable
-class BibTypeSite(DB.Model,GenericModel):
+class BibTypeSite(DB.Model, GenericModel):
     __tablename__ = "bib_type_site"
     __table_args__ = {"schema": "gn_monitoring"}
     query_class = MonitoringQuery
@@ -309,7 +284,7 @@ class TMonitoringSites(TBaseSites):
     )
 
 @serializable
-class TMonitoringSitesGroups(DB.Model,GenericModel):
+class TMonitoringSitesGroups(DB.Model, GenericModel):
     __tablename__ = 't_sites_groups'
     __table_args__ = {'schema': 'gn_monitoring'}
     query_class = MonitoringQuery
