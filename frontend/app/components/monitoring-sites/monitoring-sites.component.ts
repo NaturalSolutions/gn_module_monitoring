@@ -129,6 +129,9 @@ export class MonitoringSitesComponent
   seeDetails($event) {
     console.log("seeDetails", $event);
     this._objService.changeObjectTypeParent(this._siteService.editObjectType());
+    this.router.navigate([`sites/${$event.id_base_site}`], {
+      relativeTo: this._Activatedroute,
+    });
   }
 
   onSelect($event) {}

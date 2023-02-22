@@ -41,7 +41,13 @@ import { MonitoringMapListComponent } from "./components/monitoring-map-list/mon
 import { MonitoringFormComponentG } from "./components/monitoring-form-g/monitoring-form.component-g";
 import { EditObjectService } from "./services/edit-object.service";
 import { ObjectService } from "./services/object.service";
-import { SitesGroupService,SitesService,ApiGeomService } from "./services/api-geom.service";
+import {
+  SitesGroupService,
+  SitesService,
+  ApiGeomService,
+} from "./services/api-geom.service";
+import { MonitoringVisitsComponent } from "./components/monitoring-visits/monitoring-visits.component";
+import { MonitoringSitesGroupsCreateComponent } from "./components/monitoring-sitesgroups-create/monitoring-sitesgroups-create.component";
 
 // my module routing
 const routes: Routes = [
@@ -71,10 +77,16 @@ const routes: Routes = [
         path: "",
         component: MonitoringSitesGroupsComponent,
       },
-      { path: "create", component: MonitoringSitesGroupsComponent },
+      { path: "create", component: MonitoringSitesGroupsCreateComponent },
       {
         path: ":id",
-        component: MonitoringSitesComponent,
+        // Add new component here
+        children: [
+          {
+            path: "",
+            component: MonitoringSitesComponent,
+          },
+        ],
       },
     ],
   },
@@ -97,7 +109,8 @@ const routes: Routes = [
     MonitoringSitesComponent,
     MonitoringDatatableGComponent,
     MonitoringPropertiesGComponent,
-    MonitoringFormComponentG
+    MonitoringFormComponentG,
+    MonitoringSitesGroupsCreateComponent,
   ],
   imports: [
     GN2CommonModule,
@@ -127,7 +140,7 @@ const routes: Routes = [
     GeoJSONService,
     EditObjectService,
     ObjectService,
-    ApiGeomService
+    ApiGeomService,
   ],
   bootstrap: [ModulesComponent],
   schemas: [

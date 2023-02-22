@@ -1,22 +1,6 @@
 <!-- IF prefered observable compare to ngOnChanges we can remove rows and colsname-->
 <div>
-  <pnx-monitoring-form-g
-  [obj]="sitesGroup"
-  (objChanged)="onObjChanged($event)"
-  *ngIf="isAddingForm"
-  [(bEdit)]="isAddingForm"
-  [objForm]="objForm"
-></pnx-monitoring-form-g>
-      <pnx-monitoring-datatable-g
-      *ngIf="!isAddingForm"
-      [rows]="sitesGroups"
-      [colsname]="colsname"
-      (onSort)="setSort($event)"
-      [page]="page"
-      (onFilter)="setFilter($event)"
-      (onSetPage)="setPage($event)"
-      [obj]="sitesGroups"
-      (onDetailsRow)="seeDetails($event)"
-      (addEvent)="addSiteGp($event)"
-    ></pnx-monitoring-datatable-g>
+  <pnx-monitoring-datatable-g [rows]="sitesGroups" [colsname]="colsname" (onSort)="setSort($event)" [page]="page"
+    (onFilter)="setFilter($event)" (onSetPage)="setPage($event)" [obj]="sitesGroups" (onDetailsRow)="seeDetails($event)"
+    (addEvent)="addSiteGp($event)"></pnx-monitoring-datatable-g>
 </div>
