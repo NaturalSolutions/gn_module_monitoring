@@ -31,7 +31,6 @@ export class ConfigService {
   }
 
   loadConfig(moduleCode) {
-    console.log(moduleCode)
     const urlConfig =
       moduleCode === 'generic'
         ? `${this.backendModuleUrl()}/config`
