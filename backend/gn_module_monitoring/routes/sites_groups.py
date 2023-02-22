@@ -1,6 +1,5 @@
 from flask import jsonify, request
 from geonature.utils.env import db
-from gn_module_monitoring.utils.strings.strings import gettext
 from marshmallow import ValidationError
 from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
@@ -70,13 +69,10 @@ def patch(_id):
     item_schema = MonitoringSitesGroupsSchema()
     item_json = request.get_json()
     item = TMonitoringSitesGroups.find_by_id(_id)
-    if item:
-        fields = TMonitoringSitesGroups.attribute_names()
-        for field in item_json:
-            if field in fields:
-                setattr(item, field, item_json[field])
-    else:
-        item = item_schema.load(item_json)
+    fields = TMonitoringSitesGroups.attribute_names()
+    for field in item_json:
+        if field in fields:
+            setattr(item, field, item_json[field])
     item_schema.load(item_json)
     db.session.add(item)
 
@@ -106,5 +102,5 @@ def post():
 @blueprint.errorhandler(ValidationError)
 def handle_validation_error(error):
     return InvalidUsage(
-        gettext("item_not_validated").format(error.messages), status_code=422, payload=error.data
+        "Fields cannot be validated, message : {}".format(error.messages), status_code=422, payload=error.data
     ).to_dict()
