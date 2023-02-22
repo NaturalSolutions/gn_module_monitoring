@@ -13,7 +13,6 @@ class InvalidUsage(GeonatureApiError):
 
     def to_dict(self):
         rv = {}
-        # rv['payload'] = dict(self.payload or ())
         rv["payload"] = self.payload
         rv["message"] = self.message
         rv["status_code"] = self.status_code
