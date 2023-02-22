@@ -66,15 +66,8 @@ export class MonitoringFormComponentG implements OnInit {
   ) {}
 
   ngOnInit() {
-    // console.log(this.obj);
-    // this.obj.moduleCode = "generic";
-    // this.obj.objectType = "sites_group";
-    console.log(this.obj);
     this._editService.currentData.subscribe((dataToEdit) => {
       this.obj = dataToEdit;
-      console.log("inside subscribe FORM", this.obj);
-      // this.obj.moduleCode = "generic";
-      // this.obj.objectType = "sites_group";
       this.obj.bIsInitialized = true;
       this._configService
         .init(this.obj.moduleCode)
@@ -91,7 +84,6 @@ export class MonitoringFormComponentG implements OnInit {
             this.obj.moduleCode,
             this.obj.objectType
           );
-          console.log(schema);
           this.obj[this.obj.moduleCode] = schema;
           // const schema = this.obj.schema();
 
@@ -107,7 +99,6 @@ export class MonitoringFormComponentG implements OnInit {
             parents: this.obj.parents,
           };
 
-          console.log(this.meta);
           this.objFormsDefinition = this._dynformService
             .formDefinitionsdictToArray(schema, this.meta)
             .filter((formDef) => formDef.type_widget)
@@ -190,10 +181,8 @@ export class MonitoringFormComponentG implements OnInit {
     }
 
     this.setQueryParams();
-    console.log("Init Form", this.obj);
     // pour donner la valeur de l'objet au formulaire
     this._editService.formValues(this.obj).subscribe((formValue) => {
-      console.log(formValue);
       this.objForm.patchValue(formValue);
       this.setDefaultFormValue();
       this.dataForm = formValue;
@@ -296,8 +285,8 @@ export class MonitoringFormComponentG implements OnInit {
    */
   navigateToParent() {
     this.bEditChange.emit(false); // patch bug navigation
-    this._router.navigateByUrl('/monitorings/sites_group')
-   
+    this._router.navigateByUrl("/monitorings/sites_group");
+
     // this.obj.navigateToParent();
   }
 
@@ -308,13 +297,12 @@ export class MonitoringFormComponentG implements OnInit {
 
   /** TODO améliorer site etc.. */
   onSubmit() {
-    console.log(this.obj);
     const { patch_update, ...sendValue } = this.dataForm;
     const action = this.obj.id
       ? // ? this.obj.patch(this.objForm.value)
         // : this.obj.post(this.objForm.value);
         this._apiGeomService.patch(this.obj.id, sendValue)
-      : this._apiGeomService.create(sendValue)
+      : this._apiGeomService.create(sendValue);
     const actionLabel = this.obj.id ? "Modification" : "Création";
     action.subscribe((objData) => {
       this._commonService.regularToaster(
@@ -330,13 +318,10 @@ export class MonitoringFormComponentG implements OnInit {
       }
 
       if (this.bChainInput) {
-        console.log('bChainInput')
         this.resetObjForm();
       } else if (this.bAddChildren) {
-        console.log('bAddChildren')
         this.navigateToAddChildren();
       } else {
-        console.log('this._configService.configModuleObjectParam')
         if (
           this._configService.configModuleObjectParam(
             this.obj.moduleCode,
@@ -367,33 +352,20 @@ export class MonitoringFormComponentG implements OnInit {
   onDelete() {
     this.bDeleteSpinner = true;
     this._commonService.regularToaster("info", this.msgToaster("Suppression"));
-        // : this.obj.post(this.objForm.value);
-    this._apiGeomService.delete(this.obj.id).subscribe((del)=>{
-      console.log("del obj",del)
+    // : this.obj.post(this.objForm.value);
+    this._apiGeomService.delete(this.obj.id).subscribe((del) => {
       this.bDeleteSpinner = this.bDeleteModal = false;
       this.objChanged.emit(this.obj);
       setTimeout(() => {
         this.navigateToParent();
       }, 100);
-    }
-
-    )
-    // this.obj.delete().subscribe((objData) => {
-    //   this.bDeleteSpinner = this.bDeleteModal = false;
-    //   this.obj.deleted = true;
-    //   this.objChanged.emit(this.obj);
-
-    //   setTimeout(() => {
-    //     this.navigateToParent();
-    //   }, 100);
-    // });
+    });
   }
 
   onObjFormValueChange(event) {
     // let {id_module,medias, ...rest} = this.objForm.value;
     // this.dataForm = rest
     this.dataForm = this.objForm.value;
-    console.log(this.dataForm);
     const change = this._configService.change(
       this.obj.moduleCode,
       this.obj.objectType
@@ -420,13 +392,5 @@ export class MonitoringFormComponentG implements OnInit {
     this._configService.setFrontendParams("bChainInput", this.bChainInput);
     // patch pour recalculers
     this.procesPatchUpdateForm();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    console.log("inside ngOnChanges");
-    console.log("changes", changes);
-    if (changes["obj"] && this.obj) {
-      console.log(this.obj);
-    }
   }
 }
