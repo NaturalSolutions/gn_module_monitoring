@@ -5,7 +5,6 @@ import { tap, map, mergeMap } from "rxjs/operators";
 import * as L from "leaflet";
 import { ISite, ISitesGroup } from "../../interfaces/geom";
 import { IPage, IPaginated } from "../../interfaces/page";
-// import {  } from "../../services/sites_group.service";
 import { columnNameSite } from "../../class/monitoring-site";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
@@ -127,14 +126,11 @@ export class MonitoringSitesComponent
   }
 
   seeDetails($event) {
-    console.log("seeDetails", $event);
     this._objService.changeObjectTypeParent(this._siteService.editObjectType());
     this.router.navigate([`sites/${$event.id_base_site}`], {
       relativeTo: this._Activatedroute,
     });
   }
-
-  onSelect($event) {}
 
   onObjChanged($event) {
     this.initSite();

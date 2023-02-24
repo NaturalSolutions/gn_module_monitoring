@@ -23,7 +23,6 @@ export class ApiGeomService implements IGeomService {
 
   init() {
     this.objectType = endPoints.sites_groups;
-    console.log(this.objectType);
   }
   get(
     page: number = 1,
