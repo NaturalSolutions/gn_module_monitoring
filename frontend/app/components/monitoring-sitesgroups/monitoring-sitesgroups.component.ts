@@ -62,11 +62,12 @@ export class MonitoringSitesGroupsComponent
 
   initSiteGroup() {
     this._objService.changeObjectTypeParent(
-      this._sites_group_service.editObjectType()
+      this._sites_group_service.objectObs
     );
     this._objService.changeObjectType(
-      this._sites_group_service.addObjectType()
+      this._sites_group_service.objectObs
     );
+    
     this.getSitesGroups(1);
     this.geojsonService.getSitesGroupsGeometries(
       this.onEachFeatureSiteGroups()
@@ -110,7 +111,7 @@ export class MonitoringSitesGroupsComponent
   seeDetails($event) {
     // TODO: routerLink
     this._objService.changeObjectTypeParent(
-      this._sites_group_service.editObjectType()
+      this._sites_group_service.objectObs
     );
     this.router.navigate([$event.id_sites_group], {
       relativeTo: this._Activatedroute,
