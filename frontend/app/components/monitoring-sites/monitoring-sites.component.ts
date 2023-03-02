@@ -136,4 +136,6 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
   onObjChanged($event) {
     this.initSite();
   }
+
+  onSelect($event) {}
 }
