@@ -32,6 +32,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+
     this._objService.currentObjectTypeParent.subscribe((newObjType) => {
       this.objectType = newObjType;
       this.fieldsNames = newObjType.template.fieldNames;
