@@ -9,6 +9,7 @@ import {
 import { FormControl } from "@angular/forms";
 import { extendedDetailsSiteGroup } from "../../class/monitoring-sites-group";
 import { ISitesGroup } from "../../interfaces/geom";
+import { IobjObs } from "../../interfaces/objObs";
 import { EditObjectService } from "../../services/edit-object.service";
 import { ObjectService } from "../../services/object.service";
 
@@ -21,7 +22,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   @Input() selectedObj: ISitesGroup;
   @Input() bEdit: boolean;
   @Output() bEditChange = new EventEmitter<boolean>();
-  @Input() objectType: string;
+  @Input() objectType: IobjObs;
 
   infosColsSiteGroups: typeof extendedDetailsSiteGroup =
     extendedDetailsSiteGroup;
@@ -36,6 +37,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+
     this._objService.currentObjectTypeParent.subscribe((newObjType) => {
       this.objectType = newObjType;
     });

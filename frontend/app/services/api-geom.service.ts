@@ -1,21 +1,19 @@
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { GeoJSON } from "geojson";
+import { Observable, of } from "rxjs";
 
 import { CacheService } from "./cache.service";
 import { IGeomService, ISitesGroup, ISite } from "../interfaces/geom";
 import { IPaginated } from "../interfaces/page";
 import { JsonData } from "../types/jsondata";
 import { Resp } from "../types/response";
+import { endPoints } from "../enum/endpoints";
+import { IobjObs } from "../interfaces/objObs";
 
-export enum endPoints {
-  sites_groups = "sites_groups",
-  sites = "sites",
-}
 
 @Injectable()
 export class ApiGeomService implements IGeomService {
   public objectType: endPoints = endPoints.sites_groups;
+  public objectObs: IobjObs;
 
   constructor(protected _cacheService: CacheService) {
     this.init();
@@ -23,6 +21,15 @@ export class ApiGeomService implements IGeomService {
 
   init() {
     this.objectType = endPoints.sites_groups;
+    this.objectObs = {
+      properties: {},
+      endPoint: endPoints.sites_groups,
+      label:"groupe de site",
+      addObjLabel: "Ajouter",
+      editObjLabel: "Editer",
+      id: null,
+      moduleCode: "generic",
+    };
   }
   get(
     page: number = 1,
@@ -78,6 +85,15 @@ export class SitesGroupService extends ApiGeomService {
   }
   init(): void {
     this.objectType = endPoints.sites_groups;
+    this.objectObs ={
+      properties: {},
+      endPoint: endPoints.sites_groups,
+      label:"groupe de site",
+      addObjLabel: "Ajouter un nouveau groupe de site",
+      editObjLabel: "Editer le groupe de site",
+      id: null,
+      moduleCode: "generic",
+    };
   }
 
   getSitesChild(
@@ -94,6 +110,7 @@ export class SitesGroupService extends ApiGeomService {
     );
   }
 
+
   addObjectType(): string {
     return "un nouveau groupe de site";
   }
@@ -108,9 +125,21 @@ export class SitesService extends ApiGeomService {
   constructor(_cacheService: CacheService) {
     super(_cacheService);
   }
+  opts = [];
+
   init(): void {
     this.objectType = endPoints.sites;
+    this.objectObs ={
+      properties: {},
+      endPoint: endPoints.sites,
+      label:"site",
+      addObjLabel: "Ajouter un nouveau site",
+      editObjLabel: "Editer le site",
+      id: null,
+      moduleCode: "generic",
+    };
   }
+
   addObjectType(): string {
     return " un nouveau site";
   }

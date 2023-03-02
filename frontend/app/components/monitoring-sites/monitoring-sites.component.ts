@@ -15,6 +15,7 @@ import {
   SitesGroupService,
 } from "../../services/api-geom.service";
 import { ObjectService } from "../../services/object.service";
+import { IobjObs } from "../../interfaces/objObs";
 
 const LIMIT = 10;
 
@@ -36,7 +37,7 @@ export class MonitoringSitesComponent
   siteGroupLayer: L.FeatureGroup;
   @Input() bEdit: boolean;
   objForm: FormGroup;
-  objectType: string;
+  objectType: IobjObs;
 
   constructor(
     private _sitesGroupService: SitesGroupService,
@@ -53,7 +54,8 @@ export class MonitoringSitesComponent
 
   ngOnInit() {
     this.objForm = this._formBuilder.group({});
-    this._objService.changeObjectType(this._siteService.addObjectType());
+    this._objService.changeObjectTypeParent(this._sitesGroupService.objectObs);
+    this._objService.changeObjectType(this._siteService.objectObs);
     this.initSite();
   }
 
@@ -126,7 +128,7 @@ export class MonitoringSitesComponent
   }
 
   seeDetails($event) {
-    this._objService.changeObjectTypeParent(this._siteService.editObjectType());
+    this._objService.changeObjectTypeParent(this._siteService.objectObs);
     this.router.navigate([`sites/${$event.id_base_site}`], {
       relativeTo: this._Activatedroute,
     });
@@ -135,4 +137,6 @@ export class MonitoringSitesComponent
   onObjChanged($event) {
     this.initSite();
   }
+
+  onSelect($event) {}
 }
