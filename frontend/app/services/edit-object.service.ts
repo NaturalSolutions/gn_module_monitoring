@@ -20,12 +20,13 @@ export class EditObjectService {
       private _objService:MonitoringObjectService
   ) {}
 
+  // TODO: voir si nécessaire de garder ça (objService permet d'avoir le bon objet ? et sinon modifier pour obtenir ce qu'il faut en formulaire)
   changeDataSub(newDat: JsonData) {
     this.properties = newDat;
     newDat.moduleCode = "generic";
-    newDat.objectType = "sites_group";
+    newDat.objectType = "sites_groups";
     this.moduleCode=  "generic";
-    this.objecType=  "sites_group"
+    this.objecType=  "sites_groups"
     this.dataSub.next(newDat)
     
   }

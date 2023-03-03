@@ -11,17 +11,17 @@ import { of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
 @Injectable()
-export class ConfigService {
+export class ConfigJsonService {
   private _config;
 
   constructor(private _http: HttpClient, private _moduleService: ModuleService) {}
 
   /** Configuration */
 
-  init(moduleCode = null) {
+  init(moduleCode: string) {
     // a definir ailleurs
 
-    moduleCode = moduleCode || 'generic';
+    // moduleCode = moduleCode || 'generic';
 
     if (this._config && this._config[moduleCode]) {
       return of(true);
@@ -48,13 +48,13 @@ export class ConfigService {
   }
 
   /** Backend Url et static dir ??*/
-  backendUrl() {
-    return `${AppConfig.API_ENDPOINT}`;
-  }
+  // backendUrl() {
+  //   return `${AppConfig.API_ENDPOINT}`;
+  // }
 
-  urlApplication() {
-    return `${AppConfig.URL_APPLICATION}`;
-  }
+  // urlApplication() {
+  //   return `${AppConfig.URL_APPLICATION}`;
+  // }
 
   /** Backend Module Url */
   backendModuleUrl() {
@@ -66,20 +66,20 @@ export class ConfigService {
     return `${api_url}${this._moduleService.currentModule.module_path}`;
   }
 
-  descriptionModule() {
-    return ModuleConfig.DESCRIPTION_MODULE;
-  }
-  titleModule() {
-    return ModuleConfig.TITLE_MODULE;
-  }
-  /** Frontend Module Monitoring Url */
-  frontendModuleMonitoringUrl() {
-    return this._moduleService.currentModule.module_path;
-  }
+  // descriptionModule() {
+  //   return ModuleConfig.DESCRIPTION_MODULE;
+  // }
+  // titleModule() {
+  //   return ModuleConfig.TITLE_MODULE;
+  // }
+  // /** Frontend Module Monitoring Url */
+  // frontendModuleMonitoringUrl() {
+  //   return this._moduleService.currentModule.module_path;
+  // }
 
-  moduleMonitoringCode() {
-    return ModuleConfig.MODULE_CODE;
-  }
+  // moduleMonitoringCode() {
+  //   return ModuleConfig.MODULE_CODE;
+  // }
 
   /**
    * Converti s en function js
@@ -116,13 +116,13 @@ export class ConfigService {
    * @param moduleCode
    * @param objectType
    */
-  change(moduleCode, objectType) {
-    moduleCode = moduleCode || 'generic';
+  // change(moduleCode, objectType) {
+  //   moduleCode = moduleCode || 'generic';
 
-    const configObject = this._config[moduleCode][objectType];
-    const change = configObject.change;
-    return this.toFunction(change);
-  }
+  //   const configObject = this._config[moduleCode][objectType];
+  //   const change = configObject.change;
+  //   return this.toFunction(change);
+  // }
 
   /** Config Object Schema */
   schema(moduleCode, objectType, typeSchema = 'all'): Object {
@@ -130,18 +130,18 @@ export class ConfigService {
     console.log(objectType)
     const configObject = this._config[moduleCode][objectType];
     // gerer quand les paramètres ont un fonction comme valeur
-
-    for (const typeSchema of ['generic', 'specific']) {
-      for (const keyDef of Object.keys(configObject[typeSchema])) {
-        const formDef = configObject[typeSchema][keyDef];
-        for (const keyParam of Object.keys(formDef)) {
-          const func = this.toFunction(formDef[keyParam]);
-          if (func) {
-            formDef[keyParam] = func;
+    if (configObject)
+      for (const typeSchema of ['generic', 'specific']) {
+        for (const keyDef of Object.keys(configObject[typeSchema])) {
+          const formDef = configObject[typeSchema][keyDef];
+          for (const keyParam of Object.keys(formDef)) {
+            const func = this.toFunction(formDef[keyParam]);
+            if (func) {
+              formDef[keyParam] = func;
+            }
           }
         }
       }
-    }
 
     // patch media TODO fix
     if (!configObject) {
@@ -179,25 +179,34 @@ export class ConfigService {
   /** config data : pour initialiser les données Nomenclature, Taxons, Users,...
    * contient une liste de type de nomenclature, les liste d'utilisateur et une liste de taxon
    */
-  configData(moduleCode) {
-    return this._config[moduleCode]['data'];
-  }
+  // configData(moduleCode) {
+  //   return this._config[moduleCode]['data'];
+  // }
 
-  frontendParams() {
-    return this._config.frontendParams;
-  }
+  // frontendParams() {
+  //   return this._config.frontendParams;
+  // }
 
-  setFrontendParams(paramName, paramValue) {
-    if (this._config && this._config.frontendParams) {
-      this._config.frontendParams[paramName] = paramValue;
+  // setFrontendParams(paramName, paramValue) {
+  //   if (this._config && this._config.frontendParams) {
+  //     this._config.frontendParams[paramName] = paramValue;
+  //   }
+  // }
+
+  // config() {
+  //   return this._config;
+  // }
+
+  // cache() {
+  //   return this._config;
+  // }
+
+  fieldLabels(schema) {
+    const fieldLabels = {};
+    for (const key of Object.keys(schema)) {
+      fieldLabels[key] = schema[key]["attribut_label"];
     }
+    return fieldLabels;
   }
 
-  config() {
-    return this._config;
-  }
-
-  cache() {
-    return this._config;
-  }
 }

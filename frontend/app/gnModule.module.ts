@@ -13,6 +13,7 @@ import { DataUtilsService } from "./services/data-utils.service";
 import { CacheService } from "./services/cache.service";
 import { MonitoringObjectService } from "./services/monitoring-object.service";
 import { ConfigService } from "./services/config.service";
+import { ConfigJsonService } from "./services/config-json.service";
 
 // Component
 import { BreadcrumbsComponent } from "./components/breadcrumbs/breadcrumbs.component";
@@ -132,6 +133,7 @@ const routes: Routes = [
     DataMonitoringObjectService,
     DataUtilsService,
     ConfigService,
+    ConfigJsonService,
     MonitoringObjectService,
     DataTableService,
     SitesGroupService,

@@ -4,14 +4,13 @@ import {
   Input,
   Output,
   EventEmitter,
-  SimpleChanges,
 } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { extendedDetailsSiteGroup } from "../../class/monitoring-sites-group";
 import { ISitesGroup } from "../../interfaces/geom";
 import { IobjObs } from "../../interfaces/objObs";
 import { EditObjectService } from "../../services/edit-object.service";
 import { ObjectService } from "../../services/object.service";
+import { JsonData } from "../../types/jsondata";
 
 @Component({
   selector: "pnx-monitoring-properties-g",
@@ -24,22 +23,24 @@ export class MonitoringPropertiesGComponent implements OnInit {
   @Output() bEditChange = new EventEmitter<boolean>();
   @Input() objectType: IobjObs;
 
-  infosColsSiteGroups: typeof extendedDetailsSiteGroup =
-    extendedDetailsSiteGroup;
   color: string = "white";
   dataDetails: ISitesGroup;
+  fields: JsonData;
+  fieldsNames: [];
 
   datasetForm = new FormControl();
 
   constructor(
     private _editService: EditObjectService,
-    private _objService: ObjectService
+    private _objService: ObjectService,
   ) {}
 
   ngOnInit() {
-
+    
     this._objService.currentObjectTypeParent.subscribe((newObjType) => {
       this.objectType = newObjType;
+      this.fieldsNames = newObjType.template.fieldNames;
+      this.fields= newObjType.template.fieldLabels;
     });
   }
 

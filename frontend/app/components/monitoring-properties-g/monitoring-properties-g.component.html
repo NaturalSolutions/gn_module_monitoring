@@ -41,12 +41,12 @@
         <table class="table table-striped table-sm">
           <tr
             *ngFor="
-              let fieldName of infosColsSiteGroups | keyvalue;
+              let fieldName of fieldsNames;
               let i = index
             "
           >
             <td style="width: 50%" class="key text-muted">
-              {{ fieldName.value }}
+              {{ fields[fieldName] }}
               <!-- <i
               *ngIf="obj.template['fieldDefinitions'][fieldName]"
               class="material-icons small-icon"
@@ -59,7 +59,7 @@
               >help</i
             > -->
             </td>
-            <td class="td-value">{{ selectedObj[fieldName.key] }}</td>
+            <td class="td-value">{{ selectedObj[fieldName] }}</td>
           </tr>
         </table>
       </div>

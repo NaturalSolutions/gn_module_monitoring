@@ -8,19 +8,20 @@ import { JsonData } from "../types/jsondata";
 import { Resp } from "../types/response";
 import { endPoints } from "../enum/endpoints";
 import { IobjObs } from "../interfaces/objObs";
+import { ConfigJsonService } from "./config-json.service";
 
 
 @Injectable()
 export class ApiGeomService implements IGeomService {
-  public objectType: endPoints = endPoints.sites_groups;
+  public endPoint: endPoints = endPoints.sites_groups;
   public objectObs: IobjObs;
 
-  constructor(protected _cacheService: CacheService) {
+  constructor(protected _cacheService: CacheService,protected _configJsonService: ConfigJsonService ) {
     this.init();
   }
 
   init() {
-    this.objectType = endPoints.sites_groups;
+    this.endPoint = endPoints.sites_groups;
     this.objectObs = {
       properties: {},
       endPoint: endPoints.sites_groups,
@@ -29,6 +30,8 @@ export class ApiGeomService implements IGeomService {
       editObjLabel: "Editer",
       id: null,
       moduleCode: "generic",
+      schema:{},
+      template:{fieldNames:[],  fieldLabels:{}}
     };
   }
   get(
@@ -38,7 +41,7 @@ export class ApiGeomService implements IGeomService {
   ): Observable<IPaginated<ISitesGroup | ISite>> {
     return this._cacheService.request<
       Observable<IPaginated<ISitesGroup | ISite>>
-    >("get", this.objectType, {
+    >("get", this.endPoint, {
       queryParams: { page, limit, ...params },
     });
   }
@@ -46,14 +49,14 @@ export class ApiGeomService implements IGeomService {
   getById(id: number): Observable<ISitesGroup | ISite> {
     return this._cacheService.request<Observable<ISitesGroup | ISite>>(
       "get",
-      `${this.objectType}/${id}`
+      `${this.endPoint}/${id}`
     );
   }
 
   get_geometries(params: JsonData = {}): Observable<GeoJSON.FeatureCollection> {
     return this._cacheService.request<Observable<GeoJSON.FeatureCollection>>(
       "get",
-      `${this.objectType}/geometries`,
+      `${this.endPoint}/geometries`,
       {
         queryParams: { ...params },
       }
@@ -61,30 +64,30 @@ export class ApiGeomService implements IGeomService {
   }
 
   patch(id: number, updatedData: ISitesGroup | ISite): Observable<Resp> {
-    return this._cacheService.request("patch", `${this.objectType}/${id}`, {
+    return this._cacheService.request("patch", `${this.endPoint}/${id}`, {
       postData: updatedData,
     });
   }
 
   create( postData: ISitesGroup | ISite): Observable<Resp> {
-    return this._cacheService.request("post", `${this.objectType}`, {
+    return this._cacheService.request("post", `${this.endPoint}`, {
       postData: postData,
     });
   }
 
   delete(id: number): Observable<Resp> {
-    return this._cacheService.request("delete", `${this.objectType}/${id}`);
+    return this._cacheService.request("delete", `${this.endPoint}/${id}`);
   }
   
 }
 
 @Injectable()
 export class SitesGroupService extends ApiGeomService {
-  constructor(_cacheService: CacheService) {
-    super(_cacheService);
+  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
+    super(_cacheService, _configJsonService);
   }
   init(): void {
-    this.objectType = endPoints.sites_groups;
+    this.endPoint = endPoints.sites_groups;
     this.objectObs ={
       properties: {},
       endPoint: endPoints.sites_groups,
@@ -93,7 +96,22 @@ export class SitesGroupService extends ApiGeomService {
       editObjLabel: "Editer le groupe de site",
       id: null,
       moduleCode: "generic",
+      schema:{},
+      template:{fieldNames:[],  fieldLabels:{}}
     };
+    this._configJsonService
+    .init(this.objectObs.moduleCode)
+    .pipe()
+    .subscribe(() => {
+      
+  const fieldNames = this._configJsonService.configModuleObjectParam(this.objectObs.moduleCode,this.objectObs.endPoint,"display_properties")
+  const schema = this._configJsonService.schema(this.objectObs.moduleCode,this.objectObs.endPoint)
+  const fieldLabels = this._configJsonService.fieldLabels(schema)
+  console.log(fieldNames)
+  this.objectObs.template.fieldNames = fieldNames;
+  this.objectObs.schema = schema;
+  this.objectObs.template.fieldLabels = fieldLabels;
+})
   }
 
   getSitesChild(
@@ -122,13 +140,13 @@ export class SitesGroupService extends ApiGeomService {
 
 @Injectable()
 export class SitesService extends ApiGeomService {
-  constructor(_cacheService: CacheService) {
-    super(_cacheService);
+  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
+    super(_cacheService, _configJsonService);
   }
   opts = [];
 
   init(): void {
-    this.objectType = endPoints.sites;
+    this.endPoint = endPoints.sites;
     this.objectObs ={
       properties: {},
       endPoint: endPoints.sites,
@@ -137,7 +155,23 @@ export class SitesService extends ApiGeomService {
       editObjLabel: "Editer le site",
       id: null,
       moduleCode: "generic",
+      schema:{},
+      template:{fieldNames:[], fieldLabels:{}}
     };
+    this._configJsonService
+    .init(this.objectObs.moduleCode)
+    .pipe()
+    .subscribe(() => {
+      
+  const fieldNames = this._configJsonService.configModuleObjectParam(this.objectObs.moduleCode,this.objectObs.endPoint,"display_properties")
+  const schema = this._configJsonService.schema(this.objectObs.moduleCode,this.objectObs.endPoint)
+  const fieldLabels = this._configJsonService.fieldLabels(schema)
+  console.log(fieldNames)
+  this.objectObs.template.fieldNames = fieldNames;
+  this.objectObs.schema = schema;
+  this.objectObs.template.fieldLabels = fieldLabels;
+})
+    
   }
 
   addObjectType(): string {

@@ -10,6 +10,10 @@ import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
 import { ObjectService } from "../../services/object.service";
 import { FormGroup, FormBuilder } from "@angular/forms";
+import { ConfigService } from "../../services/config.service";
+import { IobjObs } from "../../interfaces/objObs";
+import { ConfigJsonService } from "../../services/config-json.service";
+import { mergeMap } from "rxjs/operators";
 
 const LIMIT = 10;
 
@@ -33,7 +37,7 @@ export class MonitoringSitesGroupsComponent
   // @Input() rows;
   @Input() colsname;
   @Input() obj;
-  objectType: string;
+  objectType: IobjObs;
   objForm: FormGroup;
   objInitForm: Object = {};
   // siteGroupEmpty={
@@ -50,6 +54,7 @@ export class MonitoringSitesGroupsComponent
     private router: Router,
     private _objService: ObjectService,
     private _formBuilder: FormBuilder,
+    private _configJsonService: ConfigJsonService,
     private _Activatedroute: ActivatedRoute // private _routingService: RoutingService
   ) {
     super();
@@ -58,20 +63,61 @@ export class MonitoringSitesGroupsComponent
 
   ngOnInit() {
     this.initSiteGroup();
+    // this.loadConfig();
   }
 
   initSiteGroup() {
     this._objService.changeObjectTypeParent(
-      this._sites_group_service.objectObs
+      this._sites_group_service.objectObs,true
     );
     this._objService.changeObjectType(
-      this._sites_group_service.objectObs
+      this._sites_group_service.objectObs,true
     );
     
     this.getSitesGroups(1);
     this.geojsonService.getSitesGroupsGeometries(
       this.onEachFeatureSiteGroups()
     );
+  }
+
+  loadConfig(){
+    // const currentObjType$ = this._objService.currentObjectType.pipe(mergeMap(
+    //   obj => this._configJsonService.init(obj.moduleCode)))
+    // currentObjType$
+    //   .subscribe((conf)=>{conf.schema()})
+    this._objService.currentObjectType.subscribe(
+      (obj) => {
+      this.objectType = obj
+      this._configJsonService
+        .init(this.objectType.moduleCode)
+        .pipe()
+        .subscribe(() => {
+          
+      const fieldNames = this._configJsonService.configModuleObjectParam(this.objectType.moduleCode,this.objectType.endPoint,"display_properties")
+      const schema = this._configJsonService.schema(this.objectType.moduleCode,this.objectType.endPoint)
+      const fieldLabels = this._configJsonService.fieldLabels(schema)
+      console.log(fieldNames)
+      this.objectType.template.fieldNames = fieldNames;
+      this.objectType.schema = schema;
+      this.objectType.template.fieldLabels = fieldLabels;
+    })})
+    
+    this._objService.currentObjectTypeParent.subscribe(
+      (obj) => {
+      this.objectType = obj
+      this._configJsonService
+        .init(this.objectType.moduleCode)
+        .pipe()
+        .subscribe(() => {
+          const fieldNames = this._configJsonService.configModuleObjectParam(this.objectType.moduleCode,this.objectType.endPoint,"display_properties")
+          const schema = this._configJsonService.schema(this.objectType.moduleCode,this.objectType.endPoint)
+          const fieldLabels = this._configJsonService.fieldLabels(schema)
+          console.log(fieldNames)
+          this.objectType.template.fieldNames = fieldNames;
+          this.objectType.schema = schema;
+          this.objectType.template.fieldLabels = fieldLabels;
+    })})
+  // ).subscribe();
   }
 
   ngOnDestroy() {
@@ -111,7 +157,7 @@ export class MonitoringSitesGroupsComponent
   seeDetails($event) {
     // TODO: routerLink
     this._objService.changeObjectTypeParent(
-      this._sites_group_service.objectObs
+      this._sites_group_service.objectObs,true
     );
     this.router.navigate([$event.id_sites_group], {
       relativeTo: this._Activatedroute,
