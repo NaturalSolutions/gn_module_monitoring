@@ -194,9 +194,9 @@ export class MonitoringDatatableGComponent implements OnInit {
     });
   }
   navigateToDetail(row) {
-    this._objService.changeObjectTypeParent(
-      this.objectType
-    );
+    // this._objService.changeObjectTypeParent(
+    //   this.objectType
+    // );
     row["id"] = row.pk;
     this.onDetailsRow.emit(row);
   }
