@@ -8,7 +8,7 @@ import { Utils } from "../utils/utils";
 import { MonitoringObjectService } from "./monitoring-object.service";
 
 @Injectable()
-export class EditObjectService {
+export class FormService {
   data: JsonData = {};
   private dataSub = new BehaviorSubject<object>(this.data);
   currentData = this.dataSub.asObservable();
@@ -22,6 +22,7 @@ export class EditObjectService {
 
   // TODO: voir si nécessaire de garder ça (objService permet d'avoir le bon objet ? et sinon modifier pour obtenir ce qu'il faut en formulaire)
   changeDataSub(newDat: JsonData) {
+    console.log(newDat)
     this.properties = newDat;
     newDat.moduleCode = "generic";
     newDat.objectType = "sites_groups";

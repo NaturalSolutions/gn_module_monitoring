@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { SitesGroupService } from "../../services/api-geom.service";
-import { columnNameSiteGroup } from "../../class/monitoring-sites-group";
 import { IPaginated, IPage } from "../../interfaces/page";
 import { Router, ActivatedRoute } from "@angular/router";
 import { columnNameSite } from "../../class/monitoring-site";
@@ -10,10 +9,8 @@ import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
 import { ObjectService } from "../../services/object.service";
 import { FormGroup, FormBuilder } from "@angular/forms";
-import { ConfigService } from "../../services/config.service";
 import { IobjObs } from "../../interfaces/objObs";
 import { ConfigJsonService } from "../../services/config-json.service";
-import { mergeMap } from "rxjs/operators";
 
 const LIMIT = 10;
 
@@ -29,15 +26,13 @@ export class MonitoringSitesGroupsComponent
   @Input() page: IPage;
   @Input() sitesGroups: ISitesGroup[];
   @Input() sitesChild: ISite[];
-  @Input() columnNameSiteGroup: typeof columnNameSiteGroup =
-    columnNameSiteGroup;
   @Input() columnNameSite: typeof columnNameSite = columnNameSite;
   @Input() sitesGroupsSelected: ISitesGroup;
 
   // @Input() rows;
   @Input() colsname;
   @Input() obj;
-  objectType: IobjObs;
+  objectType: IobjObs<ISitesGroup>;
   objForm: FormGroup;
   objInitForm: Object = {};
   // siteGroupEmpty={
@@ -63,7 +58,6 @@ export class MonitoringSitesGroupsComponent
 
   ngOnInit() {
     this.initSiteGroup();
-    // this.loadConfig();
   }
 
   initSiteGroup() {
@@ -78,46 +72,6 @@ export class MonitoringSitesGroupsComponent
     this.geojsonService.getSitesGroupsGeometries(
       this.onEachFeatureSiteGroups()
     );
-  }
-
-  loadConfig(){
-    // const currentObjType$ = this._objService.currentObjectType.pipe(mergeMap(
-    //   obj => this._configJsonService.init(obj.moduleCode)))
-    // currentObjType$
-    //   .subscribe((conf)=>{conf.schema()})
-    this._objService.currentObjectType.subscribe(
-      (obj) => {
-      this.objectType = obj
-      this._configJsonService
-        .init(this.objectType.moduleCode)
-        .pipe()
-        .subscribe(() => {
-          
-      const fieldNames = this._configJsonService.configModuleObjectParam(this.objectType.moduleCode,this.objectType.endPoint,"display_properties")
-      const schema = this._configJsonService.schema(this.objectType.moduleCode,this.objectType.endPoint)
-      const fieldLabels = this._configJsonService.fieldLabels(schema)
-      console.log(fieldNames)
-      this.objectType.template.fieldNames = fieldNames;
-      this.objectType.schema = schema;
-      this.objectType.template.fieldLabels = fieldLabels;
-    })})
-    
-    this._objService.currentObjectTypeParent.subscribe(
-      (obj) => {
-      this.objectType = obj
-      this._configJsonService
-        .init(this.objectType.moduleCode)
-        .pipe()
-        .subscribe(() => {
-          const fieldNames = this._configJsonService.configModuleObjectParam(this.objectType.moduleCode,this.objectType.endPoint,"display_properties")
-          const schema = this._configJsonService.schema(this.objectType.moduleCode,this.objectType.endPoint)
-          const fieldLabels = this._configJsonService.fieldLabels(schema)
-          console.log(fieldNames)
-          this.objectType.template.fieldNames = fieldNames;
-          this.objectType.schema = schema;
-          this.objectType.template.fieldLabels = fieldLabels;
-    })})
-  // ).subscribe();
   }
 
   ngOnDestroy() {
@@ -139,6 +93,7 @@ export class MonitoringSitesGroupsComponent
   }
 
   getSitesGroups(page = 1, params = {}) {
+
     this._sites_group_service
       .get(page, LIMIT, params)
       .subscribe((data: IPaginated<ISitesGroup>) => {
@@ -148,7 +103,7 @@ export class MonitoringSitesGroupsComponent
           page: data.page - 1,
         };
         this.sitesGroups = data.items;
-        this.colsname = this.columnNameSiteGroup;
+        this.colsname = this._sites_group_service.objectObs.dataTable.colNameObj;
         // IF prefered observable compare to ngOnChanges uncomment this:
         // this._dataTableService.changeColsTable(this.colsname,this.sitesGroups[0])
       });

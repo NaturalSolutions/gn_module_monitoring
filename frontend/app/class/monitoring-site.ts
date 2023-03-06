@@ -1,3 +1,4 @@
+// TODO: voir si colonnes doivent être définies depuis le fichier de config site_group
 export enum columnNameSite {
   base_site_name = "Nom",
   last_visit = "Dernière visite",

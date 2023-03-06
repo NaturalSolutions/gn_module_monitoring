@@ -116,13 +116,13 @@ export class ConfigJsonService {
    * @param moduleCode
    * @param objectType
    */
-  // change(moduleCode, objectType) {
-  //   moduleCode = moduleCode || 'generic';
+  change(moduleCode, objectType) {
+    moduleCode = moduleCode || 'generic';
 
-  //   const configObject = this._config[moduleCode][objectType];
-  //   const change = configObject.change;
-  //   return this.toFunction(change);
-  // }
+    const configObject = this._config[moduleCode][objectType];
+    const change = configObject.change;
+    return this.toFunction(change);
+  }
 
   /** Config Object Schema */
   schema(moduleCode, objectType, typeSchema = 'all'): Object {
@@ -183,15 +183,15 @@ export class ConfigJsonService {
   //   return this._config[moduleCode]['data'];
   // }
 
-  // frontendParams() {
-  //   return this._config.frontendParams;
-  // }
+  frontendParams() {
+    return this._config.frontendParams;
+  }
 
-  // setFrontendParams(paramName, paramValue) {
-  //   if (this._config && this._config.frontendParams) {
-  //     this._config.frontendParams[paramName] = paramValue;
-  //   }
-  // }
+  setFrontendParams(paramName, paramValue) {
+    if (this._config && this._config.frontendParams) {
+      this._config.frontendParams[paramName] = paramValue;
+    }
+  }
 
   // config() {
   //   return this._config;
@@ -207,6 +207,23 @@ export class ConfigJsonService {
       fieldLabels[key] = schema[key]["attribut_label"];
     }
     return fieldLabels;
+  }
+
+  fieldNames(moduleCode, objectType,typeDisplay = "") {
+    if (["display_properties", "display_list"].includes(typeDisplay)) {
+      return this.configModuleObjectParam(moduleCode, objectType, typeDisplay);
+    }
+    if (typeDisplay === "schema") {
+      return Object.keys(this.schema(moduleCode, objectType));
+    }
+  }
+
+  fieldDefinitions(schema) {
+    const fieldDefinitions = {};
+    for (const key of Object.keys(schema)) {
+      fieldDefinitions[key] = schema[key]["definition"];
+    }
+    return fieldDefinitions;
   }
 
 }

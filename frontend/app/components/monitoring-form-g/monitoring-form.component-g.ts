@@ -12,10 +12,11 @@ import { ConfigService } from "../../services/config.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { DynamicFormService } from "@geonature_common/form/dynamic-form-generator/dynamic-form.service";
 import { ActivatedRoute } from "@angular/router";
-import { EditObjectService } from "../../services/edit-object.service";
+import { FormService } from "../../services/form.service";
 import { Router } from "@angular/router";
 import { IDataForm } from "../../interfaces/form";
 import { ApiGeomService } from "../../services/api-geom.service";
+import { ConfigJsonService } from "../../services/config-json.service";
 @Component({
   selector: "pnx-monitoring-form-g",
   templateUrl: "./monitoring-form.component-g.html",
@@ -57,16 +58,17 @@ export class MonitoringFormComponentG implements OnInit {
   constructor(
     private _formBuilder: FormBuilder,
     private _route: ActivatedRoute,
-    private _configService: ConfigService,
+    private _configService: ConfigJsonService,
     private _commonService: CommonService,
     private _dynformService: DynamicFormService,
-    private _editService: EditObjectService,
+    private _formService: FormService,
     private _apiGeomService: ApiGeomService,
     private _router: Router
   ) {}
 
   ngOnInit() {
-    this._editService.currentData.subscribe((dataToEdit) => {
+    this._formService.currentData.subscribe((dataToEdit) => {
+      console.log(dataToEdit)
       this.obj = dataToEdit;
       this.obj.bIsInitialized = true;
       this._configService
@@ -182,7 +184,7 @@ export class MonitoringFormComponentG implements OnInit {
 
     this.setQueryParams();
     // pour donner la valeur de l'objet au formulaire
-    this._editService.formValues(this.obj).subscribe((formValue) => {
+    this._formService.formValues(this.obj).subscribe((formValue) => {
       this.objForm.patchValue(formValue);
       this.setDefaultFormValue();
       this.dataForm = formValue;

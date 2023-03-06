@@ -7,14 +7,14 @@ import { IPaginated } from "../interfaces/page";
 import { JsonData } from "../types/jsondata";
 import { Resp } from "../types/response";
 import { endPoints } from "../enum/endpoints";
-import { IobjObs } from "../interfaces/objObs";
+import { IobjObs, ObjDataType } from "../interfaces/objObs";
 import { ConfigJsonService } from "./config-json.service";
-
+import { Utils } from "../utils/utils";
 
 @Injectable()
 export class ApiGeomService implements IGeomService {
   public endPoint: endPoints = endPoints.sites_groups;
-  public objectObs: IobjObs;
+  public objectObs: IobjObs<ObjDataType>;
 
   constructor(protected _cacheService: CacheService,protected _configJsonService: ConfigJsonService ) {
     this.init();
@@ -31,7 +31,8 @@ export class ApiGeomService implements IGeomService {
       id: null,
       moduleCode: "generic",
       schema:{},
-      template:{fieldNames:[],  fieldLabels:{}}
+      template:{fieldNames:[],  fieldLabels:{}, fieldNamesList:[], fieldDefinitions:{}},
+      dataTable:{colNameObj:{}}
     };
   }
   get(
@@ -97,7 +98,8 @@ export class SitesGroupService extends ApiGeomService {
       id: null,
       moduleCode: "generic",
       schema:{},
-      template:{fieldNames:[],  fieldLabels:{}}
+      template:{fieldNames:[],  fieldLabels:{}, fieldNamesList:[], fieldDefinitions:{}},
+      dataTable:{colNameObj:{}}
     };
     this._configJsonService
     .init(this.objectObs.moduleCode)
@@ -105,14 +107,23 @@ export class SitesGroupService extends ApiGeomService {
     .subscribe(() => {
       
   const fieldNames = this._configJsonService.configModuleObjectParam(this.objectObs.moduleCode,this.objectObs.endPoint,"display_properties")
+  const fieldNamesList = this._configJsonService.configModuleObjectParam(this.objectObs.moduleCode,this.objectObs.endPoint,"display_list")
   const schema = this._configJsonService.schema(this.objectObs.moduleCode,this.objectObs.endPoint)
   const fieldLabels = this._configJsonService.fieldLabels(schema)
+  const fieldDefinitions = this._configJsonService.fieldDefinitions(schema)
   console.log(fieldNames)
+  console.log(fieldNamesList)
   this.objectObs.template.fieldNames = fieldNames;
+  this.objectObs.template.fieldNamesList = fieldNamesList;
   this.objectObs.schema = schema;
   this.objectObs.template.fieldLabels = fieldLabels;
-})
-  }
+  this.objectObs.template.fieldDefinitions = fieldDefinitions;
+  this.objectObs.template.fieldNamesList = fieldNamesList;
+  this.objectObs.dataTable.colNameObj = Utils.toObject(fieldNamesList,fieldLabels)
+  console.log(this.objectObs.dataTable.colNameObj)
+  })
+}
+
 
   getSitesChild(
     page: number = 1,
@@ -156,7 +167,8 @@ export class SitesService extends ApiGeomService {
       id: null,
       moduleCode: "generic",
       schema:{},
-      template:{fieldNames:[], fieldLabels:{}}
+      template:{fieldNames:[], fieldLabels:{}, fieldNamesList:[], fieldDefinitions:{}},
+      dataTable:{colNameObj:{}}
     };
     this._configJsonService
     .init(this.objectObs.moduleCode)

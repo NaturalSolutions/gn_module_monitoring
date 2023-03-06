@@ -16,7 +16,8 @@ import { DataTableService } from "../../services/data-table.service";
 import { IColumn } from "../../interfaces/column";
 import { IPage } from "../../interfaces/page";
 import { ObjectService } from "../../services/object.service";
-import { IobjObs } from "../../interfaces/objObs";
+import { IobjObs, ObjDataType } from "../../interfaces/objObs";
+
 
 interface ItemObjectTable {
   id: number | null;
@@ -54,7 +55,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   displayFilter: boolean = false;
   objectsStatus: ItemsObjectTable;
 
-  objectType: IobjObs;
+  objectType: IobjObs<ObjDataType>;
   columns;
   row_save;
   selected = [];

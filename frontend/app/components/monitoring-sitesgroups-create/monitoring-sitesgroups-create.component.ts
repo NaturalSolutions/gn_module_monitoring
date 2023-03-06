@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { EditObjectService } from "../../services/edit-object.service";
+import { FormService } from "../../services/form.service";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { ISitesGroup } from "../../interfaces/geom";
 
@@ -12,12 +12,12 @@ export class MonitoringSitesGroupsCreateComponent implements OnInit {
   siteGroup: ISitesGroup;
   form: FormGroup;
   constructor(
-    private _editService: EditObjectService,
+    private _formService: FormService,
     private _formBuilder: FormBuilder
   ) {}
 
   ngOnInit() {
-    this._editService.changeDataSub({});
+    this._formService.changeDataSub({});
     this.form = this._formBuilder.group({});
   }
 }

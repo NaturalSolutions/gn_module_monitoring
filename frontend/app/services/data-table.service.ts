@@ -39,8 +39,9 @@ export class DataTableService {
   //   this.dataCols.next(allColumn)
   // }
 
-  colsTable(colName:IColumn[], dataTable): IColumn[] {
+  colsTable(colName:{}, dataTable): IColumn[] {
     const arr = Object.keys(colName);
+    console.log(arr)
     const allColumn: IColumn[] = arr
       .filter((item) => Object.keys(dataTable).includes(item))
       .map((elm) => ({

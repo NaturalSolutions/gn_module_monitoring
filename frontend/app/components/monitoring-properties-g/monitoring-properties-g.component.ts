@@ -7,10 +7,11 @@ import {
 } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { ISitesGroup } from "../../interfaces/geom";
-import { IobjObs } from "../../interfaces/objObs";
-import { EditObjectService } from "../../services/edit-object.service";
+import { IobjObs, ObjDataType } from "../../interfaces/objObs";
+import { FormService } from "../../services/form.service";
 import { ObjectService } from "../../services/object.service";
 import { JsonData } from "../../types/jsondata";
+
 
 @Component({
   selector: "pnx-monitoring-properties-g",
@@ -21,7 +22,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   @Input() selectedObj: ISitesGroup;
   @Input() bEdit: boolean;
   @Output() bEditChange = new EventEmitter<boolean>();
-  @Input() objectType: IobjObs;
+  @Input() objectType: IobjObs<ObjDataType>;
 
   color: string = "white";
   dataDetails: ISitesGroup;
@@ -31,7 +32,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   datasetForm = new FormControl();
 
   constructor(
-    private _editService: EditObjectService,
+    private _formService: FormService,
     private _objService: ObjectService,
   ) {}
 
@@ -46,7 +47,8 @@ export class MonitoringPropertiesGComponent implements OnInit {
 
   onEditClick() {
     this.bEditChange.emit(true);
+    console.log(this.selectedObj)
     this.selectedObj["id"] = this.selectedObj[this.selectedObj.pk];
-    this._editService.changeDataSub(this.selectedObj);
+    this._formService.changeDataSub(this.selectedObj);
   }
 }

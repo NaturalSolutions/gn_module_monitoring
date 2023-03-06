@@ -40,7 +40,7 @@ import { GeoJSONService } from "./services/geojson.service";
 import { MonitoringSitesComponent } from "./components/monitoring-sites/monitoring-sites.component";
 import { MonitoringMapListComponent } from "./components/monitoring-map-list/monitoring-map-list.component";
 import { MonitoringFormComponentG } from "./components/monitoring-form-g/monitoring-form.component-g";
-import { EditObjectService } from "./services/edit-object.service";
+import { FormService } from "./services/form.service";
 import { ObjectService } from "./services/object.service";
 import {
   SitesGroupService,
@@ -139,7 +139,7 @@ const routes: Routes = [
     SitesGroupService,
     SitesService,
     GeoJSONService,
-    EditObjectService,
+    FormService,
     ObjectService,
     ApiGeomService,
   ],

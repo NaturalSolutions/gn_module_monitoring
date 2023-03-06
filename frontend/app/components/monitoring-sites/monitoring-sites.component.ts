@@ -15,7 +15,7 @@ import {
   SitesGroupService,
 } from "../../services/api-geom.service";
 import { ObjectService } from "../../services/object.service";
-import { IobjObs } from "../../interfaces/objObs";
+import { IobjObs, ObjDataType } from "../../interfaces/objObs";
 
 const LIMIT = 10;
 
@@ -37,7 +37,7 @@ export class MonitoringSitesComponent
   siteGroupLayer: L.FeatureGroup;
   @Input() bEdit: boolean;
   objForm: FormGroup;
-  objectType: IobjObs;
+  objectType: IobjObs<ISite>;
 
   constructor(
     private _sitesGroupService: SitesGroupService,
