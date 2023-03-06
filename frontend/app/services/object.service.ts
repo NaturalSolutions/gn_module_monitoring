@@ -1,10 +1,8 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject,ReplaySubject } from "rxjs";
 import { endPoints } from "../enum/endpoints";
-import { ISitesGroup, ISiteType } from "../interfaces/geom";
 import { IobjObs, ObjDataType } from "../interfaces/objObs";
 import { JsonData } from "../types/jsondata";
-
 
 @Injectable()
 export class ObjectService {
@@ -39,7 +37,7 @@ export class ObjectService {
      this.dataObjType.next(newObjType);
   }
 
-   changeObjectTypeParent(newObjType: IobjObs<JsonData>,storeObjectTypeParent: boolean = false) {
+  changeObjectTypeParent(newObjType: IobjObs<JsonData>,storeObjectTypeParent: boolean = false) {
     if (storeObjectTypeParent)
       localStorage.setItem('storedObjectTypeParent', JSON.stringify(newObjType));
      this.dataObjTypeParent.next(newObjType);

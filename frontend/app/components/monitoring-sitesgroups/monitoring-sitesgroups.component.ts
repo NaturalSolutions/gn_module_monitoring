@@ -56,7 +56,6 @@ export class MonitoringSitesGroupsComponent
 
   ngOnInit() {
     this.initSiteGroup();
-    // this.loadConfig();
   }
 
   initSiteGroup() {
@@ -71,46 +70,6 @@ export class MonitoringSitesGroupsComponent
     this.geojsonService.getSitesGroupsGeometries(
       this.onEachFeatureSiteGroups()
     );
-  }
-
-  loadConfig(){
-    // const currentObjType$ = this._objService.currentObjectType.pipe(mergeMap(
-    //   obj => this._configJsonService.init(obj.moduleCode)))
-    // currentObjType$
-    //   .subscribe((conf)=>{conf.schema()})
-    this._objService.currentObjectType.subscribe(
-      (obj) => {
-      this.objectType = obj
-      this._configJsonService
-        .init(this.objectType.moduleCode)
-        .pipe()
-        .subscribe(() => {
-          
-      const fieldNames = this._configJsonService.configModuleObjectParam(this.objectType.moduleCode,this.objectType.endPoint,"display_properties")
-      const schema = this._configJsonService.schema(this.objectType.moduleCode,this.objectType.endPoint)
-      const fieldLabels = this._configJsonService.fieldLabels(schema)
-      console.log(fieldNames)
-      this.objectType.template.fieldNames = fieldNames;
-      this.objectType.schema = schema;
-      this.objectType.template.fieldLabels = fieldLabels;
-    })})
-    
-    this._objService.currentObjectTypeParent.subscribe(
-      (obj) => {
-      this.objectType = obj
-      this._configJsonService
-        .init(this.objectType.moduleCode)
-        .pipe()
-        .subscribe(() => {
-          const fieldNames = this._configJsonService.configModuleObjectParam(this.objectType.moduleCode,this.objectType.endPoint,"display_properties")
-          const schema = this._configJsonService.schema(this.objectType.moduleCode,this.objectType.endPoint)
-          const fieldLabels = this._configJsonService.fieldLabels(schema)
-          console.log(fieldNames)
-          this.objectType.template.fieldNames = fieldNames;
-          this.objectType.schema = schema;
-          this.objectType.template.fieldLabels = fieldLabels;
-    })})
-  // ).subscribe();
   }
 
   ngOnDestroy() {

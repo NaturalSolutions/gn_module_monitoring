@@ -6,6 +6,7 @@ import { FormService } from "../../services/form.service";
 import { ObjectService } from "../../services/object.service";
 import { JsonData } from "../../types/jsondata";
 
+
 @Component({
   selector: "pnx-monitoring-properties-g",
   templateUrl: "./monitoring-properties-g.component.html",
@@ -45,6 +46,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
 
   onEditClick() {
     this.bEditChange.emit(true);
+    console.log(this.selectedObj)
     this.selectedObj["id"] = this.selectedObj[this.selectedObj.pk];
     this._formService.changeDataSub(
       this.selectedObj,

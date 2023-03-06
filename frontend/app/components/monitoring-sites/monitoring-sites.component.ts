@@ -14,7 +14,7 @@ import {
   SitesGroupService,
 } from "../../services/api-geom.service";
 import { ObjectService } from "../../services/object.service";
-import { IobjObs } from "../../interfaces/objObs";
+import { IobjObs, ObjDataType } from "../../interfaces/objObs";
 
 const LIMIT = 10;
 

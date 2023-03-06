@@ -40,6 +40,7 @@ export class DataTableService {
 
   colsTable(colName: {}, dataTable): IColumn[] {
     const arr = Object.keys(colName);
+    console.log(arr)
     const allColumn: IColumn[] = arr
       .filter((item) => Object.keys(dataTable).includes(item))
       .map((elm) => ({
