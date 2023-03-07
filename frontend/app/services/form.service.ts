@@ -44,7 +44,10 @@ export class FormService {
       if (!elem.type_widget) {
         continue;
       }
-      observables[attribut_name] = this._objService.toForm(elem, properties[attribut_name]);
+      observables[attribut_name] = this._objService.toForm(
+        elem,
+        properties[attribut_name]
+      );
     }
 
     return forkJoin(observables).pipe(

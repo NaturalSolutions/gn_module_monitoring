@@ -290,7 +290,6 @@ export class MonitoringFormComponentG implements OnInit {
   onSubmit() {
     const { patch_update, ...sendValue } = this.dataForm;
     const objToUpdateOrCreate = this._formService.postData(sendValue, this.obj);
-    console.log(objToUpdateOrCreate);
     const action = this.obj.id
       ? this._apiGeomService.patch(this.obj.id, objToUpdateOrCreate)
       : this._apiGeomService.create(objToUpdateOrCreate);

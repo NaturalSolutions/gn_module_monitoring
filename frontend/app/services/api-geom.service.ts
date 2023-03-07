@@ -96,7 +96,10 @@ export class ApiGeomService implements IGeomService {
 
 @Injectable()
 export class SitesGroupService extends ApiGeomService {
-  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
+  constructor(
+    _cacheService: CacheService,
+    _configJsonService: ConfigJsonService
+  ) {
     super(_cacheService, _configJsonService);
   }
   init(): void {
@@ -159,7 +162,6 @@ export class SitesGroupService extends ApiGeomService {
     });
   }
 
-
   addObjectType(): string {
     return 'un nouveau groupe de site';
   }
@@ -171,7 +173,10 @@ export class SitesGroupService extends ApiGeomService {
 
 @Injectable()
 export class SitesService extends ApiGeomService {
-  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
+  constructor(
+    _cacheService: CacheService,
+    _configJsonService: ConfigJsonService
+  ) {
     super(_cacheService, _configJsonService);
   }
   opts = [];
