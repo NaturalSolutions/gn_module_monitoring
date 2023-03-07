@@ -44,7 +44,7 @@ export interface IGeomService {
     params: JsonData
   ): Observable<IPaginated<IGeomObject>>;
   get_geometries(params: JsonData): Observable<GeoJSON.FeatureCollection>;
-  create(postdata: IGeomObject): Observable<Resp>;
-  patch(id: number, updatedData: IGeomObject): Observable<Resp>;
-  // delete(obj: IGeomObject)
+  create(postdata: { properties: IGeomObject }): Observable<Resp>;
+  patch(id: number, updatedData: { properties: IGeomObject }): Observable<Resp>;
+  delete(id: number);
 }

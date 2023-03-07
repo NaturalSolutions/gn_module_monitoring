@@ -1,14 +1,6 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  SimpleChanges,
-} from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { MonitoringObject } from "../../class/monitoring-object";
-import { ConfigService } from "../../services/config.service";
 import { CommonService } from "@geonature_common/service/common.service";
 import { DynamicFormService } from "@geonature_common/form/dynamic-form-generator/dynamic-form.service";
 import { ActivatedRoute } from "@angular/router";
@@ -17,6 +9,7 @@ import { Router } from "@angular/router";
 import { IDataForm } from "../../interfaces/form";
 import { ApiGeomService } from "../../services/api-geom.service";
 import { ConfigJsonService } from "../../services/config-json.service";
+import { ISite, ISitesGroup } from "../../interfaces/geom";
 @Component({
   selector: "pnx-monitoring-form-g",
   templateUrl: "./monitoring-form.component-g.html",
@@ -68,7 +61,6 @@ export class MonitoringFormComponentG implements OnInit {
 
   ngOnInit() {
     this._formService.currentData.subscribe((dataToEdit) => {
-      console.log(dataToEdit)
       this.obj = dataToEdit;
       this.obj.bIsInitialized = true;
       this._configService
@@ -300,11 +292,12 @@ export class MonitoringFormComponentG implements OnInit {
   /** TODO améliorer site etc.. */
   onSubmit() {
     const { patch_update, ...sendValue } = this.dataForm;
+    const objToUpdateOrCreate = this._formService.postData(sendValue, this.obj);
     const action = this.obj.id
       ? // ? this.obj.patch(this.objForm.value)
         // : this.obj.post(this.objForm.value);
-        this._apiGeomService.patch(this.obj.id, sendValue)
-      : this._apiGeomService.create(sendValue);
+        this._apiGeomService.patch(this.obj.id, objToUpdateOrCreate)
+      : this._apiGeomService.create(objToUpdateOrCreate);
     const actionLabel = this.obj.id ? "Modification" : "Création";
     action.subscribe((objData) => {
       this._commonService.regularToaster(

@@ -11,7 +11,7 @@ from .objects import (
     MonitoringSite
 )
 
-from .base import monitoring_definitions
+from .base import monitoring_definitions, monitoring_g_definitions
 from .repositories import MonitoringObject
 from .geom import MonitoringObjectGeom
 
@@ -41,3 +41,26 @@ MonitoringObjects_dict = {
 }
 
 monitoring_definitions.set(MonitoringObjects_dict, MonitoringModels_dict)
+
+
+
+
+# #####################""
+
+MonitoringModelsG_dict = {
+    'site': TMonitoringSites,
+    'visit': TMonitoringVisits,
+    'observation': TMonitoringObservations,
+    'observation_detail': TMonitoringObservationDetails,
+    'sites_group': TMonitoringSitesGroups
+}
+
+MonitoringObjectsG_dict = {
+    'site': MonitoringSite,
+    'visit': MonitoringObject,
+    'observation': MonitoringObject,
+    'observation_detail': MonitoringObject,
+    'sites_group': MonitoringObjectGeom,
+}
+
+monitoring_g_definitions.set(MonitoringObjectsG_dict, MonitoringModelsG_dict)
