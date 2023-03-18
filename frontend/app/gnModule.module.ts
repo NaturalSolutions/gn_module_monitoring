@@ -85,7 +85,7 @@ const routes: Routes = [
         path: ":id",
         children: [
           {
-            path: "",
+            path:"",
             component: MonitoringSitesComponent,
           },
           {
