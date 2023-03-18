@@ -48,3 +48,9 @@ export interface IGeomService {
   patch(id: number, updatedData: { properties: IGeomObject }): Observable<Resp>;
   delete(id: number);
 }
+
+export interface ISiteType {
+  config:JsonData,
+  id_nomenclature_type_site:number,
+  label:string
+}

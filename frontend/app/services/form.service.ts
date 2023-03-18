@@ -24,8 +24,6 @@ export class FormService {
     this.properties = newDat;
     newDat.moduleCode = "generic";
     newDat.objectType = "sites_group";
-    this.moduleCode = "generic";
-    this.objecType = "sites_group";
     this.dataSub.next(newDat);
   }
 

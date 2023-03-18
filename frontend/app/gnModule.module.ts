@@ -33,6 +33,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatSelectModule } from "@angular/material/select";
 import { MatInputModule } from "@angular/material/input";
+import {MatChipsModule} from '@angular/material/chips';
 import { MonitoringSitesGroupsComponent } from "./components/monitoring-sitesgroups/monitoring-sitesgroups.component";
 import { DataTableService } from "./services/data-table.service";
 import { MonitoringPropertiesGComponent } from "./components/monitoring-properties-g/monitoring-properties-g.component";
@@ -48,6 +49,8 @@ import {
   ApiGeomService,
 } from "./services/api-geom.service";
 import { MonitoringSitesGroupsCreateComponent } from "./components/monitoring-sitesgroups-create/monitoring-sitesgroups-create.component";
+import { MonitoringSitesCreateComponent } from "./components/monitoring-sites-create/monitoring-sites-create.component";
+import { BtnSelectComponent } from "./components/btn-select/btn-select.component";
 
 // my module routing
 const routes: Routes = [
@@ -80,11 +83,14 @@ const routes: Routes = [
       { path: "create", component: MonitoringSitesGroupsCreateComponent },
       {
         path: ":id",
-        // Add new component here
         children: [
           {
-            path: "",
+            path:"",
             component: MonitoringSitesComponent,
+          },
+          {
+            path: "create",
+            component: MonitoringSitesCreateComponent,
           },
         ],
       },
@@ -111,6 +117,8 @@ const routes: Routes = [
     MonitoringPropertiesGComponent,
     MonitoringFormComponentG,
     MonitoringSitesGroupsCreateComponent,
+    MonitoringSitesCreateComponent,
+    BtnSelectComponent
   ],
   imports: [
     GN2CommonModule,
@@ -123,6 +131,7 @@ const routes: Routes = [
     MatAutocompleteModule,
     MatSelectModule,
     MatInputModule,
+    MatChipsModule,
     HttpClientXsrfModule.withOptions({
       headerName: "token",
     }),

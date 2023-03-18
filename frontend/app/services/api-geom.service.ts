@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 
 import { CacheService } from "./cache.service";
-import { IGeomService, ISitesGroup, ISite } from "../interfaces/geom";
+import { IGeomService, ISitesGroup, ISite, ISiteType } from "../interfaces/geom";
 import { IPaginated } from "../interfaces/page";
 import { JsonData } from "../types/jsondata";
 import { Resp } from "../types/response";
@@ -226,6 +226,28 @@ export class SitesService extends ApiGeomService {
         this.objectObs.schema = schema;
         this.objectObs.template.fieldLabels = fieldLabels;
       });
+  }
+
+  // getTypeSites(
+  // ): Observable<IPaginated<ISiteType>> {
+  //   return this._cacheService.request<Observable<IPaginated<ISiteType>>>(
+  //     "get",
+  //     "sites/types"
+  //   );
+  // }
+
+  getTypeSites(
+    page: number = 1,
+    limit: number = 10,
+    params: JsonData = {}
+  ): Observable<IPaginated<ISiteType>> {
+    return this._cacheService.request<Observable<IPaginated<ISiteType>>>(
+      "get",
+      "sites/types_label",
+      {
+        queryParams: { page, limit, ...params },
+      }
+    );
   }
 
   addObjectType(): string {

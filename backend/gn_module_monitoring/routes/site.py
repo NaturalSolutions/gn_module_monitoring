@@ -3,7 +3,7 @@ from flask.json import jsonify
 from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
-from gn_module_monitoring.monitoring.models import BibTypeSite, TMonitoringSites
+from gn_module_monitoring.monitoring.models import BibTypeSite, TMonitoringSites,TNomenclatures
 from gn_module_monitoring.monitoring.schemas import BibTypeSiteSchema, MonitoringSitesSchema
 from gn_module_monitoring.utils.routes import (
     filter_params,
@@ -32,6 +32,26 @@ def get_types_site():
         limit=limit,
         page=page,
     )
+
+@blueprint.route("/sites/types_label", methods=["GET"])
+def get_types_site_by_label():
+    params = MultiDict(request.args)
+    limit, page = get_limit_page(params=params)
+    sort_label, sort_dir = get_sort(
+        params=params, default_sort="label_fr", default_direction="desc"
+    )
+    joinquery = BibTypeSite.query.join(BibTypeSite.nomenclature).filter(TNomenclatures.label_fr.ilike(f"%{params['label_fr']}%"))
+    if sort_dir == 'asc':
+        joinquery = joinquery.order_by(TNomenclatures.label_fr.asc())
+    
+    return paginate(
+        query=joinquery,
+        schema=BibTypeSiteSchema,
+        limit=limit,
+        page=page,
+    )
+
+
 
 
 @blueprint.route("/sites/types/<int:id_type_site>", methods=["GET"])
