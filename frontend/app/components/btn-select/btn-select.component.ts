@@ -1,15 +1,6 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  Input,
-  Output,
-  EventEmitter,
-  ElementRef,
-} from "@angular/core";
+import { Component, OnInit, ViewChild, ElementRef, Input } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { Router, ActivatedRoute } from "@angular/router";
-import { Observable,of } from "rxjs";
+import { Observable, of, iif } from "rxjs";
 import {
   startWith,
   debounceTime,
@@ -17,16 +8,11 @@ import {
   switchMap,
   map,
 } from "rxjs/operators";
-import { SitesService } from "../../services/api-geom.service";
-import { ObjectService } from "../../services/object.service";
-import { IobjObs, ObjDataType } from "../../interfaces/objObs";
-import { endPoints } from "../../enum/endpoints";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
-import { MatChipInputEvent } from "@angular/material/chips";
 import { COMMA, ENTER } from "@angular/cdk/keycodes";
-import { ISiteType } from "../../interfaces/geom";
+import { JsonData } from "../../types/jsondata";
 export interface EmptyObject {
-    label: string;
+  name: string;
 }
 
 @Component({
@@ -34,101 +20,99 @@ export interface EmptyObject {
   templateUrl: "./btn-select.component.html",
   styleUrls: ["./btn-select.component.css"],
 })
-export class BtnSelectComponent implements OnInit {
+export class BtnSelectComponent
+implements OnInit {
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
   myControl = new FormControl();
-  filteredOptions: Observable<ISiteType[]| EmptyObject>;
-  listTypeSiteChosen: string[] = [];
-  allFruits: string[] = ["Apple", "Lemon", "Lime", "Orange", "Strawberry"];
-  newData: any = [];
+  @Input()placeholderText : string = "Selectionnez vos options dans la liste";
+  @Input()titleBtn : string = "Choix des options";
 
-  @ViewChild("fruitInput") fruitInput: ElementRef<HTMLInputElement>;
-  // @ViewChild(MatMenuTrigger) ddTrigger: MatMenuTrigger;
+  filteredOptions: Observable<any>;
+  listOptionChosen: string[] = [];
+  configObjAdded: JsonData = {};
+  genericResponse:JsonData={}
 
-  // myControl = new FormControl();
-  // options = [];
-  // filteredOptions: Observable<any[]>;
-  // selectedType: string;
-  // value: unknown;
-  // endPoint = endPoints;
-  // @Input() objectType: IobjObs<ObjDataType>;
-  // @Output() addEvent = new EventEmitter<any>();
+  @Input() paramToFilt:string;
+  @Input() callBackFunction: (pageNumber: number, limit:number, valueToFilter:string)=>  Observable<any>;
+  @ViewChild("optionInput") optionInput: ElementRef<HTMLInputElement>;
 
-  constructor(
-    private _objService: ObjectService,
-    private _siteService: SitesService,
-    private router: Router,
-    private _Activatedroute: ActivatedRoute
-  ) {}
-
-  
-  // //////////////////////////////////////////////////////////////////////
+  constructor() {
+  }
 
   ngOnInit() {
-    this.filteredOptions = this.myControl.valueChanges
-    .pipe(
+    this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(""),
       debounceTime(400),
       distinctUntilChanged(),
       switchMap((val: string) => {
-          console.log(val)
-          return this.filterTypeSite(val)
+        console.log(val)
+        return iif(
+          () => val == "",
+          of([{ name: val }]),
+          this.filterOnRequest(val,this.paramToFilt)
+        );
       }),
-    )
-    
+      map((res) => (res.length > 0 ? res : [{ name: "Pas de résultats" }]))
+    );
   }
 
-  add(event: MatChipInputEvent): void {
-    console.log(event);
-    const value = (event.value || "").trim();
-
-    // Add our fruit
-    if (value) {
-      this.listTypeSiteChosen.push(value);
-    }
-
-    // Clear the input value
-    event.chipInput!.clear();
-
-    this.myControl.setValue(null);
-  }
 
   remove(fruit: string): void {
-    const index = this.listTypeSiteChosen.indexOf(fruit);
+    const index = this.listOptionChosen.indexOf(fruit);
 
     if (index >= 0) {
-      this.listTypeSiteChosen.splice(index, 1);
+      this.listOptionChosen.splice(index, 1);
     }
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    console.log(event.option.viewValue);
-    console.log(event.option);
-    this.listTypeSiteChosen.push(event.option.viewValue);
-    this.fruitInput.nativeElement.value = "";
+    const shouldAddValue = this.checkBeforeAdding(event.option.viewValue);
+    shouldAddValue
+      ? this.listOptionChosen.push(event.option.viewValue) &&
+        this.addObject(event.option.value)
+      : null;
+    console.log(this.listOptionChosen);
+    this.optionInput.nativeElement.value = "";
     this.myControl.setValue(null);
   }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.allFruits.filter((fruit) =>
-      fruit.toLowerCase().includes(filterValue)
-    );
+  filterOnRequest(val: string, keyToFilt:string): Observable<any> {
+    return this.callBackFunction(1, 100,  val)
+      .pipe(
+        // Ici on map pour créer une liste d'objet contenant la valeur entré
+        map((response) =>
+          response.items.filter((option) => {
+            return option[keyToFilt].toLowerCase().includes(val.toLowerCase());
+          }),
+        ),
+        // Ici on map pour uniformiser la "key" utilisé pour afficher les options (default Key : 'name')
+        map((response)=> 
+          response.filter((obj) => {
+            console.log(obj)
+            Object.assign(obj, { name: obj[keyToFilt] })[keyToFilt];
+          delete obj[keyToFilt];
+          return obj
+          })
+     )
+      );
   }
 
-  filterTypeSite(val: string): Observable<ISiteType[]> {
-    return this._siteService
-    .getTypeSites(1, 10000, { label_fr: val, sort_dir: "asc" }).pipe(
-      map(response => 
-        response.items.filter((option) => {
-          // console.log(option)
-          return option.label.toLowerCase().includes(val.toLowerCase());
-        }
-        )
-      )
-    )
+  checkBeforeAdding(valToAdd: string) {
+    const noValidInput = [null, "", "Pas de résultats"];
+    if (
+      noValidInput.includes(valToAdd) ||
+      this.listOptionChosen.includes(valToAdd)
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  addObject(obj: JsonData) {
+    const {name, ...configAndId} = obj
+    this.configObjAdded[name] = configAndId;
   }
 }

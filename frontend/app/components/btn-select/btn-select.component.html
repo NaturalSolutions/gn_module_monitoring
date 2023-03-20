@@ -1,8 +1,8 @@
 <mat-form-field class="example-chip-list" appearance="fill">
-  <mat-label>Sélectionner le type de site</mat-label>
+  <mat-label>{{titleBtn}}</mat-label>
   <mat-chip-list #chipList aria-label="option selection">
     <mat-chip
-      *ngFor="let optionSelected of listTypeSiteChosen"
+      *ngFor="let optionSelected of listOptionChosen"
       [selectable]="selectable"
       [removable]="removable"
       (removed)="remove(optionSelected)">
@@ -12,18 +12,20 @@
       </button>
     </mat-chip>
     <input
-      placeholder="Type de site..."
+      [placeholder]="placeholderText"
       #optionInput
       [formControl]="myControl"
       [matAutocomplete]="auto"
       [matChipInputFor]="chipList"
       [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-      (matChipInputTokenEnd)="add($event)">
+      >
   </mat-chip-list>
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-    <mat-option  *ngFor="let option of filteredOptions | async" [value]="option.label">
-        {{option.label}}
+    <ng-container *ngFor="let option of filteredOptions | async">
+    <mat-option  *ngIf="option.name != '' " [value]="option">
+        {{option.name}}
       </mat-option>
+    </ng-container>
   </mat-autocomplete>
 </mat-form-field>
 
