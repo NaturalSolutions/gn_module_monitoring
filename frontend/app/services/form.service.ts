@@ -30,7 +30,7 @@ export class FormService {
   formValues(obj): Observable<any> {
     const properties = Utils.copy(this.properties);
     const observables = {};
-    const schema = obj[this.moduleCode];
+    const schema = obj[obj.moduleCode];
     for (const attribut_name of Object.keys(schema)) {
       const elem = schema[attribut_name];
       if (!elem.type_widget) {
@@ -57,7 +57,7 @@ export class FormService {
   // TODO: A voir si nécessaire d'utiliser le formatage des post et update data avant éxécution route coté backend
   postData(formValue, obj): { properties: ISitesGroup | ISite | any } {
     const propertiesData = {};
-    const schema = obj[this.moduleCode];
+    const schema = obj[obj.moduleCode];
     for (const attribut_name of Object.keys(schema)) {
       const elem = schema[attribut_name];
       if (!elem.type_widget) {

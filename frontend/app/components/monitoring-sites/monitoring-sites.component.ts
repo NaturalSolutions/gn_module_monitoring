@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { forkJoin } from "rxjs";
-import { tap, map, mergeMap } from "rxjs/operators";
+import { tap, map, mergeMap,switchMap } from "rxjs/operators";
 import * as L from "leaflet";
 import { ISite, ISitesGroup } from "../../interfaces/geom";
 import { IPage, IPaginated } from "../../interfaces/page";
@@ -15,7 +15,7 @@ import {
   SitesGroupService,
 } from "../../services/api-geom.service";
 import { ObjectService } from "../../services/object.service";
-import { IobjObs, ObjDataType } from "../../interfaces/objObs";
+import { IobjObs } from "../../interfaces/objObs";
 
 const LIMIT = 10;
 
@@ -54,7 +54,7 @@ export class MonitoringSitesComponent
 
   ngOnInit() {
     this.objForm = this._formBuilder.group({});
-    // this._objService.changeObjectTypeParent(this._sitesGroupService.objectObs);
+    this._objService.changeObjectTypeParent(this._sitesGroupService.objectObs);
     this._objService.changeObjectType(this._siteService.objectObs);
     this.initSite();
   }
@@ -76,10 +76,10 @@ export class MonitoringSitesComponent
               id_sites_group: id,
             }),
           })
-        )
-      )
+        ))
       .subscribe(
-        (data: { sitesGroup: ISitesGroup; sites: IPaginated<ISite> }) => {
+        (data: { sitesGroup: ISitesGroup; sites: IPaginated<ISite>}) => {
+          this._objService.changeSelectedObj(data.sitesGroup, true);
           this.sitesGroup = data.sitesGroup;
           this.sites = data.sites.items;
           this.page = {
