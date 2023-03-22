@@ -18,7 +18,6 @@ import { IPage } from "../../interfaces/page";
 import { ObjectService } from "../../services/object.service";
 import { IobjObs, ObjDataType } from "../../interfaces/objObs";
 
-
 interface ItemObjectTable {
   id: number | null;
   selected: boolean;

@@ -17,7 +17,10 @@ export class MonitoringSitesGroupsCreateComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this._formService.changeDataSub({});
+    this._formService.dataToCreate({
+      module: "generic",
+      objectType: "sites_group",
+    });
     this.form = this._formBuilder.group({});
   }
 }

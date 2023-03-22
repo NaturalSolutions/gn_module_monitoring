@@ -1,4 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef, Input } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  Input,
+  Output,
+  EventEmitter,
+} from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { Observable, of, iif } from "rxjs";
 import {
@@ -20,26 +28,30 @@ export interface EmptyObject {
   templateUrl: "./btn-select.component.html",
   styleUrls: ["./btn-select.component.css"],
 })
-export class BtnSelectComponent
-implements OnInit {
+export class BtnSelectComponent implements OnInit {
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
   myControl = new FormControl();
-  @Input()placeholderText : string = "Selectionnez vos options dans la liste";
-  @Input()titleBtn : string = "Choix des options";
+  @Input() placeholderText: string = "Selectionnez vos options dans la liste";
+  @Input() titleBtn: string = "Choix des options";
 
   filteredOptions: Observable<any>;
   listOptionChosen: string[] = [];
   configObjAdded: JsonData = {};
-  genericResponse:JsonData={}
+  genericResponse: JsonData = {};
 
-  @Input() paramToFilt:string;
-  @Input() callBackFunction: (pageNumber: number, limit:number, valueToFilter:string)=>  Observable<any>;
+  @Input() paramToFilt: string;
+  @Input() callBackFunction: (
+    pageNumber: number,
+    limit: number,
+    valueToFilter: string
+  ) => Observable<any>;
   @ViewChild("optionInput") optionInput: ElementRef<HTMLInputElement>;
 
-  constructor() {
-  }
+  @Output() public sendobject = new EventEmitter<JsonData>();
+
+  constructor() {}
 
   ngOnInit() {
     this.filteredOptions = this.myControl.valueChanges.pipe(
@@ -47,23 +59,29 @@ implements OnInit {
       debounceTime(400),
       distinctUntilChanged(),
       switchMap((val: string) => {
-        console.log(val)
+        console.log(val);
         return iif(
           () => val == "",
           of([{ name: val }]),
-          this.filterOnRequest(val,this.paramToFilt)
+          this.filterOnRequest(val, this.paramToFilt)
         );
       }),
       map((res) => (res.length > 0 ? res : [{ name: "Pas de résultats" }]))
     );
   }
 
+  remove(option: string): void {
+    console.log(this.configObjAdded[option]);
 
-  remove(fruit: string): void {
-    const index = this.listOptionChosen.indexOf(fruit);
+    const index = this.listOptionChosen.indexOf(option);
 
     if (index >= 0) {
       this.listOptionChosen.splice(index, 1);
+    }
+
+    if (this.configObjAdded && this.configObjAdded[option] !== undefined) {
+      delete this.configObjAdded[option];
+      console.log(this.configObjAdded);
     }
   }
 
@@ -78,25 +96,24 @@ implements OnInit {
     this.myControl.setValue(null);
   }
 
-  filterOnRequest(val: string, keyToFilt:string): Observable<any> {
-    return this.callBackFunction(1, 100,  val)
-      .pipe(
-        // Ici on map pour créer une liste d'objet contenant la valeur entré
-        map((response) =>
-          response.items.filter((option) => {
-            return option[keyToFilt].toLowerCase().includes(val.toLowerCase());
-          }),
-        ),
-        // Ici on map pour uniformiser la "key" utilisé pour afficher les options (default Key : 'name')
-        map((response)=> 
-          response.filter((obj) => {
-            console.log(obj)
-            Object.assign(obj, { name: obj[keyToFilt] })[keyToFilt];
+  filterOnRequest(val: string, keyToFilt: string): Observable<any> {
+    return this.callBackFunction(1, 100, val).pipe(
+      // Ici on map pour créer une liste d'objet contenant la valeur entré
+      map((response) =>
+        response.items.filter((option) => {
+          return option[keyToFilt].toLowerCase().includes(val.toLowerCase());
+        })
+      ),
+      // Ici on map pour uniformiser la "key" utilisé pour afficher les options (default Key : 'name')
+      map((response) =>
+        response.filter((obj) => {
+          console.log(obj);
+          Object.assign(obj, { name: obj[keyToFilt] })[keyToFilt];
           delete obj[keyToFilt];
-          return obj
-          })
-     )
-      );
+          return obj;
+        })
+      )
+    );
   }
 
   checkBeforeAdding(valToAdd: string) {
@@ -112,7 +129,8 @@ implements OnInit {
   }
 
   addObject(obj: JsonData) {
-    const {name, ...configAndId} = obj
+    const { name, ...configAndId } = obj;
     this.configObjAdded[name] = configAndId;
+    this.sendobject.emit(this.configObjAdded);
   }
 }

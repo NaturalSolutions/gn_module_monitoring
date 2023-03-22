@@ -63,7 +63,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
       this.fieldsNames = newObjType.template.fieldNames;
       this.fields = newObjType.template.fieldLabels;
       this.fieldDefinitions = newObjType.template.fieldDefinitions;
-      this.objectType.properties = this.selectedObj
+      this.objectType.properties = this.selectedObj;
       console.log(this.objectType);
     });
   }
@@ -75,8 +75,9 @@ export class MonitoringPropertiesGComponent implements OnInit {
     // console.log("After routing edit")
     this.bEditChange.emit(true);
     this.selectedObj["id"] = this.selectedObj[this.selectedObj.pk];
-    this._formService.changeDataSub(this.selectedObj);
+    this._formService.changeDataSub(
+      this.selectedObj,
+      this.objectType.objectType
+    );
   }
-
-
 }

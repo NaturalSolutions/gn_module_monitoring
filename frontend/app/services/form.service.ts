@@ -20,10 +20,20 @@ export class FormService {
   constructor(private _objService: MonitoringObjectService) {}
 
   // TODO: voir si nécessaire de garder ça (objService permet d'avoir le bon objet ? et sinon modifier pour obtenir ce qu'il faut en formulaire)
-  changeDataSub(newDat: JsonData) {
+  changeDataSub(
+    newDat: JsonData,
+    objectType: string,
+    moduleCode: string = "generic"
+  ) {
     this.properties = newDat;
-    newDat.moduleCode = "generic";
-    newDat.objectType = "sites_group";
+    newDat.moduleCode = moduleCode;
+    newDat.objectType = objectType;
+    this.dataSub.next(newDat);
+  }
+
+  dataToCreate(newDat: JsonData, moduleCode: string = "generic") {
+    newDat[moduleCode] = {};
+    newDat.moduleCode = moduleCode;
     this.dataSub.next(newDat);
   }
 

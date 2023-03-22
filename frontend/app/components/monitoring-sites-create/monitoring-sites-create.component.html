@@ -1,4 +1,13 @@
-<btn-select [titleBtn]="titleBtn" [placeholderText]="placeholderText" [callBackFunction]="funcToFilt" [paramToFilt]="paramToFilt"></btn-select>
+<btn-select
+  (sendobject)="onSendConfig($event)"
+  [titleBtn]="titleBtn"
+  [placeholderText]="placeholderText"
+  [callBackFunction]="funcToFilt"
+  [paramToFilt]="paramToFilt"
+></btn-select>
 <div>
-  <pnx-monitoring-form-g [objForm]="form"></pnx-monitoring-form-g>
+  <pnx-monitoring-form-g
+    [objForm]="form"
+    #subscritionObjConfig
+  ></pnx-monitoring-form-g>
 </div>
