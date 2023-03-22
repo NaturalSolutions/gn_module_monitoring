@@ -54,6 +54,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
     //     this.objectType.properties = this.selectedObj;
     //     console.log(this.objectType);
     //   });
+    // this._objService.currentObjSelected.subscribe((objSelect)=> console.log(objSelect))
     this._objService.currentObjectTypeParent.subscribe((newObjType) => {
       console.log(newObjType);
       this.objectType = newObjType;
