@@ -323,3 +323,28 @@ export class VisitsService extends ApiGeomService {
     return "la visite";
   }
 }
+
+@Injectable()
+export class VisitsService extends ApiService<IVisit> {
+  constructor(_cacheService: CacheService) {
+    super(_cacheService);
+    this.objectObs = {
+      properties: {},
+      endPoint: endPoints.visits,
+      label: "visite",
+      addObjLabel: "Ajouter une nouvelle visite",
+      editObjLabel: "Editer la visite",
+      id: null,
+      moduleCode: "generic",
+      schema: {},
+      template: { fieldNames: [], fieldLabels: {} },
+    };
+  }
+  addObjectType(): string {
+    return " une nouvelle visite";
+  }
+
+  editObjectType(): string {
+    return "la visite";
+  }
+}
