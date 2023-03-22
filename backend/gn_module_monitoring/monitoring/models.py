@@ -219,6 +219,14 @@ class TMonitoringVisits(TBaseVisits, GenericModel):
             where(TObservations.id_base_visit==id_base_visit)
     )
 
+    module = DB.relationship(
+        TModules,
+        lazy="select",
+        primaryjoin=(TModules.id_module == TBaseVisits.id_module),
+        foreign_keys=[TModules.id_module],
+        uselist=False,
+    )
+
 
     module = DB.relationship(
         TModules,
