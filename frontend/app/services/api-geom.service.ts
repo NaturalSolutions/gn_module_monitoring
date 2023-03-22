@@ -161,7 +161,6 @@ export class SitesGroupService extends ApiGeomService {
     });
   }
 
-
   addObjectType(): string {
     return 'un nouveau groupe de site';
   }

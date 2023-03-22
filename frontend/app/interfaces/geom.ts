@@ -4,8 +4,7 @@ import { JsonData } from '../types/jsondata';
 import { Resp } from '../types/response';
 import { IPaginated } from './page';
 
-export interface IGeomObject {
-  data: JsonData;
+export interface IGeomObject extends IObject {
   geometry: GeoJSON.Geometry;
 }
 

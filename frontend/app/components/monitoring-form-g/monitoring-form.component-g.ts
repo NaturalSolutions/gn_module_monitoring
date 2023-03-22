@@ -33,6 +33,7 @@ export class MonitoringFormComponentG implements OnInit {
   @Output() bEditChange = new EventEmitter<boolean>();
 
   @Input() sites: {};
+  //@Input() apiService: ApiService;
   dataForm: IDataForm;
   searchSite = '';
 
