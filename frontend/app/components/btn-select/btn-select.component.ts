@@ -24,8 +24,7 @@ export interface EmptyObject {
   templateUrl: './btn-select.component.html',
   styleUrls: ['./btn-select.component.css'],
 })
-export class BtnSelectComponent
-implements OnInit {
+export class BtnSelectComponent implements OnInit {
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];

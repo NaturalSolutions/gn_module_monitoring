@@ -1,0 +1,122 @@
+{
+  "cruved": {"C":1, "U":1, "D": 1},
+  "chained": true,
+  "id_field_name": "id_base_site",
+  "description_field_name": "base_site_name",
+  "label": "Site",
+  "genre": "M",
+  "geom_field_name": "geom",
+  "uuid_field_name": "uuid_base_site",
+  "geometry_type": "Point",
+  "display_properties": [
+    "base_site_name",
+    "base_site_code",
+    "base_site_description",
+    "id_nomenclature_type_site",
+    "id_inventor",
+    "first_use_date",
+    "last_visit",
+    "nb_visits",
+    "altitude_min",
+    "altitude_max"
+  ],
+  "display_list": [
+    "base_site_name",
+    "base_site_code",
+    "id_nomenclature_type_site",
+    "last_visit",
+    "nb_visits"
+  ],
+  "sorts": [
+    {"prop": "last_visit", "dir": "desc"}
+  ],
+  "generic": {
+    "id_base_site": {
+      "type_widget": "text",
+      "attribut_label": "Id site",
+      "hidden": true
+    },
+    "base_site_code": {
+      "type_widget": "text",
+      "attribut_label": "Code",
+      "required": true
+    },
+    "base_site_name": {
+      "type_widget": "text",
+      "attribut_label": "Nom",
+      "required": true
+    },
+    "base_site_description": {
+      "type_widget": "textarea",
+      "attribut_label": "Description"
+    },
+
+    "id_sites_group": {
+      "type_widget": "datalist",
+      "attribut_label": "Groupe de sites",
+      "type_util": "sites_group",
+      "keyValue": "id_sites_group",
+      "keyLabel": "sites_group_name",
+      "api": "__MONITORINGS_PATH/list/__MODULE.MODULE_CODE/sites_group?id_module=__MODULE.ID_MODULE&fields=id_sites_group&fields=sites_group_name",
+      "application": "GeoNature",
+      "required": false,
+      "hidden": true
+    },
+    "id_nomenclature_type_site": {
+      "type_widget": "datalist",
+      "attribut_label": "Type site",
+      "api": "nomenclatures/nomenclature/TYPE_SITE",
+      "application": "GeoNature",
+      "keyValue": "id_nomenclature",
+      "keyLabel": "label_fr",
+      "data_path": "values",
+      "type_util": "nomenclature",
+      "required": true
+    },
+    "id_inventor": {
+      "type_widget": "datalist",
+      "attribut_label": "Descripteur",
+      "api": "users/menu/__MODULE.ID_LIST_OBSERVER",
+      "application": "GeoNature",
+      "keyValue": "id_role",
+      "keyLabel": "nom_complet",
+      "type_util": "user",
+      "required": true
+    },
+    "id_digitiser": {
+      "type_widget": "text",
+      "attribut_label": "Numérisateur",
+      "required": true,
+      "hidden": true,
+      "type_util": "user"
+    },
+    "first_use_date": {
+      "type_widget": "date",
+      "attribut_label": "Date description",
+      "required": true
+    },
+    "last_visit": {
+      "attribut_label": "Dernière visite",
+      "type_util": "date"
+    },
+    "nb_visits": {
+      "attribut_label": "Nb. visites"
+    },
+    "uuid_base_site": {
+      "attribut_label": "uuid"
+    },
+    "medias": {
+      "type_widget": "medias",
+      "attribut_label": "Médias",
+      "schema_dot_table": "gn_monitoring.t_base_sites"
+    },
+    "altitude_min": {
+      "type_widget": "integer",
+      "attribut_label": "Altitude (min)"
+      },
+      "altitude_max": {
+      "type_widget": "integer",
+      "attribut_label": "Altitude (max)"
+      }
+  }
+}

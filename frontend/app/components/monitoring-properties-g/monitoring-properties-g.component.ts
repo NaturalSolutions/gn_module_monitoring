@@ -80,6 +80,4 @@ export class MonitoringPropertiesGComponent implements OnInit {
       this.objectType
     );
   }
-
-
 }
