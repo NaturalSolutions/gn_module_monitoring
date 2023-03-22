@@ -54,7 +54,7 @@ export class MonitoringSitesComponent
 
   ngOnInit() {
     this.objForm = this._formBuilder.group({});
-    this._objService.changeObjectTypeParent(this._sitesGroupService.objectObs);
+    // this._objService.currentObjectTypeParent.subscribe((objParent)=>objParent);
     this._objService.changeObjectType(this._siteService.objectObs);
     this.initSite();
   }
@@ -128,7 +128,7 @@ export class MonitoringSitesComponent
   }
 
   seeDetails($event) {
-    this._objService.changeObjectTypeParent(this._siteService.objectObs);
+    this._objService.changeObjectTypeParent(this._siteService.objectObs,true);
     this.router.navigate([`sites/${$event.id_base_site}`], {
       relativeTo: this._Activatedroute,
     });
