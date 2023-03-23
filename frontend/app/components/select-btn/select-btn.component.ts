@@ -19,7 +19,7 @@ import { SelectObject } from "../../interfaces/object";
 export class SelectButtonComponent {
   @ViewChild(MatMenuTrigger) ddTrigger: MatMenuTrigger;
 
-  myControl = new FormControl();
+  form = new FormControl();
   private _optionList: SelectObject[];
   @Input() set optionList(value: SelectObject[]) {
     this._optionList = value;
@@ -29,6 +29,8 @@ export class SelectButtonComponent {
     // other logic
     return this._optionList;
   }
+  @Input() label: string = "";
+  @Input() placeholder: string = "";
   @Output() onSaved = new EventEmitter<SelectObject>();
   @Output() onDeployed = new EventEmitter<void>();
 
@@ -44,7 +46,7 @@ export class SelectButtonComponent {
 
   onSave() {
     this.ddTrigger.closeMenu();
-    this.onSaved.emit(this.myControl.value);
+    this.onSaved.emit(this.form.value);
   }
 
   onDeploy() {
