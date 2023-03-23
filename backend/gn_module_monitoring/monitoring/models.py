@@ -104,6 +104,12 @@ class BibTypeSite(DB.Model, GenericModel):
         uselist=False,
         backref=DB.backref('bib_type_site', uselist=False)
     )
+
+    sites = DB.relationship(
+        "TMonitoringSites",
+        secondary=cor_type_site,
+        lazy="noload"
+    )
   
 @serializable
 class TMonitoringObservationDetails(DB.Model):
