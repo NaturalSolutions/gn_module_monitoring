@@ -54,6 +54,7 @@ import { MonitoringSitesCreateComponent } from "./components/monitoring-sites-cr
 import { BtnSelectComponent } from "./components/btn-select/btn-select.component";
 import { MonitoringSitesEditComponent } from "./components/monitoring-sites-edit/monitoring-sites-edit.component";
 import { MonitoringVisitsComponent } from "./components/monitoring-visits/monitoring-visits.component";
+import { SelectButtonComponent } from "./components/select-btn/select-btn.component";
 
 // my module routing
 const routes: Routes = [
@@ -134,7 +135,8 @@ const routes: Routes = [
     MonitoringSitesCreateComponent,
     MonitoringSitesEditComponent,
     BtnSelectComponent,
-    MonitoringVisitsComponent
+    MonitoringVisitsComponent,
+    SelectButtonComponent,
   ],
   imports: [
     GN2CommonModule,

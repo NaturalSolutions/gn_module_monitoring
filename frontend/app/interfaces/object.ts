@@ -13,3 +13,8 @@ export interface IService<T> {
   patch(id: number, updatedData: T): Observable<T>;
   // delete(obj: IGeomObject)
 }
+
+export type SelectObject = {
+  id: string;
+  label: string;
+};
