@@ -14,7 +14,3 @@ export interface IService<T> {
   patch(id: number, updatedData: T): Observable<Resp>;
   // delete(obj: IGeomObject)
 }
-
-export interface IGeomService<IGeomObject> extends IService<IGeomObject> {
-  get_geometries(params: JsonData): Observable<GeoJSON.FeatureCollection>;
-}
