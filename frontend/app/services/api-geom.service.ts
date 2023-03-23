@@ -260,69 +260,69 @@ export class SitesService extends ApiGeomService {
   }
 }
 
-@Injectable()
-export class VisitsService extends ApiGeomService {
-  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
-    super(_cacheService, _configJsonService);
-  }
-  init(): void {
-    this.endPoint = endPoints.visits;
-    this.objectObs = {
-      properties: {},
-      endPoint: endPoints.visits,
-      objectType: 'visits',
-      label: 'visite',
-      addObjLabel: 'Ajouter une nouvelle visite',
-      editObjLabel: 'Editer la visite',
-      addChildLabel: 'Ajouter une observation',
-      id: null,
-      moduleCode: 'generic',
-      schema: {},
-      template: {
-        fieldNames: [],
-        fieldLabels: {},
-        fieldNamesList: [],
-        fieldDefinitions: {},
-      },
-      dataTable: { colNameObj: {} },
-    };
-    this._configJsonService
-      .init(this.objectObs.moduleCode)
-      .pipe()
-      .subscribe(() => {
-        const fieldNames = this._configJsonService.configModuleObjectParam(
-          this.objectObs.moduleCode,
-          this.objectObs.objectType,
-          'display_properties'
-        );
-        const fieldNamesList = this._configJsonService.configModuleObjectParam(
-          this.objectObs.moduleCode,
-          this.objectObs.objectType,
-          'display_list'
-        );
-        const schema = this._configJsonService.schema(
-          this.objectObs.moduleCode,
-          this.objectObs.objectType
-        );
-        const fieldLabels = this._configJsonService.fieldLabels(schema);
-        const fieldDefinitions = this._configJsonService.fieldDefinitions(schema);
-        this.objectObs.template.fieldNames = fieldNames;
-        this.objectObs.template.fieldNamesList = fieldNamesList;
-        this.objectObs.schema = schema;
-        this.objectObs.template.fieldLabels = fieldLabels;
-        this.objectObs.template.fieldDefinitions = fieldDefinitions;
-        this.objectObs.template.fieldNamesList = fieldNamesList;
-        this.objectObs.dataTable.colNameObj = Utils.toObject(fieldNamesList, fieldLabels);
-      });
-  }
-  addObjectType(): string {
-    return " une nouvelle visite";
-  }
+// @Injectable()
+// export class VisitsService extends ApiGeomService {
+//   constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
+//     super(_cacheService, _configJsonService);
+//   }
+//   init(): void {
+//     this.endPoint = endPoints.visits;
+//     this.objectObs = {
+//       properties: {},
+//       endPoint: endPoints.visits,
+//       objectType: 'visits',
+//       label: 'visite',
+//       addObjLabel: 'Ajouter une nouvelle visite',
+//       editObjLabel: 'Editer la visite',
+//       addChildLabel: 'Ajouter une observation',
+//       id: null,
+//       moduleCode: 'generic',
+//       schema: {},
+//       template: {
+//         fieldNames: [],
+//         fieldLabels: {},
+//         fieldNamesList: [],
+//         fieldDefinitions: {},
+//       },
+//       dataTable: { colNameObj: {} },
+//     };
+//     this._configJsonService
+//       .init(this.objectObs.moduleCode)
+//       .pipe()
+//       .subscribe(() => {
+//         const fieldNames = this._configJsonService.configModuleObjectParam(
+//           this.objectObs.moduleCode,
+//           this.objectObs.objectType,
+//           'display_properties'
+//         );
+//         const fieldNamesList = this._configJsonService.configModuleObjectParam(
+//           this.objectObs.moduleCode,
+//           this.objectObs.objectType,
+//           'display_list'
+//         );
+//         const schema = this._configJsonService.schema(
+//           this.objectObs.moduleCode,
+//           this.objectObs.objectType
+//         );
+//         const fieldLabels = this._configJsonService.fieldLabels(schema);
+//         const fieldDefinitions = this._configJsonService.fieldDefinitions(schema);
+//         this.objectObs.template.fieldNames = fieldNames;
+//         this.objectObs.template.fieldNamesList = fieldNamesList;
+//         this.objectObs.schema = schema;
+//         this.objectObs.template.fieldLabels = fieldLabels;
+//         this.objectObs.template.fieldDefinitions = fieldDefinitions;
+//         this.objectObs.template.fieldNamesList = fieldNamesList;
+//         this.objectObs.dataTable.colNameObj = Utils.toObject(fieldNamesList, fieldLabels);
+//       });
+//   }
+//   addObjectType(): string {
+//     return " une nouvelle visite";
+//   }
 
-  editObjectType(): string {
-    return "la visite";
-  }
-}
+//   editObjectType(): string {
+//     return "la visite";
+//   }
+// }
 
 @Injectable()
 export class VisitsService extends ApiService<IVisit> {

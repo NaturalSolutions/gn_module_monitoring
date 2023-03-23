@@ -2,7 +2,6 @@ import { JsonData } from "../types/jsondata";
 import { IPaginated } from "./page";
 import { GeoJSON } from "geojson";
 import { Observable } from "rxjs";
-import { Resp } from "../types/response";
 
 export interface IObject {
   data: JsonData;
@@ -10,7 +9,7 @@ export interface IObject {
 
 export interface IService<T> {
   get(limit: number, page: number, params: JsonData): Observable<IPaginated<T>>;
-  create(postdata: T): Observable<Resp>;
-  patch(id: number, updatedData: T): Observable<Resp>;
+  create(postdata: T): Observable<T>;
+  patch(id: number, updatedData: T): Observable<T>;
   // delete(obj: IGeomObject)
 }
