@@ -1,40 +1,36 @@
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import {
   Component,
-  OnInit,
-  ViewChild,
   ElementRef,
-  Input,
-  Output,
   EventEmitter,
-} from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { Observable, of, iif } from "rxjs";
-import {
-  startWith,
-  debounceTime,
-  distinctUntilChanged,
-  switchMap,
-  map,
-} from "rxjs/operators";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
-import { COMMA, ENTER } from "@angular/cdk/keycodes";
-import { JsonData } from "../../types/jsondata";
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { Observable, iif, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs/operators';
+
+import { JsonData } from '../../types/jsondata';
+
 export interface EmptyObject {
   name: string;
 }
 
 @Component({
-  selector: "btn-select",
-  templateUrl: "./btn-select.component.html",
-  styleUrls: ["./btn-select.component.css"],
+  selector: 'btn-select',
+  templateUrl: './btn-select.component.html',
+  styleUrls: ['./btn-select.component.css'],
 })
 export class BtnSelectComponent implements OnInit {
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
   myControl = new FormControl();
-  @Input() placeholderText: string = "Selectionnez vos options dans la liste";
-  @Input() titleBtn: string = "Choix des options";
+  @Input() placeholderText: string = 'Selectionnez vos options dans la liste';
+  @Input() titleBtn: string = 'Choix des options';
 
   filteredOptions: Observable<any>;
   listOptionChosen: string[] = [];
@@ -47,7 +43,7 @@ export class BtnSelectComponent implements OnInit {
     limit: number,
     valueToFilter: string
   ) => Observable<any>;
-  @ViewChild("optionInput") optionInput: ElementRef<HTMLInputElement>;
+  @ViewChild('optionInput') optionInput: ElementRef<HTMLInputElement>;
 
   @Output() public sendobject = new EventEmitter<JsonData>();
 
@@ -55,24 +51,21 @@ export class BtnSelectComponent implements OnInit {
 
   ngOnInit() {
     this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(""),
+      startWith(''),
       debounceTime(400),
       distinctUntilChanged(),
       switchMap((val: string) => {
-        console.log(val);
         return iif(
-          () => val == "",
+          () => val == '',
           of([{ name: val }]),
           this.filterOnRequest(val, this.paramToFilt)
         );
       }),
-      map((res) => (res.length > 0 ? res : [{ name: "Pas de résultats" }]))
+      map((res) => (res.length > 0 ? res : [{ name: 'Pas de résultats' }]))
     );
   }
 
   remove(option: string): void {
-    console.log(this.configObjAdded[option]);
-
     const index = this.listOptionChosen.indexOf(option);
 
     if (index >= 0) {
@@ -81,18 +74,16 @@ export class BtnSelectComponent implements OnInit {
 
     if (this.configObjAdded && this.configObjAdded[option] !== undefined) {
       delete this.configObjAdded[option];
-      console.log(this.configObjAdded);
     }
+    this.sendobject.emit(this.configObjAdded);
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
     const shouldAddValue = this.checkBeforeAdding(event.option.viewValue);
     shouldAddValue
-      ? this.listOptionChosen.push(event.option.viewValue) &&
-        this.addObject(event.option.value)
+      ? this.listOptionChosen.push(event.option.viewValue) && this.addObject(event.option.value)
       : null;
-    console.log(this.listOptionChosen);
-    this.optionInput.nativeElement.value = "";
+    this.optionInput.nativeElement.value = '';
     this.myControl.setValue(null);
   }
 
@@ -107,7 +98,6 @@ export class BtnSelectComponent implements OnInit {
       // Ici on map pour uniformiser la "key" utilisé pour afficher les options (default Key : 'name')
       map((response) =>
         response.filter((obj) => {
-          console.log(obj);
           Object.assign(obj, { name: obj[keyToFilt] })[keyToFilt];
           delete obj[keyToFilt];
           return obj;
@@ -117,11 +107,8 @@ export class BtnSelectComponent implements OnInit {
   }
 
   checkBeforeAdding(valToAdd: string) {
-    const noValidInput = [null, "", "Pas de résultats"];
-    if (
-      noValidInput.includes(valToAdd) ||
-      this.listOptionChosen.includes(valToAdd)
-    ) {
+    const noValidInput = [null, '', 'Pas de résultats'];
+    if (noValidInput.includes(valToAdd) || this.listOptionChosen.includes(valToAdd)) {
       return false;
     } else {
       return true;

@@ -1,14 +1,11 @@
-import { MonitoringObjectComponent } from './../components/monitoring-object/monitoring-object.component';
-import { Utils } from './../utils/utils';
+import { HttpClient } from '@angular/common/http';
 // import _ from "lodash";
 import { Injectable } from '@angular/core';
-
-import { HttpClient } from '@angular/common/http';
-import { AppConfig } from '@geonature_config/app.config';
-import { ModuleConfig } from '../module.config';
 import { ModuleService } from '@geonature/services/module.service';
+import { AppConfig } from '@geonature_config/app.config';
 import { of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
+
 
 @Injectable()
 export class ConfigJsonService {
@@ -127,7 +124,6 @@ export class ConfigJsonService {
   /** Config Object Schema */
   schema(moduleCode, objectType, typeSchema = 'all'): Object {
     moduleCode = moduleCode || 'generic';
-    console.log(objectType)
     const configObject = this._config[moduleCode][objectType];
     // gerer quand les paramètres ont un fonction comme valeur
     if (configObject)
@@ -204,16 +200,16 @@ export class ConfigJsonService {
   fieldLabels(schema) {
     const fieldLabels = {};
     for (const key of Object.keys(schema)) {
-      fieldLabels[key] = schema[key]["attribut_label"];
+      fieldLabels[key] = schema[key]['attribut_label'];
     }
     return fieldLabels;
   }
 
-  fieldNames(moduleCode, objectType,typeDisplay = "") {
-    if (["display_properties", "display_list"].includes(typeDisplay)) {
+  fieldNames(moduleCode, objectType, typeDisplay = '') {
+    if (['display_properties', 'display_list'].includes(typeDisplay)) {
       return this.configModuleObjectParam(moduleCode, objectType, typeDisplay);
     }
-    if (typeDisplay === "schema") {
+    if (typeDisplay === 'schema') {
       return Object.keys(this.schema(moduleCode, objectType));
     }
   }
@@ -221,9 +217,8 @@ export class ConfigJsonService {
   fieldDefinitions(schema) {
     const fieldDefinitions = {};
     for (const key of Object.keys(schema)) {
-      fieldDefinitions[key] = schema[key]["definition"];
+      fieldDefinitions[key] = schema[key]['definition'];
     }
     return fieldDefinitions;
   }
-
 }

@@ -1,20 +1,21 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { FormGroup, FormBuilder } from "@angular/forms";
-import { MonitoringObject } from "../../class/monitoring-object";
-import { CommonService } from "@geonature_common/service/common.service";
-import { DynamicFormService } from "@geonature_common/form/dynamic-form-generator/dynamic-form.service";
-import { ActivatedRoute } from "@angular/router";
-import { FormService } from "../../services/form.service";
-import { Router } from "@angular/router";
-import { IDataForm } from "../../interfaces/form";
-import { ApiGeomService } from "../../services/api-geom.service";
-import { ConfigJsonService } from "../../services/config-json.service";
-import { ObjectService } from "../../services/object.service";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+import { DynamicFormService } from '@geonature_common/form/dynamic-form-generator/dynamic-form.service';
+import { CommonService } from '@geonature_common/service/common.service';
+import { concatMap } from 'rxjs/operators';
+
+import { MonitoringObject } from '../../class/monitoring-object';
+import { IDataForm } from '../../interfaces/form';
+import { ApiGeomService } from '../../services/api-geom.service';
+import { ConfigJsonService } from '../../services/config-json.service';
+import { FormService } from '../../services/form.service';
 
 @Component({
-  selector: "pnx-monitoring-form-g",
-  templateUrl: "./monitoring-form.component-g.html",
-  styleUrls: ["./monitoring-form.component-g.css"],
+  selector: 'pnx-monitoring-form-g',
+  templateUrl: './monitoring-form.component-g.html',
+  styleUrls: ['./monitoring-form.component-g.css'],
 })
 export class MonitoringFormComponentG implements OnInit {
   @Input() currentUser;
@@ -32,7 +33,7 @@ export class MonitoringFormComponentG implements OnInit {
 
   @Input() sites: {};
   dataForm: IDataForm;
-  searchSite = "";
+  searchSite = '';
 
   obj: any;
   objFormsDefinition;
@@ -61,110 +62,96 @@ export class MonitoringFormComponentG implements OnInit {
   ) {}
 
   ngOnInit() {
-    // this._formService.currentData.subscribe((dataToEditOrCreate) => {
-    //   this.obj = dataToEditOrCreate;
-    //   this.obj.bIsInitialized = true;
-    this._formService.currentData.subscribe((dataToEditOrCreate) => {
-      this.obj = dataToEditOrCreate;
-      this.obj.bIsInitialized = true;
-      this._configService
-        .init(this.obj.moduleCode)
-        .pipe()
-        .subscribe(() => {
-          // return this._route.queryParamMap;
-          // })
-          // .subscribe((queryParams) => {
+    this._formService.currentData
+      .pipe(
+        concatMap((dataToEditOrCreate) => {
+          this.obj = dataToEditOrCreate;
+          this.obj.bIsInitialized = true;
+          return this._configService.init(this.obj.moduleCode).pipe();
+        })
+      )
+      .subscribe(() => {
+        // return this._route.queryParamMap;
+        // })
+        // .subscribe((queryParams) => {
 
-          this.queryParams = this._route.snapshot.queryParams || {};
-          this.bChainInput =
-            this._configService.frontendParams()["bChainInput"];
+        this.queryParams = this._route.snapshot.queryParams || {};
+        this.bChainInput = this._configService.frontendParams()['bChainInput'];
 
-          const schema = this._configService.schema(
+        const schema = this._configService.schema(this.obj.moduleCode, this.obj.objectType);
+
+        this.obj[this.obj.moduleCode] = schema;
+
+        this.obj.specific == undefined ? (this.obj.specific = {}) : null;
+        if (Object.keys(this.obj.specific).length !== 0) {
+          Object.assign(schema, this.obj.specific);
+        }
+
+        // const schema = this.obj.schema();
+
+        // init objFormsDefinition
+
+        // meta pour les parametres dynamiques
+        // ici pour avoir acces aux nomenclatures
+        this.meta = {
+          // nomenclatures: this._dataUtilsService.getDataUtil('nomenclature'),
+          // dataset: this._dataUtilsService.getDataUtil('dataset'),
+          // id_role: this.currentUser.id_role,
+          bChainInput: this.bChainInput,
+          parents: this.obj.parents,
+        };
+
+        this.objFormsDefinition = this._dynformService
+          .formDefinitionsdictToArray(schema, this.meta)
+          .filter((formDef) => formDef.type_widget)
+          .sort((a, b) => {
+            // medias à la fin
+            return a.attribut_name === 'medias' ? +1 : b.attribut_name === 'medias' ? -1 : 0;
+          });
+
+        // display_form pour customiser l'ordre dans le formulaire
+        // les éléments de display form sont placé en haut dans l'ordre du tableau
+        // tous les éléments non cachés restent affichés
+
+        let displayProperties = [
+          ...(this._configService.configModuleObjectParam(
             this.obj.moduleCode,
-            this.obj.objectType
-          );
+            this.obj.objectType,
+            'display_properties'
+          ) || []),
+        ];
+        if (displayProperties && displayProperties.length) {
+          displayProperties.reverse();
+          this.objFormsDefinition.sort((a, b) => {
+            let indexA = displayProperties.findIndex((e) => e == a.attribut_name);
+            let indexB = displayProperties.findIndex((e) => e == b.attribut_name);
+            return indexB - indexA;
+          });
+        }
 
-          this.obj[this.obj.moduleCode] = schema;
+        // champs patch pour simuler un changement de valeur et déclencher le recalcul des propriété
+        // par exemple quand bChainInput change
+        this.objForm.addControl('patch_update', this._formBuilder.control(0));
 
-          this.obj.specific == undefined ? (this.obj.specific = {}) : null;
-          if (Object.keys(this.obj.specific).length !== 0) {
-            Object.assign(schema, this.obj.specific);
-          }
+        // this._configService.configModuleObject(this.obj.moduleCode, this.obj.objectType);
+        // set geometry
+        // if (this.obj.config["geometry_type"]) {
+        //   this.objForm.addControl(
+        //     "geometry",
+        //     this._formBuilder.control("", Validators.required)
+        //   );
+        // }
 
-          // const schema = this.obj.schema();
+        // pour donner la valeur de idParent
 
-          // init objFormsDefinition
-
-          // meta pour les parametres dynamiques
-          // ici pour avoir acces aux nomenclatures
-          this.meta = {
-            // nomenclatures: this._dataUtilsService.getDataUtil('nomenclature'),
-            // dataset: this._dataUtilsService.getDataUtil('dataset'),
-            // id_role: this.currentUser.id_role,
-            bChainInput: this.bChainInput,
-            parents: this.obj.parents,
-          };
-
-          this.objFormsDefinition = this._dynformService
-            .formDefinitionsdictToArray(schema, this.meta)
-            .filter((formDef) => formDef.type_widget)
-            .sort((a, b) => {
-              // medias à la fin
-              return a.attribut_name === "medias"
-                ? +1
-                : b.attribut_name === "medias"
-                ? -1
-                : 0;
-            });
-
-          // display_form pour customiser l'ordre dans le formulaire
-          // les éléments de display form sont placé en haut dans l'ordre du tableau
-          // tous les éléments non cachés restent affichés
-
-          let displayProperties = [
-            ...(this._configService.configModuleObjectParam(
-              this.obj.moduleCode,
-              this.obj.objectType,
-              "display_properties"
-            ) || []),
-          ];
-          if (displayProperties && displayProperties.length) {
-            displayProperties.reverse();
-            this.objFormsDefinition.sort((a, b) => {
-              let indexA = displayProperties.findIndex(
-                (e) => e == a.attribut_name
-              );
-              let indexB = displayProperties.findIndex(
-                (e) => e == b.attribut_name
-              );
-              return indexB - indexA;
-            });
-          }
-
-          // champs patch pour simuler un changement de valeur et déclencher le recalcul des propriété
-          // par exemple quand bChainInput change
-          this.objForm.addControl("patch_update", this._formBuilder.control(0));
-
-          // this._configService.configModuleObject(this.obj.moduleCode, this.obj.objectType);
-          // set geometry
-          // if (this.obj.config["geometry_type"]) {
-          //   this.objForm.addControl(
-          //     "geometry",
-          //     this._formBuilder.control("", Validators.required)
-          //   );
-          // }
-
-          // pour donner la valeur de idParent
-
-          this.initForm();
-        });
-    });
+        this.initForm();
+      });
   }
 
   /** pour réutiliser des paramètres déjà saisis */
   keepDefinitions() {
     return this.objFormsDefinition.filter((def) =>
-      this.obj.configParam("keep").includes(def.attribut_name)
+      this.obj.configParam('keep').includes(def.attribut_name)
     );
   }
 
@@ -197,16 +184,14 @@ export class MonitoringFormComponentG implements OnInit {
   }
 
   keepNames() {
-    return this.obj.configParam("keep") || [];
+    return this.obj.configParam('keep') || [];
   }
 
   resetObjForm() {
     // quand on enchaine les relevés
-    const chainShow = this.obj.configParam("chain_show");
+    const chainShow = this.obj.configParam('chain_show');
     if (chainShow) {
-      this.chainShow.push(
-        chainShow.map((key) => this.obj.resolvedProperties[key])
-      );
+      this.chainShow.push(chainShow.map((key) => this.obj.resolvedProperties[key]));
       this.chainShow.push(this.obj.resolvedProperties);
     }
 
@@ -225,7 +210,7 @@ export class MonitoringFormComponentG implements OnInit {
     );
     this.obj.init({});
 
-    this.obj.properties[this.obj.configParam("id_field_Name")] = null;
+    this.obj.properties[this.obj.configParam('id_field_Name')] = null;
 
     // pq get ?????
     // this.obj.get(0).subscribe(() => {
@@ -251,7 +236,7 @@ export class MonitoringFormComponentG implements OnInit {
     const defaultValue = {
       // id_digitiser: value["id_digitiser"] || this.currentUser.id_role,
       // id_inventor: value["id_inventor"] || this.currentUser.id_role,
-      first_use_date: value["first_use_date"] || {
+      first_use_date: value['first_use_date'] || {
         year: date.getUTCFullYear(),
         month: date.getUTCMonth() + 1,
         day: date.getUTCDate(),
@@ -278,7 +263,7 @@ export class MonitoringFormComponentG implements OnInit {
   navigateToDetail(id, objectType, queryParams) {
     // patch bug navigation
     this._router.navigate(
-      ["monitorings", objectType, id].filter((s) => !!s),
+      ['monitorings', objectType, id].filter((s) => !!s),
       {
         queryParams,
       }
@@ -292,7 +277,7 @@ export class MonitoringFormComponentG implements OnInit {
    */
   navigateToParent() {
     this.bEditChange.emit(false); // patch bug navigation
-    this._router.navigateByUrl("/monitorings/sites_group");
+    this._router.navigateByUrl('/monitorings/sites_group');
 
     // this.obj.navigateToParent();
   }
@@ -309,17 +294,14 @@ export class MonitoringFormComponentG implements OnInit {
     const action = this.obj.id
       ? this._apiGeomService.patch(this.obj.id, objToUpdateOrCreate)
       : this._apiGeomService.create(objToUpdateOrCreate);
-    const actionLabel = this.obj.id ? "Modification" : "Création";
+    const actionLabel = this.obj.id ? 'Modification' : 'Création';
     action.subscribe((objData) => {
-      this._commonService.regularToaster(
-        "success",
-        this.msgToaster(actionLabel)
-      );
+      this._commonService.regularToaster('success', this.msgToaster(actionLabel));
       this.bSaveSpinner = this.bSaveAndAddChildrenSpinner = false;
       // this.objChanged.emit(this.obj);
 
       /** si c'est un module : reset de la config */
-      if (this.obj.objectType === "module") {
+      if (this.obj.objectType === 'module') {
         this._configService.loadConfig(this.obj.moduleCode).subscribe();
       }
 
@@ -332,16 +314,12 @@ export class MonitoringFormComponentG implements OnInit {
           this._configService.configModuleObjectParam(
             this.obj.moduleCode,
             this.obj.objectType,
-            "redirect_to_parent"
+            'redirect_to_parent'
           )
         ) {
           this.navigateToParent();
         } else {
-          this.navigateToDetail(
-            this.obj.id,
-            this.obj.objectType,
-            this.queryParams
-          );
+          this.navigateToDetail(this.obj.id, this.obj.objectType, this.queryParams);
         }
       }
     });
@@ -357,7 +335,7 @@ export class MonitoringFormComponentG implements OnInit {
 
   onDelete() {
     this.bDeleteSpinner = true;
-    this._commonService.regularToaster("info", this.msgToaster("Suppression"));
+    this._commonService.regularToaster('info', this.msgToaster('Suppression'));
     // : this.obj.post(this.objForm.value);
     this._apiGeomService.delete(this.obj.id).subscribe((del) => {
       this.bDeleteSpinner = this.bDeleteModal = false;
@@ -372,10 +350,7 @@ export class MonitoringFormComponentG implements OnInit {
     // let {id_module,medias, ...rest} = this.objForm.value;
     // this.dataForm = rest
     this.dataForm = this.objForm.value;
-    const change = this._configService.change(
-      this.obj.moduleCode,
-      this.obj.objectType
-    );
+    const change = this._configService.change(this.obj.moduleCode, this.obj.objectType);
     if (!change) {
       return;
     }
@@ -395,13 +370,14 @@ export class MonitoringFormComponentG implements OnInit {
     for (const formDef of this.objFormsDefinition) {
       formDef.meta.bChainInput = this.bChainInput;
     }
-    this._configService.setFrontendParams("bChainInput", this.bChainInput);
+    this._configService.setFrontendParams('bChainInput', this.bChainInput);
     // patch pour recalculers
     this.procesPatchUpdateForm();
   }
 
   getConfigFromBtnSelect(event) {
-    this.obj.specific == undefined ? (this.obj.specific = {}) : null;
+    // this.obj.specific == undefined ? (this.obj.specific = {}) : null;
+    this.obj.specific = {};
     for (const key in event) {
       if (Object.keys(event[key].config).length !== 0) {
         Object.assign(this.obj.specific, event[key].config.specific);

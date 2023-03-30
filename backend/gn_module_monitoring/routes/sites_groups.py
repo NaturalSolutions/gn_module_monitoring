@@ -7,15 +7,18 @@ from werkzeug.datastructures import MultiDict
 from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.config.repositories import get_config
 from gn_module_monitoring.modules.repositories import get_module
-from gn_module_monitoring.monitoring.definitions import \
-    monitoring_g_definitions
-from gn_module_monitoring.monitoring.models import (TMonitoringSites,
-                                                    TMonitoringSitesGroups)
+from gn_module_monitoring.monitoring.definitions import monitoring_g_definitions
+from gn_module_monitoring.monitoring.models import TMonitoringSites, TMonitoringSitesGroups
 from gn_module_monitoring.monitoring.schemas import MonitoringSitesGroupsSchema
 from gn_module_monitoring.utils.errors.errorHandler import InvalidUsage
-from gn_module_monitoring.utils.routes import (filter_params, geojson_query,
-                                               get_limit_page, get_sort,
-                                               paginate, sort)
+from gn_module_monitoring.utils.routes import (
+    filter_params,
+    geojson_query,
+    get_limit_page,
+    get_sort,
+    paginate,
+    sort,
+)
 from gn_module_monitoring.utils.utils import to_int
 
 
@@ -72,21 +75,6 @@ def patch(_id):
     module_code = "generic"
     object_type = "sites_group"
     get_config(module_code, force=True)
-    # create_or_update_object_api(module_code,object_type,_id)
-    # ###############################""
-    # item_schema = MonitoringSitesGroupsSchema()
-    # item_json = request.get_json()
-    # item = TMonitoringSitesGroups.find_by_id(_id)
-    # fields = TMonitoringSitesGroups.attribute_names()
-    # for field in item_json:
-    #     if field in fields:
-    #         setattr(item, field, item_json[field])
-    # item_schema.load(item_json)
-    # db.session.add(item)
-
-    # db.session.commit()
-    # return item_schema.dump(item), 201
-    # ###############################""
     return create_or_update_object_api(module_code, object_type, _id), 201
 
 
@@ -105,13 +93,6 @@ def post():
     object_type = "sites_group"
     get_config(module_code, force=True)
     return create_or_update_object_api(module_code, object_type), 201
-    ##################################
-    # item_schema = MonitoringSitesGroupsSchema()
-    # item_json = request.get_json()
-    # item = item_schema.load(item_json)
-    # db.session.add(item)
-    # db.session.commit()
-    # return item_schema.dump(item), 201
 
 
 @blueprint.errorhandler(ValidationError)
