@@ -17,11 +17,8 @@
     </button>
     <!--TODO  Revoir pour rendre générique le bouton "Ajouter" , avant : {{ (child0.template["label_art_undef_new"] || "") }}-->
     <!-- TODO Revoir pour les droits pour pouvoir créer un groupe de site avec anciennement:  *ngIf=obj.moduleCode && (currentUser['cruved_object'][child0.objectType] || currentUser['cruved']).C >= child0.cruved('C')" -->
-    <button
-      class="btn btn-success float-right"
-      (click)="navigateToAddChildren(null, null)"
-    >
-      <i class="fa fa-plus" aria-hidden="true"></i> {{objectType.addObjLabel}}
+    <button class="btn btn-success float-right" (click)="navigateToAddChildren(null, null)">
+      <i class="fa fa-plus" aria-hidden="true"></i> {{ objectType.addObjLabel }}
     </button>
   </div>
   <ngx-datatable
