@@ -4,13 +4,13 @@ import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { DynamicFormService } from '@geonature_common/form/dynamic-form-generator/dynamic-form.service';
 import { CommonService } from '@geonature_common/service/common.service';
-import { concatMap } from 'rxjs/operators';
 
 import { MonitoringObject } from '../../class/monitoring-object';
 import { IDataForm } from '../../interfaces/form';
 import { ApiGeomService } from '../../services/api-geom.service';
 import { ConfigJsonService } from '../../services/config-json.service';
 import { FormService } from '../../services/form.service';
+import { ObjectService } from '../../services/object.service';
 
 @Component({
   selector: 'pnx-monitoring-form-g',
@@ -58,94 +58,116 @@ export class MonitoringFormComponentG implements OnInit {
     private _dynformService: DynamicFormService,
     private _formService: FormService,
     private _apiGeomService: ApiGeomService,
-    private _router: Router
+    private _router: Router,
+    private _objService: ObjectService
   ) {}
 
   ngOnInit() {
-    this._formService.currentData
-      .pipe(
-        concatMap((dataToEditOrCreate) => {
-          this.obj = dataToEditOrCreate;
-          this.obj.bIsInitialized = true;
-          return this._configService.init(this.obj.moduleCode).pipe();
-        })
-      )
-      .subscribe(() => {
-        // return this._route.queryParamMap;
-        // })
-        // .subscribe((queryParams) => {
+    // this._formService.currentData.subscribe((dataToEditOrCreate) => {
+    //       this.obj = dataToEditOrCreate;
+    //       this.obj.bIsInitialized = true;
+    // });
 
-        this.queryParams = this._route.snapshot.queryParams || {};
-        this.bChainInput = this._configService.frontendParams()['bChainInput'];
+    // this._configService
+    // .init(this.obj.moduleCode)
+    // .pipe()
+    // .subscribe(() => {
+    // this._formService.currentData
+    //   .pipe(
+    //     mergeMap(dataToEditOrCreate => {   this.obj = dataToEditOrCreate;
+    //       this.obj.bIsInitialized = true;
+    //       return this._configService;
+    //     })
+    //   )
+    //   .subscribe((obj) => {
+    //     console.log(obj)
+    this._objService.currentObjectType.subscribe((ob) =>
+      this._apiGeomService.init(ob.endPoint, ob)
+    );
 
-        const schema = this._configService.schema(this.obj.moduleCode, this.obj.objectType);
+    this._formService.currentData.subscribe((dataToEditOrCreate) => {
+      this.obj = dataToEditOrCreate;
+      this.obj.bIsInitialized = true;
+      this._configService
+        .init(this.obj.moduleCode)
+        .pipe()
+        .subscribe(() => {
+          //     return this._route.queryParamMap;
+          //     })
+          //     .subscribe((queryParams) => {
 
-        this.obj[this.obj.moduleCode] = schema;
+          this.queryParams = this._route.snapshot.queryParams || {};
+          this.bChainInput = this._configService.frontendParams()['bChainInput'];
 
-        this.obj.specific == undefined ? (this.obj.specific = {}) : null;
-        if (Object.keys(this.obj.specific).length !== 0) {
-          Object.assign(schema, this.obj.specific);
-        }
+          const schema = this._configService.schema(this.obj.moduleCode, this.obj.objectType);
 
-        // const schema = this.obj.schema();
+          this.obj[this.obj.moduleCode] = schema;
 
-        // init objFormsDefinition
+          this.obj.specific == undefined ? (this.obj.specific = {}) : null;
+          if (Object.keys(this.obj.specific).length !== 0) {
+            Object.assign(schema, this.obj.specific);
+          }
 
-        // meta pour les parametres dynamiques
-        // ici pour avoir acces aux nomenclatures
-        this.meta = {
-          // nomenclatures: this._dataUtilsService.getDataUtil('nomenclature'),
-          // dataset: this._dataUtilsService.getDataUtil('dataset'),
-          // id_role: this.currentUser.id_role,
-          bChainInput: this.bChainInput,
-          parents: this.obj.parents,
-        };
+          // const schema = this.obj.schema();
 
-        this.objFormsDefinition = this._dynformService
-          .formDefinitionsdictToArray(schema, this.meta)
-          .filter((formDef) => formDef.type_widget)
-          .sort((a, b) => {
-            // medias à la fin
-            return a.attribut_name === 'medias' ? +1 : b.attribut_name === 'medias' ? -1 : 0;
-          });
+          // init objFormsDefinition
 
-        // display_form pour customiser l'ordre dans le formulaire
-        // les éléments de display form sont placé en haut dans l'ordre du tableau
-        // tous les éléments non cachés restent affichés
+          // meta pour les parametres dynamiques
+          // ici pour avoir acces aux nomenclatures
+          this.meta = {
+            // nomenclatures: this._dataUtilsService.getDataUtil('nomenclature'),
+            // dataset: this._dataUtilsService.getDataUtil('dataset'),
+            // id_role: this.currentUser.id_role,
+            bChainInput: this.bChainInput,
+            parents: this.obj.parents,
+          };
 
-        let displayProperties = [
-          ...(this._configService.configModuleObjectParam(
-            this.obj.moduleCode,
-            this.obj.objectType,
-            'display_properties'
-          ) || []),
-        ];
-        if (displayProperties && displayProperties.length) {
-          displayProperties.reverse();
-          this.objFormsDefinition.sort((a, b) => {
-            let indexA = displayProperties.findIndex((e) => e == a.attribut_name);
-            let indexB = displayProperties.findIndex((e) => e == b.attribut_name);
-            return indexB - indexA;
-          });
-        }
+          this.objFormsDefinition = this._dynformService
+            .formDefinitionsdictToArray(schema, this.meta)
+            .filter((formDef) => formDef.type_widget)
+            .sort((a, b) => {
+              // medias à la fin
+              return a.attribut_name === 'medias' ? +1 : b.attribut_name === 'medias' ? -1 : 0;
+            });
 
-        // champs patch pour simuler un changement de valeur et déclencher le recalcul des propriété
-        // par exemple quand bChainInput change
-        this.objForm.addControl('patch_update', this._formBuilder.control(0));
+          // display_form pour customiser l'ordre dans le formulaire
+          // les éléments de display form sont placé en haut dans l'ordre du tableau
+          // tous les éléments non cachés restent affichés
 
-        // this._configService.configModuleObject(this.obj.moduleCode, this.obj.objectType);
-        // set geometry
-        // if (this.obj.config["geometry_type"]) {
-        //   this.objForm.addControl(
-        //     "geometry",
-        //     this._formBuilder.control("", Validators.required)
-        //   );
-        // }
+          let displayProperties = [
+            ...(this._configService.configModuleObjectParam(
+              this.obj.moduleCode,
+              this.obj.objectType,
+              'display_properties'
+            ) || []),
+          ];
+          if (displayProperties && displayProperties.length) {
+            displayProperties.reverse();
+            this.objFormsDefinition.sort((a, b) => {
+              let indexA = displayProperties.findIndex((e) => e == a.attribut_name);
+              let indexB = displayProperties.findIndex((e) => e == b.attribut_name);
+              return indexB - indexA;
+            });
+          }
 
-        // pour donner la valeur de idParent
+          // champs patch pour simuler un changement de valeur et déclencher le recalcul des propriété
+          // par exemple quand bChainInput change
+          this.objForm.addControl('patch_update', this._formBuilder.control(0));
 
-        this.initForm();
-      });
+          // this._configService.configModuleObject(this.obj.moduleCode, this.obj.objectType);
+          // set geometry
+          // if (this.obj.config["geometry_type"]) {
+          //   this.objForm.addControl(
+          //     "geometry",
+          //     this._formBuilder.control("", Validators.required)
+          //   );
+          // }
+
+          // pour donner la valeur de idParent
+
+          this.initForm();
+        });
+    });
   }
 
   /** pour réutiliser des paramètres déjà saisis */
@@ -222,7 +244,7 @@ export class MonitoringFormComponentG implements OnInit {
     this.objChanged.emit(this.obj);
     this.objForm.patchValue({ geometry: null });
     this.initForm();
-    // });
+    // };
   }
 
   /** Pour donner des valeurs par defaut si la valeur n'est pas définie

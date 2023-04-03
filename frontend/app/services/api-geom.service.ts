@@ -13,36 +13,38 @@ import { ConfigJsonService } from './config-json.service';
 
 @Injectable()
 export class ApiGeomService implements IGeomService {
-  public endPoint: endPoints = endPoints.sites_groups;
+  public endPoint: endPoints;
   public objectObs: IobjObs<ObjDataType>;
 
   constructor(
     protected _cacheService: CacheService,
     protected _configJsonService: ConfigJsonService
   ) {
-    this.init();
+    this.init(this.endPoint, this.objectObs);
   }
 
-  init() {
-    this.endPoint = endPoints.sites_groups;
-    this.objectObs = {
-      properties: {},
-      endPoint: endPoints.sites_groups,
-      objectType: 'sites_group',
-      label: 'groupe de site',
-      addObjLabel: 'Ajouter',
-      editObjLabel: 'Editer',
-      id: null,
-      moduleCode: 'generic',
-      schema: {},
-      template: {
-        fieldNames: [],
-        fieldLabels: {},
-        fieldNamesList: [],
-        fieldDefinitions: {},
-      },
-      dataTable: { colNameObj: {} },
-    };
+  init(endPoint, objectObjs) {
+    this.endPoint = endPoint;
+    this.objectObs = objectObjs;
+    // this.endPoint = endPoints.sites_groups;
+    // this.objectObs = {
+    //   properties: {},
+    //   endPoint: endPoints.sites_groups,
+    //   objectType: 'sites_group',
+    //   label: 'groupe de site',
+    //   addObjLabel: 'Ajouter',
+    //   editObjLabel: 'Editer',
+    //   id: null,
+    //   moduleCode: 'generic',
+    //   schema: {},
+    //   template: {
+    //     fieldNames: [],
+    //     fieldLabels: {},
+    //     fieldNamesList: [],
+    //     fieldDefinitions: {},
+    //   },
+    //   dataTable: { colNameObj: {} },
+    // };
   }
   get(
     page: number = 1,

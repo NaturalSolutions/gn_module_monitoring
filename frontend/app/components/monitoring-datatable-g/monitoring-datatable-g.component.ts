@@ -188,6 +188,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   }
   navigateToAddChildren(_, rowId) {
     this.addEvent.emit(rowId);
+    this._objService.changeObjectType(this.objectType);
     this.router.navigate(['create'], {
       relativeTo: this._Activatedroute,
     });

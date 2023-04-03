@@ -3,6 +3,8 @@ from flask.json import jsonify
 from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
+from gn_module_monitoring.config.repositories import get_config_from_backend
+from gn_module_monitoring.routes.sites_groups import create_or_update_object_api
 from gn_module_monitoring.monitoring.models import BibTypeSite, TMonitoringSites, TNomenclatures
 from gn_module_monitoring.monitoring.schemas import BibTypeSiteSchema, MonitoringSitesSchema
 from gn_module_monitoring.utils.routes import (
@@ -104,3 +106,11 @@ def get_all_site_geometries():
 def get_module_sites(module_code: str):
     # TODO: load with site_categories.json API
     return jsonify({"module_code": module_code})
+
+
+@blueprint.route("/sites", methods=["POST"])
+def post_sites():
+    module_code = "generic"
+    object_type = "sites"
+    get_config_from_backend(module_code, force=True)
+    return create_or_update_object_api(module_code, object_type), 201
