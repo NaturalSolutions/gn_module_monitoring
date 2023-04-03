@@ -11,6 +11,7 @@ import { IDataForm } from '../../interfaces/form';
 import { ApiGeomService } from '../../services/api-geom.service';
 import { ConfigJsonService } from '../../services/config-json.service';
 import { FormService } from '../../services/form.service';
+import { ObjectService } from '../../services/object.service';
 
 @Component({
   selector: 'pnx-monitoring-form-g',
@@ -58,7 +59,8 @@ export class MonitoringFormComponentG implements OnInit {
     private _dynformService: DynamicFormService,
     private _formService: FormService,
     private _apiGeomService: ApiGeomService,
-    private _router: Router
+    private _router: Router,
+    private _objService: ObjectService
   ) {}
 
   ngOnInit() {
