@@ -3,10 +3,10 @@ from flask.json import jsonify
 from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.blueprint import blueprint
-from gn_module_monitoring.config.repositories import get_config_from_backend
-from gn_module_monitoring.routes.sites_groups import create_or_update_object_api
+from gn_module_monitoring.config.repositories import get_config
 from gn_module_monitoring.monitoring.models import BibTypeSite, TMonitoringSites, TNomenclatures
 from gn_module_monitoring.monitoring.schemas import BibTypeSiteSchema, MonitoringSitesSchema
+from gn_module_monitoring.routes.sites_groups import create_or_update_object_api
 from gn_module_monitoring.utils.routes import (
     filter_params,
     geojson_query,
@@ -111,6 +111,7 @@ def get_module_sites(module_code: str):
 @blueprint.route("/sites", methods=["POST"])
 def post_sites():
     module_code = "generic"
-    object_type = "sites"
-    get_config_from_backend(module_code, force=True)
+    object_type = "site"
+    post_data = dict(request.get_json())
+    get_config(module_code, force=True)
     return create_or_update_object_api(module_code, object_type), 201

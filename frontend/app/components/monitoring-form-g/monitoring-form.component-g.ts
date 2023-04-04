@@ -313,6 +313,7 @@ export class MonitoringFormComponentG implements OnInit {
   onSubmit() {
     const { patch_update, ...sendValue } = this.dataForm;
     const objToUpdateOrCreate = this._formService.postData(sendValue, this.obj);
+    console.log(objToUpdateOrCreate);
     const action = this.obj.id
       ? this._apiGeomService.patch(this.obj.id, objToUpdateOrCreate)
       : this._apiGeomService.create(objToUpdateOrCreate);
@@ -398,13 +399,20 @@ export class MonitoringFormComponentG implements OnInit {
   }
 
   getConfigFromBtnSelect(event) {
+    console.log(event);
     // this.obj.specific == undefined ? (this.obj.specific = {}) : null;
+    // TODO: Ajout de tous les id_parents ["id_sites_groups" etc ] dans l'objet obj.dataComplement
     this.obj.specific = {};
+    this.obj.dataComplement = {};
     for (const key in event) {
-      if (Object.keys(event[key].config).length !== 0) {
-        Object.assign(this.obj.specific, event[key].config.specific);
+      if (event[key].config != undefined) {
+        if (Object.keys(event[key].config).length !== 0) {
+          Object.assign(this.obj.specific, event[key].config.specific);
+        }
       }
     }
+    Object.assign(this.obj.dataComplement, event);
+    console.log(this.obj);
     this._formService.dataToCreate(this.obj);
   }
 }

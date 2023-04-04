@@ -48,13 +48,6 @@
       "type_widget": "textarea",
       "attribut_label": "Description"
     },
-    "id_digitiser": {
-      "type_widget": "text",
-      "attribut_label": "Numérisateur",
-      "required": true,
-      "hidden": true,
-      "type_util": "user"
-    },
     "first_use_date": {
       "type_widget": "date",
       "attribut_label": "Date description",
@@ -81,7 +74,19 @@
       },
       "altitude_max": {
       "type_widget": "integer",
-      "attribut_label": "Altitude (max)"
+      "attribut_la,bel": "Altitude (max)"
+      },
+      "id_sites_group": {
+        "type_widget": "integer",
+        "attribut_label": "ID Sites Groups",
+        "hidden": true,
+        "schema_dot_table": "gn_monitoring.t_base_sites"
+      },
+      "types_site": {
+        "type_widget": "datalist",
+        "attribut_label": "ID Type sites",
+        "hidden": true,
+        "schema_dot_table": "gn_monitoring.t_base_sites"
       }
   }
 }

@@ -1,37 +1,32 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, of, forkJoin } from "rxjs";
-import { concatMap } from "rxjs/operators";
-import { ISite, ISitesGroup } from "../interfaces/geom";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
+import { concatMap } from 'rxjs/operators';
 
-import { JsonData } from "../types/jsondata";
-
-import { Utils } from "../utils/utils";
-import { MonitoringObjectService } from "./monitoring-object.service";
+import { ISite, ISitesGroup } from '../interfaces/geom';
+import { JsonData } from '../types/jsondata';
+import { Utils } from '../utils/utils';
+import { MonitoringObjectService } from './monitoring-object.service';
 
 @Injectable()
 export class FormService {
   data: JsonData = {};
   private dataSub = new BehaviorSubject<object>(this.data);
   currentData = this.dataSub.asObservable();
-  properties: JsonData;
+  properties: JsonData = {};
   moduleCode: string;
   objecType: string;
 
   constructor(private _objService: MonitoringObjectService) {}
 
   // TODO: voir si nécessaire de garder ça (objService permet d'avoir le bon objet ? et sinon modifier pour obtenir ce qu'il faut en formulaire)
-  changeDataSub(
-    newDat: JsonData,
-    objectType: string,
-    moduleCode: string = "generic"
-  ) {
+  changeDataSub(newDat: JsonData, objectType: string, moduleCode: string = 'generic') {
     this.properties = newDat;
     newDat.moduleCode = moduleCode;
     newDat.objectType = objectType;
     this.dataSub.next(newDat);
   }
 
-  dataToCreate(newDat: JsonData, moduleCode: string = "generic") {
+  dataToCreate(newDat: JsonData, moduleCode: string = 'generic') {
     newDat[moduleCode] = {};
     newDat.moduleCode = moduleCode;
     this.dataSub.next(newDat);
@@ -46,10 +41,7 @@ export class FormService {
       if (!elem.type_widget) {
         continue;
       }
-      observables[attribut_name] = this._objService.toForm(
-        elem,
-        properties[attribut_name]
-      );
+      observables[attribut_name] = this._objService.toForm(elem, properties[attribut_name]);
     }
 
     return forkJoin(observables).pipe(
@@ -73,16 +65,32 @@ export class FormService {
       if (!elem.type_widget) {
         continue;
       }
-      propertiesData[attribut_name] = this._objService.fromForm(
-        elem,
-        formValue[attribut_name]
-      );
+      propertiesData[attribut_name] = this._objService.fromForm(elem, formValue[attribut_name]);
+    }
+    const postData = { properties: {} };
+    if (obj.dataComplement == undefined) {
+      postData['properties'] = propertiesData;
+    } else {
+      postData['properties'] = propertiesData;
+      postData['dataComplement'] = obj.dataComplement;
     }
 
-    const postData = {
-      properties: propertiesData,
-      // id_parent: this.parentId
-    };
+    // Ajout des id relationship
+    if (obj.id_relationship != undefined) {
+      for (const [key, value] of Object.entries(obj.id_relationship)) {
+        if (typeof value == 'string') {
+          if (obj[value] != undefined) {
+            postData['properties'][value] = obj[value];
+          } else if (Object.keys(obj.dataComplement).includes(value)) {
+            postData['properties'][value] = obj.dataComplement[value];
+          }
+        }
+      }
+    }
+
+    //   properties: propertiesData,
+    //   // id_parent: this.parentId
+    // };
 
     // TODO: A voir q'il faut remettre
     // if (this.config["geometry_type"]) {
