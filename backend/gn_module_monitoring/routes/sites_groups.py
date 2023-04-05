@@ -130,6 +130,10 @@ def create_or_update_object_api(module_code, object_type, id=None):
         module = get_module("module_code", module_code)
     else:
         module = {"id_module": "generic"}
+        #TODO : A enlever une fois que le post_data contiendra geometry et type depuis le front
+        if object_type == "site":
+            post_data["geometry"]={'type':'Point', 'coordinates':[2.5,50]}
+            post_data["type"]='Feature'
     # on rajoute id_module s'il n'est pas renseigné par défaut ??
     if "id_module" not in post_data["properties"]:
         module["id_module"] = "generic"

@@ -77,7 +77,7 @@ def get_config_objects(module_code, config, tree=None, parent_type=None, customS
 
         # recursif
         if tree[object_type]:
-            get_config_objects(module_code, config, tree[object_type], object_type)
+            get_config_objects(module_code, config, tree[object_type], object_type,customSpecConfig)
 
 
 def config_object_from_files(module_code, object_type,custom=None):
@@ -87,6 +87,8 @@ def config_object_from_files(module_code, object_type,custom=None):
     generic_config_object = json_config_from_file('generic', object_type)
     specific_config_object = {} if module_code == 'generic' else json_config_from_file(module_code, object_type)
 
+    if module_code == 'generic' and object_type == 'site' and custom is not None:
+        specific_config_object = custom
     config_object = generic_config_object
     config_object.update(specific_config_object)
 

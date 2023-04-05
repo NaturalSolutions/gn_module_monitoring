@@ -112,6 +112,10 @@ def get_module_sites(module_code: str):
 def post_sites():
     module_code = "generic"
     object_type = "site"
+    customConfig = dict()
     post_data = dict(request.get_json())
-    get_config(module_code, force=True)
+    for keys in post_data['dataComplement'].keys():
+        if 'config' in  post_data['dataComplement'][keys]:
+            customConfig.update( post_data['dataComplement'][keys]['config'])
+    get_config(module_code, force=True,customSpecConfig=customConfig)
     return create_or_update_object_api(module_code, object_type), 201

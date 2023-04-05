@@ -189,6 +189,9 @@ class MonitoringObjectSerializer(MonitoringObjectBase):
 
         # ajout des données en base
         if hasattr(self._model, 'from_geofeature'):
+            for key in list(post_data):
+                if key not in ("properties","geometry","type"):
+                    post_data.pop(key)
             self._model.from_geofeature(post_data, True)
         else:
             self._model.from_dict(properties, True)
