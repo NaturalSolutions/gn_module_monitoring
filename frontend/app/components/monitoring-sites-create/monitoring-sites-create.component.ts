@@ -53,11 +53,12 @@ export class MonitoringSitesCreateComponent implements OnInit {
     // }
     // )
 
-
+    // TODO: Dans l'idéal ça serait d'appeler en parallèle les observables currentObjSelected et currentObjectType pour obtenir le endPoint depuis l'objet . Tentative
+    // réalisée dans le code au dessus mais ça ne fonctionne pas . Il ne rentre pas dans le subscribe .. 
 
     this._objService.currentObjSelected.subscribe((objParent) => {
       this.id_sites_group = objParent.id_sites_group
-      this._formService.dataToCreate({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group, id_relationship: ['id_sites_group','types_site'],endPoint:endPoints.sites,objSelected:objParent.objectType});
+      this._formService.dataToCreate({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group, id_relationship: ['id_sites_group','types_site'],endPoint:endPoints.sites,objSelected:{}});
       this.form = this._formBuilder.group({});
       this.funcToFilt = this.partialfuncToFilt.bind(this);
     })

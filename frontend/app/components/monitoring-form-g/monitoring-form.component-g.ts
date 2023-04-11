@@ -93,7 +93,7 @@ export class MonitoringFormComponentG implements OnInit {
     //   {console.log("Inside Form obj:",ob)
     //   this._apiGeomService.init(ob.endPoint, ob)}
     // );
-
+    // TODO: Avoid two subscribes one inside other (code test above doesn't work. When add type site the observable currentdata is not recall)
     this._formService.currentData.subscribe((dataToEditOrCreate) => {
       this.obj = dataToEditOrCreate;
       this._apiGeomService.init(this.obj.endPoint, this.obj.objSelected)
