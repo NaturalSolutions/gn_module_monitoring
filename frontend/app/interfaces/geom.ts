@@ -22,6 +22,7 @@ export interface ISitesGroup extends IGeomObject {
 }
 
 export interface ISite extends IGeomObject {
+  pk:number;
   altitude_max: number;
   altitude_min: number;
   base_site_code: string;

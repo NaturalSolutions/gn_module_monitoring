@@ -81,12 +81,22 @@ export class MonitoringFormComponentG implements OnInit {
     //   )
     //   .subscribe((obj) => {
     //     console.log(obj)
-    this._objService.currentObjectType.subscribe((ob) =>
-      this._apiGeomService.init(ob.endPoint, ob)
-    );
+//     this._objService.currentObjectType.subscribe((ob) =>
+//     console.log("Inside Form, currentObjectType :",ob)
+//   );
+
+//   this._objService.currentObjectTypeParent.subscribe((ob) =>
+//   console.log("Inside Form, currentObjectTypeParent :",ob)
+// );
+
+    // this._objService.currentObjectTypeParent.subscribe((ob) =>
+    //   {console.log("Inside Form obj:",ob)
+    //   this._apiGeomService.init(ob.endPoint, ob)}
+    // );
 
     this._formService.currentData.subscribe((dataToEditOrCreate) => {
       this.obj = dataToEditOrCreate;
+      this._apiGeomService.init(this.obj.endPoint, this.obj.objSelected)
       this.obj.bIsInitialized = true;
       this._configService
         .init(this.obj.moduleCode)

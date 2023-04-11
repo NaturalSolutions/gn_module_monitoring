@@ -13,7 +13,7 @@ import { JsonData } from "../../types/jsondata";
 })
 export class MonitoringPropertiesGComponent implements OnInit {
   // selectedObj: ISitesGroup;
-  @Input() selectedObj: ISitesGroup;
+  @Input() selectedObj: ObjDataType;
   @Input() bEdit: boolean;
   @Output() bEditChange = new EventEmitter<boolean>();
   @Input() objectType: IobjObs<ObjDataType>;
@@ -23,7 +23,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
   fields: JsonData;
   fieldDefinitions: JsonData;
   fieldsNames: string[];
-
+  endPoint:string;
   datasetForm = new FormControl();
 
   constructor(
@@ -38,6 +38,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
       this.fields = newObjType.template.fieldLabels;
       this.fieldDefinitions = newObjType.template.fieldDefinitions;
       this.objectType.properties = this.selectedObj;
+      this.endPoint = newObjType.endPoint;
     });
   }
 
@@ -46,7 +47,9 @@ export class MonitoringPropertiesGComponent implements OnInit {
     this.selectedObj["id"] = this.selectedObj[this.selectedObj.pk];
     this._formService.changeDataSub(
       this.selectedObj,
-      this.objectType.objectType
+      this.objectType.objectType,
+      this.objectType.endPoint,
+      this.objectType
     );
   }
 }

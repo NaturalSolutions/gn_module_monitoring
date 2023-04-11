@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 
+import { IobjObs, ObjDataType } from '../interfaces/objObs';
 import { ISite, ISitesGroup } from '../interfaces/geom';
 import { JsonData } from '../types/jsondata';
 import { Utils } from '../utils/utils';
@@ -19,10 +20,12 @@ export class FormService {
   constructor(private _objService: MonitoringObjectService) {}
 
   // TODO: voir si nécessaire de garder ça (objService permet d'avoir le bon objet ? et sinon modifier pour obtenir ce qu'il faut en formulaire)
-  changeDataSub(newDat: JsonData, objectType: string, moduleCode: string = 'generic') {
+  changeDataSub(newDat: JsonData, objectType: string,endPoint:string,objSelected:IobjObs<ObjDataType>, moduleCode: string = 'generic') {
     this.properties = newDat;
     newDat.moduleCode = moduleCode;
     newDat.objectType = objectType;
+    newDat.endPoint = endPoint;
+    newDat.objSelect = objSelected
     this.dataSub.next(newDat);
   }
 

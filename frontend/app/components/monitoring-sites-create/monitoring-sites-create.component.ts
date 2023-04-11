@@ -4,12 +4,13 @@ import { FormService } from "../../services/form.service";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { ISite } from "../../interfaces/geom";
 import { SitesService } from "../../services/api-geom.service";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { Observable, forkJoin, of } from "rxjs";
+import { concatMap, map, mergeMap } from "rxjs/operators";
 import { IobjObs, ObjDataType } from "../../interfaces/objObs";
 import { MonitoringFormComponentG } from "../monitoring-form-g/monitoring-form.component-g";
 import { ObjectService } from "../../services/object.service";
 import { JsonData } from "../../types/jsondata";
+import { endPoints } from "../../enum/endpoints";
 
 @Component({
   selector: "monitoring-sites-create",
@@ -39,12 +40,28 @@ export class MonitoringSitesCreateComponent implements OnInit {
 
   ngOnInit() {
 
+    // let $obs1 = this._objService.currentObjSelected
+    // let $obs2 = this._objService.currentObjectType
+    // forkJoin([$obs1,$obs2]).subscribe( results =>{
+    //   console.log(results[0])
+    //   let objParent = results[0]
+    //   let objChild = results[1]
+    //   this.id_sites_group = objParent.id_sites_group
+    //   this._formService.dataToCreate({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group, id_relationship: ['id_sites_group','types_site'],endPoint:endPoints.sites,objSelected:objChild.objectType});
+    //     this.form = this._formBuilder.group({});
+    //     this.funcToFilt = this.partialfuncToFilt.bind(this);
+    // }
+    // )
+
+
+
     this._objService.currentObjSelected.subscribe((objParent) => {
       this.id_sites_group = objParent.id_sites_group
-      this._formService.dataToCreate({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group, id_relationship: ['id_sites_group','types_site'] });
+      this._formService.dataToCreate({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group, id_relationship: ['id_sites_group','types_site'],endPoint:endPoints.sites,objSelected:objParent.objectType});
       this.form = this._formBuilder.group({});
       this.funcToFilt = this.partialfuncToFilt.bind(this);
     })
+
     // this._Activatedroute.params
     // .pipe(
     //   map((params) => params["id"] as number))
