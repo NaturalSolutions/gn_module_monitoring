@@ -11,6 +11,7 @@ export interface IobjObs<ObjDataType> {
   label: string;
   addObjLabel: string;
   editObjLabel: string;
+  addChildLabel: string;
   id: string | null;
   moduleCode: string;
   schema: JsonData;
