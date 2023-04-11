@@ -52,7 +52,7 @@
         <a
           class="nav-link link cell-link"
           (click)="navigateToDetail(row)"
-          matTooltip="Consulter le groupe de site"
+          matTooltip="Consulter le {{ objectType.label }}"
         >
           <i class="fa fa-eye" aria-hidden="true"></i>
         </a>
@@ -60,7 +60,7 @@
         <a
           class="nav-link link cell-link"
           (click)="navigateToAddChildren(null, row.id)"
-          matTooltip="Ajouter un site "
+          matTooltip=" {{objectType.addChildLabel}}"
         >
           <i class="fa fa-plus" aria-hidden="true"></i>
         </a>
