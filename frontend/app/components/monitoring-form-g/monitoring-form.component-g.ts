@@ -58,9 +58,7 @@ export class MonitoringFormComponentG implements OnInit {
     private _dynformService: DynamicFormService,
     private _formService: FormService,
     private _apiGeomService: ApiGeomService,
-    private _router: Router,
-    private _objService: ObjectService
-  ) {}
+    private _router: Router  ) {}
 
   ngOnInit() {
     // this._formService.currentData.subscribe((dataToEditOrCreate) => {
@@ -81,13 +79,13 @@ export class MonitoringFormComponentG implements OnInit {
     //   )
     //   .subscribe((obj) => {
     //     console.log(obj)
-//     this._objService.currentObjectType.subscribe((ob) =>
-//     console.log("Inside Form, currentObjectType :",ob)
-//   );
+    //     this._objService.currentObjectType.subscribe((ob) =>
+    //     console.log("Inside Form, currentObjectType :",ob)
+    //   );
 
-//   this._objService.currentObjectTypeParent.subscribe((ob) =>
-//   console.log("Inside Form, currentObjectTypeParent :",ob)
-// );
+    //   this._objService.currentObjectTypeParent.subscribe((ob) =>
+    //   console.log("Inside Form, currentObjectTypeParent :",ob)
+    // );
 
     // this._objService.currentObjectTypeParent.subscribe((ob) =>
     //   {console.log("Inside Form obj:",ob)
@@ -96,7 +94,7 @@ export class MonitoringFormComponentG implements OnInit {
 
     this._formService.currentData.subscribe((dataToEditOrCreate) => {
       this.obj = dataToEditOrCreate;
-      this._apiGeomService.init(this.obj.endPoint, this.obj.objSelected)
+      this._apiGeomService.init(this.obj.endPoint, this.obj.objSelected);
       this.obj.bIsInitialized = true;
       this._configService
         .init(this.obj.moduleCode)
@@ -309,7 +307,7 @@ export class MonitoringFormComponentG implements OnInit {
    */
   navigateToParent() {
     this.bEditChange.emit(false); // patch bug navigation
-    this._router.navigateByUrl('/monitorings/sites_group');
+    this._router.navigateByUrl(this.obj.urlRelative);
 
     // this.obj.navigateToParent();
   }
@@ -331,7 +329,10 @@ export class MonitoringFormComponentG implements OnInit {
     action.subscribe((objData) => {
       this._commonService.regularToaster('success', this.msgToaster(actionLabel));
       this.bSaveSpinner = this.bSaveAndAddChildrenSpinner = false;
-      // this.objChanged.emit(this.obj);
+      if (objData.hasOwnProperty('id')) {
+        this.obj.id = objData['id'];
+      }
+      this.objChanged.emit(this.obj);
 
       /** si c'est un module : reset de la config */
       if (this.obj.objectType === 'module') {
@@ -423,6 +424,6 @@ export class MonitoringFormComponentG implements OnInit {
     }
     Object.assign(this.obj.dataComplement, event);
     console.log(this.obj);
-    this._formService.dataToCreate(this.obj);
+    this._formService.dataToCreate(this.obj, this.obj.urlRelative);
   }
 }

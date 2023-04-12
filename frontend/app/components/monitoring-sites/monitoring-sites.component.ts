@@ -1,33 +1,28 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { forkJoin } from "rxjs";
-import { tap, map, mergeMap,switchMap } from "rxjs/operators";
-import * as L from "leaflet";
-import { ISite, ISitesGroup } from "../../interfaces/geom";
-import { IPage, IPaginated } from "../../interfaces/page";
-import { columnNameSite } from "../../class/monitoring-site";
-import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
-import { setPopup } from "../../functions/popup";
-import { GeoJSONService } from "../../services/geojson.service";
-import { FormGroup, FormBuilder } from "@angular/forms";
-import {
-  SitesService,
-  SitesGroupService,
-} from "../../services/api-geom.service";
-import { ObjectService } from "../../services/object.service";
-import { IobjObs } from "../../interfaces/objObs";
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import * as L from 'leaflet';
+import { forkJoin } from 'rxjs';
+import { map, mergeMap, tap } from 'rxjs/operators';
+
+import { MonitoringGeomComponent } from '../../class/monitoring-geom-component';
+import { columnNameSite } from '../../class/monitoring-site';
+import { setPopup } from '../../functions/popup';
+import { ISite, ISitesGroup } from '../../interfaces/geom';
+import { IobjObs } from '../../interfaces/objObs';
+import { IPage, IPaginated } from '../../interfaces/page';
+import { SitesGroupService, SitesService } from '../../services/api-geom.service';
+import { GeoJSONService } from '../../services/geojson.service';
+import { ObjectService } from '../../services/object.service';
 
 const LIMIT = 10;
 
 @Component({
-  selector: "monitoring-sites",
-  templateUrl: "./monitoring-sites.component.html",
-  styleUrls: ["./monitoring-sites.component.css"],
+  selector: 'monitoring-sites',
+  templateUrl: './monitoring-sites.component.html',
+  styleUrls: ['./monitoring-sites.component.css'],
 })
-export class MonitoringSitesComponent
-  extends MonitoringGeomComponent
-  implements OnInit
-{
+export class MonitoringSitesComponent extends MonitoringGeomComponent implements OnInit {
   siteGroupId: number;
   sites: ISite[];
   sitesGroup: ISitesGroup;
@@ -38,6 +33,7 @@ export class MonitoringSitesComponent
   @Input() bEdit: boolean;
   objForm: FormGroup;
   objectType: IobjObs<ISite>;
+  objParent: any;
 
   constructor(
     private _sitesGroupService: SitesGroupService,
@@ -54,20 +50,21 @@ export class MonitoringSitesComponent
 
   ngOnInit() {
     this.objForm = this._formBuilder.group({});
-    // this._objService.currentObjectTypeParent.subscribe((objParent)=>objParent);
-    this._objService.changeObjectType(this._siteService.objectObs);
+    // this._sitesGroupService.init()
+    this._objService.changeObjectTypeParent(this._sitesGroupService.objectObs, true);
+    this._objService.currentObjectTypeParent.subscribe((objParent) => (this.objParent = objParent));
+    this._objService.changeObjectType(this._siteService.objectObs, true);
     this.initSite();
   }
 
   initSite() {
     this._Activatedroute.params
       .pipe(
-        map((params) => params["id"] as number),
+        map((params) => params['id'] as number),
         tap((id: number) => {
-          this._geojsonService.getSitesGroupsChildGeometries(
-            this.onEachFeatureSite(),
-            { id_sites_group: id }
-          );
+          this._geojsonService.getSitesGroupsChildGeometries(this.onEachFeatureSite(), {
+            id_sites_group: id,
+          });
         }),
         mergeMap((id: number) =>
           forkJoin({
@@ -76,29 +73,23 @@ export class MonitoringSitesComponent
               id_sites_group: id,
             }),
           })
-        ))
-      .subscribe(
-        (data: { sitesGroup: ISitesGroup; sites: IPaginated<ISite>}) => {
-          this._objService.changeSelectedObj(data.sitesGroup, true);
-          this.sitesGroup = data.sitesGroup;
-          this.sites = data.sites.items;
-          this.page = {
-            count: data.sites.count,
-            page: data.sites.page,
-            limit: data.sites.limit,
-          };
-          this.siteGroupLayer = this._geojsonService.setMapData(
-            data.sitesGroup.geometry,
-            () => {}
-          );
-          this.baseFilters = { id_sites_group: this.sitesGroup.id_sites_group };
-        }
-      );
+        )
+      )
+      .subscribe((data: { sitesGroup: ISitesGroup; sites: IPaginated<ISite> }) => {
+        this._objService.changeSelectedObj(data.sitesGroup, true);
+        this.sitesGroup = data.sitesGroup;
+        this.sites = data.sites.items;
+        this.page = {
+          count: data.sites.count,
+          page: data.sites.page,
+          limit: data.sites.limit,
+        };
+        this.siteGroupLayer = this._geojsonService.setMapData(data.sitesGroup.geometry, () => {});
+        this.baseFilters = { id_sites_group: this.sitesGroup.id_sites_group };
+      });
   }
   ngOnDestroy() {
-    this._geojsonService.removeFeatureGroup(
-      this._geojsonService.sitesFeatureGroup
-    );
+    this._geojsonService.removeFeatureGroup(this._geojsonService.sitesFeatureGroup);
     this._geojsonService.removeFeatureGroup(this.siteGroupLayer);
   }
 
@@ -108,7 +99,7 @@ export class MonitoringSitesComponent
       const popup = setPopup(
         baseUrl,
         feature.properties.id_base_site,
-        "Site :" + feature.properties.base_site_name
+        'Site :' + feature.properties.base_site_name
       );
       layer.bindPopup(popup);
     };
@@ -128,7 +119,7 @@ export class MonitoringSitesComponent
   }
 
   seeDetails($event) {
-    this._objService.changeObjectTypeParent(this._siteService.objectObs,true);
+    this._objService.changeObjectTypeParent(this._siteService.objectObs, true);
     this.router.navigate([`sites/${$event.id_base_site}`], {
       relativeTo: this._Activatedroute,
     });

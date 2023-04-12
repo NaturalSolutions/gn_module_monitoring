@@ -1,32 +1,31 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { FormService } from "../../services/form.service";
-import { FormGroup, FormBuilder } from "@angular/forms";
-import { ISite } from "../../interfaces/geom";
-import { SitesService } from "../../services/api-geom.service";
-import { Observable, forkJoin, of } from "rxjs";
-import { concatMap, map, mergeMap } from "rxjs/operators";
-import { IobjObs, ObjDataType } from "../../interfaces/objObs";
-import { MonitoringFormComponentG } from "../monitoring-form-g/monitoring-form.component-g";
-import { ObjectService } from "../../services/object.service";
-import { JsonData } from "../../types/jsondata";
-import { endPoints } from "../../enum/endpoints";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
+
+import { ISite } from '../../interfaces/geom';
+import { IobjObs, ObjDataType } from '../../interfaces/objObs';
+import { SitesService } from '../../services/api-geom.service';
+import { FormService } from '../../services/form.service';
+import { ObjectService } from '../../services/object.service';
+import { JsonData } from '../../types/jsondata';
+import { MonitoringFormComponentG } from '../monitoring-form-g/monitoring-form.component-g';
 
 @Component({
-  selector: "monitoring-sites-edit",
-  templateUrl: "./monitoring-sites-edit.component.html",
-  styleUrls: ["./monitoring-sites-edit.component.css"],
+  selector: 'monitoring-sites-edit',
+  templateUrl: './monitoring-sites-edit.component.html',
+  styleUrls: ['./monitoring-sites-edit.component.css'],
 })
 export class MonitoringSitesEditComponent implements OnInit {
   site: ISite;
   form: FormGroup;
-  paramToFilt: string = "label";
+  paramToFilt: string = 'label';
   funcToFilt: Function;
-  titleBtn: string = "Choix des types de sites";
-  placeholderText: string = "Sélectionnez les types de site";
-  id_sites_group:number;
-  types_site:string[];
-  @ViewChild("subscritionObjConfig")
+  titleBtn: string = 'Choix des types de sites';
+  placeholderText: string = 'Sélectionnez les types de site';
+  id_sites_group: number;
+  types_site: string[];
+  @ViewChild('subscritionObjConfig')
   monitoringFormComponentG: MonitoringFormComponentG;
   objToCreate: IobjObs<ObjDataType>;
 
@@ -35,11 +34,10 @@ export class MonitoringSitesEditComponent implements OnInit {
     private _formBuilder: FormBuilder,
     private siteService: SitesService,
     private _Activatedroute: ActivatedRoute,
-    private _objService:ObjectService
+    private _objService: ObjectService
   ) {}
 
   ngOnInit() {
-
     // let $obs1 = this._objService.currentObjSelected
     // let $obs2 = this._objService.currentObjectType
     // forkJoin([$obs1,$obs2]).subscribe( results =>{
@@ -53,14 +51,12 @@ export class MonitoringSitesEditComponent implements OnInit {
     // }
     // )
 
-
-
     this._objService.currentObjSelected.subscribe((objParent) => {
-      this.id_sites_group = objParent.id_sites_group
-      this._formService.dataToCreate({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group, id_relationship: ['id_sites_group','types_site'],endPoint:endPoints.sites,objSelected:objParent.objectType});
+      this.id_sites_group = objParent.id_sites_group;
+      // this._formService.changeDataSub({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group, id_relationship: ['id_sites_group','types_site'],endPoint:endPoints.sites,objSelected:objParent.objectType});
       this.form = this._formBuilder.group({});
       this.funcToFilt = this.partialfuncToFilt.bind(this);
-    })
+    });
 
     // this._Activatedroute.params
     // .pipe(
@@ -74,37 +70,29 @@ export class MonitoringSitesEditComponent implements OnInit {
     //     this.funcToFilt = this.partialfuncToFilt.bind(this);
     //   }
     // );
-  
   }
 
-
-
-  partialfuncToFilt(
-    pageNumber: number,
-    limit: number,
-    valueToFilter: string
-  ): Observable<any> {
+  partialfuncToFilt(pageNumber: number, limit: number, valueToFilter: string): Observable<any> {
     return this.siteService.getTypeSites(pageNumber, limit, {
       label_fr: valueToFilter,
-      sort_dir: "desc",
+      sort_dir: 'desc',
     });
   }
 
   onSendConfig(config: JsonData): void {
-    config  = this.addTypeSiteListIds(config)
+    config = this.addTypeSiteListIds(config);
     this.monitoringFormComponentG.getConfigFromBtnSelect(config);
   }
 
-  addTypeSiteListIds(config:JsonData):JsonData{
-    if (config && config.length !=0){
-      config["types_site"]=[]
-      for (const key in config ){
+  addTypeSiteListIds(config: JsonData): JsonData {
+    if (config && config.length != 0) {
+      config['types_site'] = [];
+      for (const key in config) {
         if ('id_nomenclature_type_site' in config[key]) {
-          config["types_site"].push(config[key]['id_nomenclature_type_site']);
+          config['types_site'].push(config[key]['id_nomenclature_type_site']);
         }
       }
-      
     }
-    return config
+    return config;
   }
 }
