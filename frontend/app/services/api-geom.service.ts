@@ -24,7 +24,7 @@ export class ApiGeomService implements IGeomService {
     this.init(this.endPoint, this.objectObs);
   }
 
-  init(endPoint, objectObjs) {
+  init(endPoint:endPoints, objectObjs: IobjObs<ObjDataType>) {
     this.endPoint = endPoint;
     this.objectObs = objectObjs;
     // this.endPoint = endPoints.sites_groups;
@@ -271,7 +271,7 @@ export class VisitsService extends ApiGeomService {
       properties: {},
       endPoint: endPoints.visits,
       objectType: 'visits',
-      label: 'groupe de site',
+      label: 'visite',
       addObjLabel: 'Ajouter une nouvelle visite',
       editObjLabel: 'Editer la visite',
       addChildLabel: 'Ajouter une observation',

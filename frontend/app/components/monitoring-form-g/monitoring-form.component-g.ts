@@ -59,9 +59,7 @@ export class MonitoringFormComponentG implements OnInit {
     private _dynformService: DynamicFormService,
     private _formService: FormService,
     private _apiGeomService: ApiGeomService,
-    private _router: Router,
-    private _objService: ObjectService
-  ) {}
+    private _router: Router  ) {}
 
   ngOnInit() {
     // TODO: Avoid two subscribes one inside other (code test above doesn't work. When add type site the observable currentdata is not recall)
@@ -275,7 +273,7 @@ export class MonitoringFormComponentG implements OnInit {
    */
   navigateToParent() {
     this.bEditChange.emit(false); // patch bug navigation
-    this._router.navigateByUrl('/monitorings/sites_group');
+    this._router.navigateByUrl(this.obj.urlRelative);
 
     // this.obj.navigateToParent();
   }
@@ -297,7 +295,10 @@ export class MonitoringFormComponentG implements OnInit {
     action.subscribe((objData) => {
       this._commonService.regularToaster('success', this.msgToaster(actionLabel));
       this.bSaveSpinner = this.bSaveAndAddChildrenSpinner = false;
-      // this.objChanged.emit(this.obj);
+      if (objData.hasOwnProperty('id')) {
+        this.obj.id = objData['id'];
+      }
+      this.objChanged.emit(this.obj);
 
       /** si c'est un module : reset de la config */
       if (this.obj.objectType === 'module') {
@@ -388,6 +389,6 @@ export class MonitoringFormComponentG implements OnInit {
       }
     }
     Object.assign(this.obj.dataComplement, event);
-    this._formService.dataToCreate(this.obj);
+    this._formService.dataToCreate(this.obj, this.obj.urlRelative);
   }
 }
