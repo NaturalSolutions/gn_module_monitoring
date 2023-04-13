@@ -35,11 +35,3 @@ class MonitoringSite(MonitoringObjectGeom):
             data["id_nomenclature_type_site"]=data["types_site"][0]
 
         data['types_site'] = type_site_ids
-
-       
-        # module_ids = [module.id_module for module in self._model.modules]
-        # id_module = int(data['id_module'])
-        # if id_module not in module_ids:
-        #     module_ids.append(id_module)
-
-        # data['modules'] = module_ids
