@@ -12,6 +12,7 @@
     "base_site_name",
     "base_site_code",
     "base_site_description",
+    "id_inventor",
     "first_use_date",
     "last_visit",
     "nb_visits",
@@ -48,6 +49,23 @@
       "type_widget": "textarea",
       "attribut_label": "Description"
     },
+    "id_inventor": {
+      "type_widget": "datalist",
+      "attribut_label": "Descripteur",
+      "api": "users/menu/__MODULE.ID_LIST_OBSERVER",
+      "application": "GeoNature",
+      "keyValue": "id_role",
+      "keyLabel": "nom_complet",
+      "type_util": "user",
+      "required": true
+    },
+    "id_digitiser": {
+      "type_widget": "text",
+      "attribut_label": "Numérisateur",
+      "required": true,
+      "hidden": true,
+      "type_util": "user"
+    },
     "first_use_date": {
       "type_widget": "date",
       "attribut_label": "Date description",
@@ -74,7 +92,7 @@
       },
       "altitude_max": {
       "type_widget": "integer",
-      "attribut_la,bel": "Altitude (max)"
+      "attribut_label": "Altitude (max)"
       },
       "id_sites_group": {
         "type_widget": "integer",
