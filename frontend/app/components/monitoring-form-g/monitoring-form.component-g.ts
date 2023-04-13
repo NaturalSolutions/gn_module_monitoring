@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { tap, mergeMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { DynamicFormService } from '@geonature_common/form/dynamic-form-generator/dynamic-form.service';
@@ -63,121 +64,87 @@ export class MonitoringFormComponentG implements OnInit {
   ) {}
 
   ngOnInit() {
-    // this._formService.currentData.subscribe((dataToEditOrCreate) => {
-    //       this.obj = dataToEditOrCreate;
-    //       this.obj.bIsInitialized = true;
-    // });
-
-    // this._configService
-    // .init(this.obj.moduleCode)
-    // .pipe()
-    // .subscribe(() => {
-    // this._formService.currentData
-    //   .pipe(
-    //     mergeMap(dataToEditOrCreate => {   this.obj = dataToEditOrCreate;
-    //       this.obj.bIsInitialized = true;
-    //       return this._configService;
-    //     })
-    //   )
-    //   .subscribe((obj) => {
-    //     console.log(obj)
-//     this._objService.currentObjectType.subscribe((ob) =>
-//     console.log("Inside Form, currentObjectType :",ob)
-//   );
-
-//   this._objService.currentObjectTypeParent.subscribe((ob) =>
-//   console.log("Inside Form, currentObjectTypeParent :",ob)
-// );
-
-    // this._objService.currentObjectTypeParent.subscribe((ob) =>
-    //   {console.log("Inside Form obj:",ob)
-    //   this._apiGeomService.init(ob.endPoint, ob)}
-    // );
     // TODO: Avoid two subscribes one inside other (code test above doesn't work. When add type site the observable currentdata is not recall)
-    this._formService.currentData.subscribe((dataToEditOrCreate) => {
-      this.obj = dataToEditOrCreate;
-      this._apiGeomService.init(this.obj.endPoint, this.obj.objSelected)
-      this.obj.bIsInitialized = true;
-      this._configService
-        .init(this.obj.moduleCode)
-        .pipe()
-        .subscribe(() => {
-          //     return this._route.queryParamMap;
-          //     })
-          //     .subscribe((queryParams) => {
+    this._formService.currentData
+      .pipe(
+        tap((data) => {
+          this.obj = data;
+          this.obj.bIsInitialized = true;
+          this._apiGeomService.init(this.obj.endPoint, this.obj.objSelected);
+        }),
+        mergeMap((data: any) => this._configService.init(data.moduleCode))
+      )
+      .subscribe(() => {
 
-          this.queryParams = this._route.snapshot.queryParams || {};
-          this.bChainInput = this._configService.frontendParams()['bChainInput'];
+        this.queryParams = this._route.snapshot.queryParams || {};
+        this.bChainInput = this._configService.frontendParams()['bChainInput'];
 
-          const schema = this._configService.schema(this.obj.moduleCode, this.obj.objectType);
+        const schema = this._configService.schema(
+          this.obj.moduleCode,
+          this.obj.objectType
+        );
 
-          this.obj[this.obj.moduleCode] = schema;
+        this.obj[this.obj.moduleCode] = schema;
 
-          this.obj.specific == undefined ? (this.obj.specific = {}) : null;
-          if (Object.keys(this.obj.specific).length !== 0) {
-            Object.assign(schema, this.obj.specific);
-          }
+        this.obj.specific == undefined ? (this.obj.specific = {}) : null;
+        if (Object.keys(this.obj.specific).length !== 0) {
+          Object.assign(schema, this.obj.specific);
+        }
 
-          // const schema = this.obj.schema();
 
-          // init objFormsDefinition
 
-          // meta pour les parametres dynamiques
-          // ici pour avoir acces aux nomenclatures
-          this.meta = {
-            // nomenclatures: this._dataUtilsService.getDataUtil('nomenclature'),
-            // dataset: this._dataUtilsService.getDataUtil('dataset'),
-            // id_role: this.currentUser.id_role,
-            bChainInput: this.bChainInput,
-            parents: this.obj.parents,
-          };
+        // meta pour les parametres dynamiques
+        // ici pour avoir acces aux nomenclatures
+        this.meta = {
+          // nomenclatures: this._dataUtilsService.getDataUtil('nomenclature'),
+          // dataset: this._dataUtilsService.getDataUtil('dataset'),
+          // id_role: this.currentUser.id_role,
+          bChainInput: this.bChainInput,
+          parents: this.obj.parents,
+        };
 
-          this.objFormsDefinition = this._dynformService
-            .formDefinitionsdictToArray(schema, this.meta)
-            .filter((formDef) => formDef.type_widget)
-            .sort((a, b) => {
-              // medias à la fin
-              return a.attribut_name === 'medias' ? +1 : b.attribut_name === 'medias' ? -1 : 0;
-            });
+        this.objFormsDefinition = this._dynformService
+          .formDefinitionsdictToArray(schema, this.meta)
+          .filter((formDef) => formDef.type_widget)
+          .sort((a, b) => {
+            // medias à la fin
+            return a.attribut_name === 'medias'
+              ? +1
+              : b.attribut_name === 'medias'
+              ? -1
+              : 0;
+          });
 
-          // display_form pour customiser l'ordre dans le formulaire
-          // les éléments de display form sont placé en haut dans l'ordre du tableau
-          // tous les éléments non cachés restent affichés
+        // display_form pour customiser l'ordre dans le formulaire
+        // les éléments de display form sont placé en haut dans l'ordre du tableau
+        // tous les éléments non cachés restent affichés
 
-          let displayProperties = [
-            ...(this._configService.configModuleObjectParam(
-              this.obj.moduleCode,
-              this.obj.objectType,
-              'display_properties'
-            ) || []),
-          ];
-          if (displayProperties && displayProperties.length) {
-            displayProperties.reverse();
-            this.objFormsDefinition.sort((a, b) => {
-              let indexA = displayProperties.findIndex((e) => e == a.attribut_name);
-              let indexB = displayProperties.findIndex((e) => e == b.attribut_name);
-              return indexB - indexA;
-            });
-          }
+        let displayProperties = [
+          ...(this._configService.configModuleObjectParam(
+            this.obj.moduleCode,
+            this.obj.objectType,
+            'display_properties'
+          ) || []),
+        ];
+        if (displayProperties && displayProperties.length) {
+          displayProperties.reverse();
+          this.objFormsDefinition.sort((a, b) => {
+            let indexA = displayProperties.findIndex(
+              (e) => e == a.attribut_name
+            );
+            let indexB = displayProperties.findIndex(
+              (e) => e == b.attribut_name
+            );
+            return indexB - indexA;
+          });
+        }
 
-          // champs patch pour simuler un changement de valeur et déclencher le recalcul des propriété
-          // par exemple quand bChainInput change
-          this.objForm.addControl('patch_update', this._formBuilder.control(0));
+        // champs patch pour simuler un changement de valeur et déclencher le recalcul des propriété
+        // par exemple quand bChainInput change
+        this.objForm.addControl('patch_update', this._formBuilder.control(0));
 
-          // this._configService.configModuleObject(this.obj.moduleCode, this.obj.objectType);
-          // set geometry
-          // if (this.obj.config["geometry_type"]) {
-          //   this.objForm.addControl(
-          //     "geometry",
-          //     this._formBuilder.control("", Validators.required)
-          //   );
-          // }
-
-          // pour donner la valeur de idParent
-
-          this.initForm();
-        });
-    });
+        this.initForm();
+      });
   }
 
   /** pour réutiliser des paramètres déjà saisis */
@@ -409,7 +376,6 @@ export class MonitoringFormComponentG implements OnInit {
   }
 
   getConfigFromBtnSelect(event) {
-    console.log(event);
     // this.obj.specific == undefined ? (this.obj.specific = {}) : null;
     // TODO: Ajout de tous les id_parents ["id_sites_groups" etc ] dans l'objet obj.dataComplement
     this.obj.specific = {};
@@ -422,7 +388,6 @@ export class MonitoringFormComponentG implements OnInit {
       }
     }
     Object.assign(this.obj.dataComplement, event);
-    console.log(this.obj);
     this._formService.dataToCreate(this.obj);
   }
 }
