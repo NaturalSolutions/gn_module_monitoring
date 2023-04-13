@@ -6,6 +6,7 @@ import { AppConfig } from '@geonature_config/app.config';
 import { of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
+// FIXME: see if can be merged with ConfigService
 
 @Injectable()
 export class ConfigJsonService {

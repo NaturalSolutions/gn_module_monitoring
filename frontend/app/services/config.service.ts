@@ -127,7 +127,6 @@ export class ConfigService {
   /** Config Object Schema */
   schema(moduleCode, objectType, typeSchema = 'all'): Object {
     moduleCode = moduleCode || 'generic';
-    console.log(objectType)
     const configObject = this._config[moduleCode][objectType];
     // gerer quand les paramètres ont un fonction comme valeur
 
