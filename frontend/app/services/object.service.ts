@@ -9,22 +9,10 @@ import { JsonData } from "../types/jsondata";
 @Injectable()
 export class ObjectService {
   objObs: IobjObs<ObjDataType>;
-  //  = {
-  //   properties: {},
-  //   endPoint: endPoints.sites,
-  //   addObjLabel: "Ajouter",
-  //   label: "",
-  //   editObjLabel: "Editer",
-  //   id: null,
-  //   moduleCode: "generic",
-  //   schema:{},
-  //   template:{fieldNames:[],  fieldLabels:{}}
-  // };
   private objSelected =  new ReplaySubject<any>(1);
   currentObjSelected = this.objSelected.asObservable();
 
   private dataObjType = new ReplaySubject<IobjObs<JsonData>>(1);
-  // private dataObjType = new BehaviorSubject<IobjObs>(this.objObs);
   currentObjectType = this.dataObjType.asObservable();
 
   private dataObjTypeParent = new ReplaySubject<IobjObs<JsonData>>(1);
