@@ -68,7 +68,8 @@ export class MonitoringPropertiesGComponent implements OnInit {
     this._formService.changeDataSub(
       this.selectedObj,
       this.objectType.objectType,
-      this.objectType.endPoint
+      this.objectType.endPoint,
+      this.objectType['urlRelative']
     );
   }
 

@@ -139,7 +139,7 @@ def create_or_update_object_api(module_code, object_type, id=None):
         module["id_module"] = "generic"
         post_data["properties"]["id_module"] = module["id_module"]
     else:
-        post_data["properties"]["id_module"] = module.id_module
+        post_data["properties"]["id_module"] = module["id_module"]
 
     return (
         monitoring_g_definitions.monitoring_object_instance(module_code, object_type, id)

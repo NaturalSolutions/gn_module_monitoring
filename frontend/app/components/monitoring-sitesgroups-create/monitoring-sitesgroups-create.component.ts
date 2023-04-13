@@ -23,7 +23,7 @@ export class MonitoringSitesGroupsCreateComponent implements OnInit {
 
   ngOnInit() {
     // Remove "create" segmentUrl
-    this.urlRelative = this.removeLastPart(this.route.snapshot['_routerState'].url);
+    this.urlRelative = '/monitorings';
     this._formService.dataToCreate(
       {
         module: 'generic',
@@ -35,9 +35,5 @@ export class MonitoringSitesGroupsCreateComponent implements OnInit {
       this.urlRelative
     );
     this.form = this._formBuilder.group({});
-  }
-
-  removeLastPart(url: string): string {
-    return url.slice(0, url.lastIndexOf('/'));
   }
 }

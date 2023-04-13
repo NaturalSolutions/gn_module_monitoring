@@ -96,7 +96,7 @@ const routes: Routes = [
             component: MonitoringSitesCreateComponent,
           },
           {
-            path: "sites/:id",
+            path: "site/:id",
             component: MonitoringVisitsComponent,
             children: [
               {
