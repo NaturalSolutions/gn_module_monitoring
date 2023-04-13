@@ -2,7 +2,6 @@ import { Component, OnInit, Input } from "@angular/core";
 import { SitesGroupService } from "../../services/api-geom.service";
 import { IPaginated, IPage } from "../../interfaces/page";
 import { Router, ActivatedRoute } from "@angular/router";
-import { columnNameSite } from "../../class/monitoring-site";
 import { ISite, ISitesGroup } from "../../interfaces/geom";
 import { GeoJSONService } from "../../services/geojson.service";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
@@ -26,12 +25,11 @@ export class MonitoringSitesGroupsComponent
   @Input() page: IPage;
   @Input() sitesGroups: ISitesGroup[];
   @Input() sitesChild: ISite[];
-  @Input() columnNameSite: typeof columnNameSite = columnNameSite;
   @Input() sitesGroupsSelected: ISitesGroup;
 
   // @Input() rows;
-  @Input() colsname;
   @Input() obj;
+  colsname: {};
   objectType: IobjObs<ISitesGroup>;
   objForm: FormGroup;
   objInitForm: Object = {};

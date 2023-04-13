@@ -1,11 +1,10 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { forkJoin } from "rxjs";
-import { tap, map, mergeMap,switchMap } from "rxjs/operators";
+import { tap, map, mergeMap } from "rxjs/operators";
 import * as L from "leaflet";
 import { ISite, ISitesGroup } from "../../interfaces/geom";
 import { IPage, IPaginated } from "../../interfaces/page";
-import { columnNameSite } from "../../class/monitoring-site";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
 import { GeoJSONService } from "../../services/geojson.service";
@@ -31,7 +30,7 @@ export class MonitoringSitesComponent
   siteGroupId: number;
   sites: ISite[];
   sitesGroup: ISitesGroup;
-  colsName: typeof columnNameSite = columnNameSite;
+  colsname: {};
   page: IPage;
   filters = {};
   siteGroupLayer: L.FeatureGroup;
@@ -92,6 +91,7 @@ export class MonitoringSitesComponent
             () => {}
           );
           this.baseFilters = { id_sites_group: this.sitesGroup.id_sites_group };
+          this.colsname = this._siteService.objectObs.dataTable.colNameObj;
         }
       );
   }
@@ -128,7 +128,7 @@ export class MonitoringSitesComponent
   }
 
   seeDetails($event) {
-    this._objService.changeObjectTypeParent(this._siteService.objectObs,true);
+    this._objService.changeObjectTypeParent(this._siteService.objectObs, true);
     this.router.navigate([`sites/${$event.id_base_site}`], {
       relativeTo: this._Activatedroute,
     });

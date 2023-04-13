@@ -204,14 +204,25 @@ export class SitesService extends ApiGeomService {
           this.objectObs.objectType,
           'display_properties'
         );
+        //FIXME: same as site group: to refact
+        const fieldNamesList = this._configJsonService.configModuleObjectParam(
+          this.objectObs.moduleCode,
+          this.objectObs.objectType,
+          'display_list'
+        );
         const schema = this._configJsonService.schema(
           this.objectObs.moduleCode,
           this.objectObs.objectType
         );
         const fieldLabels = this._configJsonService.fieldLabels(schema);
+        const fieldDefinitions = this._configJsonService.fieldDefinitions(schema);
         this.objectObs.template.fieldNames = fieldNames;
+        this.objectObs.template.fieldNamesList = fieldNamesList;
         this.objectObs.schema = schema;
         this.objectObs.template.fieldLabels = fieldLabels;
+        this.objectObs.template.fieldDefinitions = fieldDefinitions;
+        this.objectObs.template.fieldNamesList = fieldNamesList;
+        this.objectObs.dataTable.colNameObj = Utils.toObject(fieldNamesList, fieldLabels);
       });
   }
 
