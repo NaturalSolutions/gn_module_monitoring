@@ -34,7 +34,6 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
   objForm: FormGroup;
   objectType: IobjObs<ISite>;
   objParent: any;
-  urlRelative: string;
 
   constructor(
     private _sitesGroupService: SitesGroupService,
@@ -52,10 +51,9 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
   ngOnInit() {
     this.objForm = this._formBuilder.group({});
     // this._sitesGroupService.init()
-    this.urlRelative = '/monitorings';
     this._objService.changeObjectTypeParent(this._sitesGroupService.objectObs, true);
     this._objService.currentObjectTypeParent.subscribe((objParent) => {
-      (this.objParent = objParent), (this.objParent['urlRelative'] = this.urlRelative);
+      this.objParent = objParent;
     });
     this._objService.changeObjectType(this._siteService.objectObs, true);
     this.initSite();

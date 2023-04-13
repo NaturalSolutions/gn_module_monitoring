@@ -24,14 +24,12 @@ export class FormService {
     newDat: JsonData,
     objectType: string,
     endPoint: string,
-    urlRelative: string,
     moduleCode: string = 'generic'
   ) {
     this.properties = newDat;
     newDat.moduleCode = moduleCode;
     newDat.objectType = objectType;
     newDat.endPoint = endPoint;
-    newDat.urlRelative = urlRelative;
     this.dataSub.next(newDat);
   }
 
