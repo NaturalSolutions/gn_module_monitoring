@@ -26,8 +26,7 @@
       "sites_group_code": {
         "type_widget": "text",
         "attribut_label": "Code",
-        "required": true,
-        "definition":"Code du groupe de site"
+        "required": true
       },
       "sites_group_description": {
         "type_widget": "textarea",
