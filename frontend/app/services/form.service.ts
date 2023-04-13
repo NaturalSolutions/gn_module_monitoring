@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 
-import { IobjObs, ObjDataType } from '../interfaces/objObs';
 import { ISite, ISitesGroup } from '../interfaces/geom';
+import { IobjObs, ObjDataType } from '../interfaces/objObs';
 import { JsonData } from '../types/jsondata';
 import { Utils } from '../utils/utils';
 import { MonitoringObjectService } from './monitoring-object.service';
@@ -20,15 +20,22 @@ export class FormService {
   constructor(private _objService: MonitoringObjectService) {}
 
   // TODO: voir si nécessaire de garder ça (objService permet d'avoir le bon objet ? et sinon modifier pour obtenir ce qu'il faut en formulaire)
-  changeDataSub(newDat: JsonData, objectType: string,endPoint:string, moduleCode: string = 'generic') {
+  changeDataSub(
+    newDat: JsonData,
+    objectType: string,
+    endPoint: string,
+    urlRelative: string,
+    moduleCode: string = 'generic'
+  ) {
     this.properties = newDat;
     newDat.moduleCode = moduleCode;
     newDat.objectType = objectType;
     newDat.endPoint = endPoint;
+    newDat.urlRelative = urlRelative;
     this.dataSub.next(newDat);
   }
 
-  dataToCreate(newDat: JsonData,urlRelative:string, moduleCode: string = 'generic') {
+  dataToCreate(newDat: JsonData, urlRelative: string, moduleCode: string = 'generic') {
     newDat[moduleCode] = {};
     newDat.moduleCode = moduleCode;
     newDat.urlRelative = urlRelative;

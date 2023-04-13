@@ -59,7 +59,8 @@ export class MonitoringFormComponentG implements OnInit {
     private _dynformService: DynamicFormService,
     private _formService: FormService,
     private _apiGeomService: ApiGeomService,
-    private _router: Router  ) {}
+    private _router: Router
+  ) {}
 
   ngOnInit() {
     // TODO: Avoid two subscribes one inside other (code test above doesn't work. When add type site the observable currentdata is not recall)
@@ -258,14 +259,25 @@ export class MonitoringFormComponentG implements OnInit {
    */
   navigateToDetail(id, objectType, queryParams) {
     // patch bug navigation
-    this._router.navigate(
-      ['monitorings', objectType, id].filter((s) => !!s),
-      {
-        queryParams,
-      }
-    );
+    // this._router.navigate(
+    //   ['monitorings', objectType, id].filter((s) => !!s),
+    //   {
+    //     queryParams,
+    //   }
+    // );
+    // TODO: voir a quel moment on a besoin des params
+    // const urlSegmentsBase = this.obj.urlRelative.split("/")
+    // const urlPathDetail = urlSegmentsBase.concat([objectType, id])
+    // this._router.navigate(
+    //   [urlPathDetail.filter((s) => !!s)],
+    //   {
+    //     queryParams}
+    // );
+    const urlSegment = [objectType, id].filter((s) => !!s);
+    const urlPathDetail = [this.obj.urlRelative].concat(urlSegment).join('/');
     this.objChanged.emit(this.obj);
     this.bEditChange.emit(false);
+    this._router.navigateByUrl(urlPathDetail);
   }
 
   /**
@@ -273,7 +285,9 @@ export class MonitoringFormComponentG implements OnInit {
    */
   navigateToParent() {
     this.bEditChange.emit(false); // patch bug navigation
-    this._router.navigateByUrl(this.obj.urlRelative);
+    const urlSegment = [this.obj.objectType].filter((s) => !!s);
+    const urlPathDetail = [this.obj.urlRelative].concat(urlSegment).join('/');
+    this._router.navigateByUrl(urlPathDetail);
 
     // this.obj.navigateToParent();
   }
