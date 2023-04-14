@@ -13,7 +13,7 @@ export class FormService {
   data: JsonData = {};
   private dataSub = new BehaviorSubject<object>(this.data);
   currentData = this.dataSub.asObservable();
-  properties: JsonData;
+  properties: JsonData = {};
   moduleCode: string;
   objecType: string;
 
