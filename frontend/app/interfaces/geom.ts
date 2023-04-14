@@ -1,8 +1,8 @@
-import { GeoJSON } from "geojson";
-import { Observable } from "rxjs";
-import { JsonData } from "../types/jsondata";
-import { Resp } from "../types/response";
-import { IPaginated } from "./page";
+import { GeoJSON } from 'geojson';
+import { Observable } from 'rxjs';
+import { JsonData } from '../types/jsondata';
+import { Resp } from '../types/response';
+import { IPaginated } from './page';
 
 export interface IGeomObject {
   data: JsonData;
@@ -22,7 +22,7 @@ export interface ISitesGroup extends IGeomObject {
 }
 
 export interface ISite extends IGeomObject {
-  pk:number;
+  pk: number;
   altitude_max: number;
   altitude_min: number;
   base_site_code: string;
@@ -39,15 +39,11 @@ export interface ISite extends IGeomObject {
 }
 
 interface IGeomObjectProperties {
-  properties: IGeomObject
+  properties: IGeomObject;
 }
 
 export interface IGeomService {
-  get(
-    limit: number,
-    page: number,
-    params: JsonData
-  ): Observable<IPaginated<IGeomObject>>;
+  get(limit: number, page: number, params: JsonData): Observable<IPaginated<IGeomObject>>;
   get_geometries(params: JsonData): Observable<GeoJSON.FeatureCollection>;
   create(postdata: IGeomObjectProperties): Observable<Resp>;
   patch(id: number, updatedData: IGeomObjectProperties): Observable<Resp>;
@@ -55,7 +51,7 @@ export interface IGeomService {
 }
 
 export interface ISiteType {
-  config:JsonData,
-  id_nomenclature_type_site:number,
-  label:string
+  config: JsonData;
+  id_nomenclature_type_site: number;
+  label: string;
 }
