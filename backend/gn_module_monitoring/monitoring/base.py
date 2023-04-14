@@ -52,7 +52,7 @@ class MonitoringDefinitions:
 
 
 monitoring_definitions = MonitoringDefinitions()
-
+monitoring_g_definitions = MonitoringDefinitions()
 
 class MonitoringObjectBase():
 
