@@ -12,13 +12,13 @@ import { mergeMap } from 'rxjs/operators';
 
 @Injectable()
 export class ConfigService {
-  private _config;
+  protected _config;
 
-  constructor(private _http: HttpClient, private _moduleService: ModuleService) {}
+  constructor(protected _http: HttpClient, protected _moduleService: ModuleService) {}
 
   /** Configuration */
 
-  init(moduleCode = null) {
+  init(moduleCode: null | string = null) {
     // a definir ailleurs
 
     moduleCode = moduleCode || 'generic';
@@ -129,14 +129,15 @@ export class ConfigService {
     moduleCode = moduleCode || 'generic';
     const configObject = this._config[moduleCode][objectType];
     // gerer quand les paramètres ont un fonction comme valeur
-
-    for (const typeSchema of ['generic', 'specific']) {
-      for (const keyDef of Object.keys(configObject[typeSchema])) {
-        const formDef = configObject[typeSchema][keyDef];
-        for (const keyParam of Object.keys(formDef)) {
-          const func = this.toFunction(formDef[keyParam]);
-          if (func) {
-            formDef[keyParam] = func;
+    if (configObject) {
+      for (const typeSchema of ['generic', 'specific']) {
+        for (const keyDef of Object.keys(configObject[typeSchema])) {
+          const formDef = configObject[typeSchema][keyDef];
+          for (const keyParam of Object.keys(formDef)) {
+            const func = this.toFunction(formDef[keyParam]);
+            if (func) {
+              formDef[keyParam] = func;
+            }
           }
         }
       }
