@@ -245,3 +245,13 @@ def get_config_frontend(module_code=None, force=True):
 
     config = dict(get_config(module_code, force))
     return config
+
+
+
+# def get_config_from_backend(module_code=None, force=False):
+
+#     module_code = 'generic'
+#     #TODO: voir la sortie de cette fonction
+#     config = config_from_backend('config', module_code)
+#     #TODO: voir également à quoi sert cette fonction
+#     get_config_objects(module_code, config)

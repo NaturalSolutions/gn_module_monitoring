@@ -1,14 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormService } from '../../services/form.service';
-import { FormGroup, FormBuilder } from '@angular/forms';
-import { ISite, ISiteType } from '../../interfaces/geom';
-import { SitesService } from '../../services/api-geom.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
+
+import { endPoints } from '../../enum/endpoints';
+import { ISite, ISiteType } from '../../interfaces/geom';
 import { IobjObs, ObjDataType } from '../../interfaces/objObs';
-import { MonitoringFormComponentG } from '../monitoring-form-g/monitoring-form.component-g';
+import { SitesService } from '../../services/api-geom.service';
+import { FormService } from '../../services/form.service';
 import { ObjectService } from '../../services/object.service';
 import { JsonData } from '../../types/jsondata';
-import { endPoints } from '../../enum/endpoints';
+import { MonitoringFormComponentG } from '../monitoring-form-g/monitoring-form.component-g';
 import { IPaginated } from '../../interfaces/page';
 
 @Component({

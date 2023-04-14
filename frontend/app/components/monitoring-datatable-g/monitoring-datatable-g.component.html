@@ -59,7 +59,7 @@
         <!-- TODO Action Column :  Changer ngIf, click function, matTooltip // voir comment adapter à ce qu'il y avait avant :  *ngIf="child0.child0()"" et dans la function `child0.child0().labelArtUndef(true)` -->
         <a
           class="nav-link link cell-link"
-          (click)="navigateToAddChildren(null, row.id)"
+          (click)="navigateToAddChildren(null, row)"
           matTooltip=" {{objectType.addChildLabel}}"
         >
           <i class="fa fa-plus" aria-hidden="true"></i>

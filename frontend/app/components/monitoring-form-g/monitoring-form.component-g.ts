@@ -59,7 +59,7 @@ export class MonitoringFormComponentG implements OnInit {
     private _dynformService: DynamicFormService,
     private _formService: FormService,
     private _apiGeomService: ApiGeomService,
-    private _router: Router
+    private _router: Router,
   ) {}
 
   ngOnInit() {
@@ -265,14 +265,9 @@ export class MonitoringFormComponentG implements OnInit {
     //     queryParams,
     //   }
     // );
-    // TODO: voir a quel moment on a besoin des params
-    // const urlSegmentsBase = this.obj.urlRelative.split("/")
-    // const urlPathDetail = urlSegmentsBase.concat([objectType, id])
-    // this._router.navigate(
-    //   [urlPathDetail.filter((s) => !!s)],
-    //   {
-    //     queryParams}
-    // );
+    // TODO: this commented code works only if ".." is not based url (example working : sites_group/:id/site/:id , not working if create site_group)
+    // this._router.navigate(['..',objectType,id], {relativeTo: this._route});
+    // 
     const urlSegment = [objectType, id].filter((s) => !!s);
     const urlPathDetail = [this.obj.urlRelative].concat(urlSegment).join('/');
     this.objChanged.emit(this.obj);
@@ -285,12 +280,13 @@ export class MonitoringFormComponentG implements OnInit {
    */
   navigateToParent() {
     this.bEditChange.emit(false); // patch bug navigation
-    const urlSegment = [this.obj.objectType].filter((s) => !!s);
-    const urlPathDetail = [this.obj.urlRelative].concat(urlSegment).join('/');
-    this._router.navigateByUrl(urlPathDetail);
-
-    // this.obj.navigateToParent();
+    this._router.navigate(['..'], {relativeTo: this._route});
+    // const urlSegment = [this.obj.objectType].filter((s) => !!s);
+    // const urlPathDetail = [this.obj.urlRelative].concat(urlSegment).join('/');
+    // this._router.navigateByUrl(this.obj.urlRelative);
   }
+
+
 
   msgToaster(action) {
     // return `${action} ${this.obj.labelDu()} ${this.obj.description()} effectuée`.trim();

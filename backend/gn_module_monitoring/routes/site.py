@@ -50,29 +50,6 @@ def get_types_site_by_label():
     if sort_dir == "asc":
         joinquery = joinquery.order_by(TNomenclatures.label_fr.asc())
 
-    return paginate(
-        query=joinquery,
-        schema=BibTypeSiteSchema,
-        limit=limit,
-        page=page,
-    )
-
-
-
-
-@blueprint.route("/sites/types/label", methods=["GET"])
-def get_types_site_by_label():
-    params = MultiDict(request.args)
-    limit, page = get_limit_page(params=params)
-    sort_label, sort_dir = get_sort(
-        params=params, default_sort="label_fr", default_direction="desc"
-    )
-    joinquery = BibTypeSite.query.join(BibTypeSite.nomenclature).filter(
-        TNomenclatures.label_fr.ilike(f"%{params['label_fr']}%")
-    )
-    if sort_dir == "asc":
-        joinquery = joinquery.order_by(TNomenclatures.label_fr.asc())
-
     # See if there are not too much labels since they are used
     # in select in the frontend side. And an infinite select is not
     # implemented
