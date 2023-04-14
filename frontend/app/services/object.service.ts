@@ -34,14 +34,12 @@ export class ObjectService {
 
 
   changeObjectType(newObjType: IobjObs<JsonData>,storeObjectType: boolean = false) {
-    console.log("Change type",newObjType)
     if (storeObjectType)
       localStorage.setItem('storedObjectType', JSON.stringify(newObjType));
      this.dataObjType.next(newObjType);
   }
 
    changeObjectTypeParent(newObjType: IobjObs<JsonData>,storeObjectTypeParent: boolean = false) {
-    console.log("Change parent type",newObjType)
     if (storeObjectTypeParent)
       localStorage.setItem('storedObjectTypeParent', JSON.stringify(newObjType));
      this.dataObjTypeParent.next(newObjType);

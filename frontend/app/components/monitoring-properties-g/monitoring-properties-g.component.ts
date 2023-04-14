@@ -33,26 +33,9 @@ export class MonitoringPropertiesGComponent implements OnInit {
   constructor(private _formService: FormService, private _objService: ObjectService) {}
 
   ngOnInit() {
-    // this._sub = this._objService.currentObjectTypeParent.subscribe((newParentType) => {
-    //   this.objectType = newParentType;
-    //   this.fieldsNames = newParentType.template.fieldNames;
-    //   this.fields = newParentType.template.fieldLabels;
-    //   this.fieldDefinitions = newParentType.template.fieldDefinitions;
-    //   this.objectType.properties = this.selectedObj;
-    //   this.endPoint = newParentType.endPoint;
-    // });
     this.initProperties();
   }
-  // ngAfterViewInit() {
-  //   this._sub = this._objService.currentObjectTypeParent.subscribe((newParentType) => {
-  //     this.objectType = newParentType;
-  //     this.fieldsNames = newParentType.template.fieldNames;
-  //     this.fields = newParentType.template.fieldLabels;
-  //     this.fieldDefinitions = newParentType.template.fieldDefinitions;
-  //     this.objectType.properties = this.selectedObj;
-  //     this.endPoint = newParentType.endPoint;
-  //   });
-  // }
+
   initProperties() {
     this.objectType = this.newParentType;
     this.fieldsNames = this.newParentType.template.fieldNames;
@@ -73,18 +56,8 @@ export class MonitoringPropertiesGComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // if (changes.newParentType){
-    //   if (changes.newParentType.currentValue) {
-    //       this.initProperties()
-    //   }
-    // } else if (this.newParentType.template.fieldNames.length != 0){
-    //   this.initProperties()
-    // }
     if (this.newParentType.template.fieldNames.length != 0) {
       this.initProperties();
     }
   }
-  // ngOnDestroy() {
-  //   this._sub.unsubscribe()
-  // }
 }

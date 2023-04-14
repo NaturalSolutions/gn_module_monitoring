@@ -281,9 +281,6 @@ export class MonitoringFormComponentG implements OnInit {
   navigateToParent() {
     this.bEditChange.emit(false); // patch bug navigation
     this._router.navigate(['..'], {relativeTo: this._route});
-    // const urlSegment = [this.obj.objectType].filter((s) => !!s);
-    // const urlPathDetail = [this.obj.urlRelative].concat(urlSegment).join('/');
-    // this._router.navigateByUrl(this.obj.urlRelative);
   }
 
 
@@ -386,7 +383,6 @@ export class MonitoringFormComponentG implements OnInit {
   }
 
   getConfigFromBtnSelect(event) {
-    console.log(event);
     // this.obj.specific == undefined ? (this.obj.specific = {}) : null;
     // TODO: Ajout de tous les id_parents ["id_sites_groups" etc ] dans l'objet obj.dataComplement
     this.obj.specific = {};

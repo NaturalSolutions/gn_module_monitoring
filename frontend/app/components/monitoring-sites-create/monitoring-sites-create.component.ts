@@ -40,19 +40,6 @@ export class MonitoringSitesCreateComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // let $obs1 = this._objService.currentObjSelected
-    // let $obs2 = this._objService.currentObjectType
-    // forkJoin([$obs1,$obs2]).subscribe( results =>{
-    //   console.log(results[0])
-    //   let objParent = results[0]
-    //   let objChild = results[1]
-    //   this.id_sites_group = objParent.id_sites_group
-    //   this._formService.dataToCreate({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group, id_relationship: ['id_sites_group','types_site'],endPoint:endPoints.sites,objSelected:objChild.objectType});
-    //     this.form = this._formBuilder.group({});
-    //     this.funcToFilt = this.partialfuncToFilt.bind(this);
-    // }
-    // )
-
     this.urlRelative = this.removeLastPart(this.route.snapshot['_routerState'].url);
     this._objService.currentObjSelected.subscribe((objParent) => {
       this.id_sites_group = objParent.id_sites_group;
@@ -71,19 +58,6 @@ export class MonitoringSitesCreateComponent implements OnInit {
       this.form = this._formBuilder.group({});
       this.funcToFilt = this.partialfuncToFilt.bind(this);
     });
-
-    // this._Activatedroute.params
-    // .pipe(
-    //   map((params) => params["id"] as number))
-    // .subscribe(
-    //   (id_site_group) => {
-    //     console.log(id_site_group)
-    //     this.id_sites_group = id_site_group
-    //     this._formService.dataToCreate({ module: "generic", objectType: "site", id_sites_group : this.id_sites_group });
-    //     this.form = this._formBuilder.group({});
-    //     this.funcToFilt = this.partialfuncToFilt.bind(this);
-    //   }
-    // );
   }
 
   removeLastPart(url: string): string {
