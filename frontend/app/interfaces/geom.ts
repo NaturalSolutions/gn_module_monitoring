@@ -38,6 +38,10 @@ export interface ISite extends IGeomObject {
   uuid_base_site: string;
 }
 
+interface IGeomObjectProperties {
+  properties: IGeomObject
+}
+
 export interface IGeomService {
   get(
     limit: number,
@@ -45,8 +49,8 @@ export interface IGeomService {
     params: JsonData
   ): Observable<IPaginated<IGeomObject>>;
   get_geometries(params: JsonData): Observable<GeoJSON.FeatureCollection>;
-  create(postdata: { properties: IGeomObject }): Observable<Resp>;
-  patch(id: number, updatedData: { properties: IGeomObject }): Observable<Resp>;
+  create(postdata: IGeomObjectProperties): Observable<Resp>;
+  patch(id: number, updatedData: IGeomObjectProperties): Observable<Resp>;
   delete(id: number);
 }
 
