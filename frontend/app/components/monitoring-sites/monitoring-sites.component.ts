@@ -53,7 +53,6 @@ export class MonitoringSitesComponent
 
   ngOnInit() {
     this.objForm = this._formBuilder.group({});
-    // this._objService.currentObjectTypeParent.subscribe((objParent)=>objParent);
     this._objService.changeObjectType(this._siteService.objectObs);
     this.initSite();
   }
@@ -137,6 +136,4 @@ export class MonitoringSitesComponent
   onObjChanged($event) {
     this.initSite();
   }
-
-  onSelect($event) {}
 }
