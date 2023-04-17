@@ -27,6 +27,7 @@ export interface EmptyObject {
 export class BtnSelectComponent implements OnInit {
   selectable = true;
   removable = true;
+  isInit = false;
   separatorKeysCodes: number[] = [ENTER, COMMA];
   myControl = new FormControl();
   @Input() placeholderText: string = 'Selectionnez vos options dans la liste';
@@ -36,13 +37,17 @@ export class BtnSelectComponent implements OnInit {
   listOptionChosen: string[] = [];
   configObjAdded: JsonData = {};
   genericResponse: JsonData = {};
+  objToEdit: JsonData;
 
+  @Input() bEdit: boolean;
+  @Input() isInitialValues:boolean;
   @Input() paramToFilt: string;
   @Input() callBackFunction: (
     pageNumber: number,
     limit: number,
     valueToFilter: string
   ) => Observable<any>;
+  @Input() initValueFunction : ()=> JsonData;
   @ViewChild('optionInput') optionInput: ElementRef<HTMLInputElement>;
 
   @Output() public sendobject = new EventEmitter<JsonData>();
@@ -50,6 +55,11 @@ export class BtnSelectComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
+    if(this.isInitialValues && !this.isInit){
+      this.initFromExistingObj(this.paramToFilt)
+      this.objToEdit.map(val => this.addObject(val))
+      this.isInit = true
+    }
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
       debounceTime(400),
@@ -120,4 +130,16 @@ export class BtnSelectComponent implements OnInit {
     this.configObjAdded[name] = configAndId;
     this.sendobject.emit(this.configObjAdded);
   }
+
+  initFromExistingObj(keyToFilt: string){
+  const objInput = this.initValueFunction()
+  this.objToEdit = objInput .filter((obj) => {
+    Object.assign(obj, { name: obj[keyToFilt] })[keyToFilt];
+    delete obj[keyToFilt];
+    return obj;
+  })
+  this.objToEdit.map(obj => this.listOptionChosen.push(obj.name))
+
+  }
+
 }

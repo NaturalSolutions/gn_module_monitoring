@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 
 import { MonitoringGeomComponent } from '../../class/monitoring-geom-component';
-import { ISite } from '../../interfaces/geom';
+import { ISite, ISiteType } from '../../interfaces/geom';
 import { IPage, IPaginated } from '../../interfaces/page';
 import { IVisit } from '../../interfaces/visit';
 import { SitesService, VisitsService } from '../../services/api-geom.service';
@@ -15,6 +15,7 @@ import { JsonData } from '../../types/jsondata';
 import { SelectObject } from '../../interfaces/object';
 import { Module } from '../../interfaces/module';
 import { ConfigService } from '../../services/config.service';
+import { MonitoringFormComponentG } from '../monitoring-form-g/monitoring-form.component-g';
 
 @Component({
   selector: 'monitoring-visits',
@@ -22,16 +23,28 @@ import { ConfigService } from '../../services/config.service';
   styleUrls: ['./monitoring-visits.component.css'],
 })
 export class MonitoringVisitsComponent extends MonitoringGeomComponent implements OnInit {
+  @ViewChild('subscritionObjConfig')
+  monitoringFormComponentG: MonitoringFormComponentG;
   site: ISite;
   @Input() visits: IVisit[];
   @Input() page: IPage;
   // colsname: typeof columnNameVisit = columnNameVisit;
   objectType: string;
-  bEdit: boolean;
-  objForm: FormGroup;
-  @Input() colsname;
+  @Input() bEdit: boolean;
+  form: FormGroup;
+  colsname: {};
   objParent: any;
   modules: SelectObject[];
+
+  isInitialValues:boolean;
+  paramToFilt: string = 'label';
+  funcToFilt: Function;
+  funcInitValues: Function;
+  titleBtn: string = 'Choix des types de sites';
+  placeholderText: string = 'Sélectionnez les types de site';
+  id_sites_group: number;
+  types_site: string[];
+
 
   constructor(
     private _sites_service: SitesService,
@@ -41,7 +54,8 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
     private router: Router,
     private _Activatedroute: ActivatedRoute,
     private _formBuilder: FormBuilder,
-    private _configService: ConfigService
+    private _configService: ConfigService,
+    private siteService: SitesService,
   ) {
     super();
     this.getAllItemsCallback = this.getVisits;
@@ -49,7 +63,9 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
   }
 
   ngOnInit() {
-    this.objForm = this._formBuilder.group({});
+    this.funcInitValues = this.initValueToSend.bind(this)
+    this.funcToFilt = this.partialfuncToFilt.bind(this);
+    this.form = this._formBuilder.group({});
     this._objService.changeObjectTypeParent(this._sites_service.objectObs, true);
     this._objService.currentObjectTypeParent.subscribe((objParent) => (this.objParent = objParent));
 
@@ -71,6 +87,7 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
         this.setVisits(data.visits);
         this.baseFilters = { id_base_site: this.site.id_base_site };
       });
+      this.isInitialValues = true;
   }
 
   getVisits(page: number, filters: JsonData) {
@@ -114,5 +131,36 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
         queryParams: { id_base_site: this.site.id_base_site, parents_path: parent_paths },
       });
     });
+  }
+  partialfuncToFilt(
+    pageNumber: number,
+    limit: number,
+    valueToFilter: string
+  ): Observable<IPaginated<ISiteType>> {
+    return this.siteService.getTypeSites(pageNumber, limit, {
+      label_fr: valueToFilter,
+      sort_dir: 'desc',
+    });
+  }
+
+  onSendConfig(config: JsonData): void {
+    config = this.addTypeSiteListIds(config);
+    this.monitoringFormComponentG.getConfigFromBtnSelect(config);
+  }
+
+  addTypeSiteListIds(config: JsonData): JsonData {
+    if (config && config.length != 0) {
+      config.types_site = [];
+      for (const key in config) {
+        if ('id_nomenclature_type_site' in config[key]) {
+          config.types_site.push(config[key]['id_nomenclature_type_site']);
+        }
+      }
+    }
+    return config;
+  }
+
+  initValueToSend(){
+    return this.site['types_site']
   }
 }
