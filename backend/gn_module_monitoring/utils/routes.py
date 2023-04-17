@@ -13,7 +13,7 @@ from werkzeug.datastructures import MultiDict
 
 from gn_module_monitoring.monitoring.queries import Query as MonitoringQuery
 from gn_module_monitoring.monitoring.schemas import paginate_schema
-from gn_module_monitoring.monitoring.definitions import monitoring_g_definitions
+from gn_module_monitoring.monitoring.definitions import monitoring_definitions
 
 
 def get_limit_page(params: MultiDict) -> Tuple[int]:
@@ -97,7 +97,7 @@ def create_or_update_object_api_sites_sites_group(module_code, object_type, id=N
         post_data["properties"]["id_module"] = module.id_module
 
     return (
-        monitoring_g_definitions.monitoring_object_instance(module_code, object_type, id)
+        monitoring_definitions.monitoring_object_instance(module_code, object_type, id)
         .create_or_update(post_data)
         .serialize(depth)
     )
