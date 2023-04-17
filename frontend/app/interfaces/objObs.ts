@@ -7,7 +7,7 @@ export type ObjDataType = ISite | ISitesGroup | IVisit ;
 export interface IobjObs<T> {
   properties: T | {};
   endPoint: endPoints;
-  objectType: "site" | "sites_group" | "visits";
+  objectType: "site" | "sites_group" | "visit";
   label: string;
   addObjLabel: string;
   editObjLabel: string;
