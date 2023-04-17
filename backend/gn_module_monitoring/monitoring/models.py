@@ -234,15 +234,6 @@ class TMonitoringVisits(TBaseVisits, GenericModel):
     )
 
 
-    module = DB.relationship(
-        TModules,
-        lazy="select",
-        primaryjoin=(TModules.id_module == TBaseVisits.id_module),
-        foreign_keys=[TModules.id_module],
-        uselist=False,
-    )
-
-
 @geoserializable(geoCol="geom", idCol="id_base_site")
 class TMonitoringSites(TBaseSites, GenericModel):
 

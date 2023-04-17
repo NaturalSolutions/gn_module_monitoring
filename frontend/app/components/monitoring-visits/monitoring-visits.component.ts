@@ -13,6 +13,8 @@ import { GeoJSONService } from '../../services/geojson.service';
 import { ObjectService } from '../../services/object.service';
 import { JsonData } from '../../types/jsondata';
 import { SelectObject } from '../../interfaces/object';
+import { Module } from '../../interfaces/module';
+import { ConfigService } from '../../services/config.service';
 
 @Component({
   selector: 'monitoring-visits',
@@ -38,7 +40,8 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
     public geojsonService: GeoJSONService,
     private router: Router,
     private _Activatedroute: ActivatedRoute,
-    private _formBuilder: FormBuilder
+    private _formBuilder: FormBuilder,
+    private _configService: ConfigService
   ) {
     super();
     this.getAllItemsCallback = this.getVisits;

@@ -95,13 +95,6 @@ def get_site_by_id(id_base_site):
     schema = MonitoringSitesSchema()
     return schema.dump(site)
 
-@blueprint.route("/sites/<int:id_base_site>", methods=["GET"])
-def get_site_by_id(id_base_site):
-    site = TMonitoringSites.query.get_or_404(id_base_site)
-    schema = MonitoringSitesSchema()
-    return schema.dump(site)
-
-
 @blueprint.route("/sites/geometries", methods=["GET"])
 def get_all_site_geometries():
     params = MultiDict(request.args)

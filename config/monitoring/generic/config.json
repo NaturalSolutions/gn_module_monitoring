@@ -18,7 +18,7 @@
     "observer_list": "nom_liste",
     "taxonomy": "__MODULE.TAXONOMY_DISPLAY_FIELD_NAME",
     "taxonomy_list": "nom_liste",
-    "sites_groups": "sites_group_name",
+    "sites_group": "sites_group_name",
     "habitat": "lb_hab_fr",
     "area": "area_name",
     "municipality": "nom_com_dept",

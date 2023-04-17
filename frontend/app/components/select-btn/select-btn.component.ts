@@ -54,6 +54,8 @@ export class SelectButtonComponent {
   }
 
   displayFn(value: SelectObject) {
-    return value.label;
+    if (value) {
+      return value.label;
+    }
   }
 }
