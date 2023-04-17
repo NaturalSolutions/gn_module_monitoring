@@ -2,10 +2,10 @@ import { endPoints } from "../enum/endpoints";
 import { JsonData } from "../types/jsondata";
 import { ISite, ISitesGroup } from "./geom";
 import { IVisit } from "./visit";
-export type ObjDataType = ISite | ISitesGroup | IVisit | JsonData ;
 
-export interface IobjObs<ObjDataType> {
-  properties: ObjDataType;
+export type ObjDataType = ISite | ISitesGroup | IVisit ;
+export interface IobjObs<T> {
+  properties: T | {};
   endPoint: endPoints;
   objectType: "site" | "sites_group" | "visits";
   label: string;

@@ -2,202 +2,88 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import { endPoints } from '../enum/endpoints';
-import { IGeomService, ISite, ISiteType, ISitesGroup } from '../interfaces/geom';
-import { IobjObs, ObjDataType } from '../interfaces/objObs';
+import { IGeomObject, IGeomService, ISite, ISiteType, ISitesGroup } from '../interfaces/geom';
+import { IobjObs } from '../interfaces/objObs';
 import { IPaginated } from '../interfaces/page';
 import { JsonData } from '../types/jsondata';
-import { Resp } from '../types/response';
 import { Utils } from '../utils/utils';
 import { CacheService } from './cache.service';
 import { ConfigJsonService } from './config-json.service';
 import { IVisit } from '../interfaces/visit';
+import { IObject, IObjectProperties, IService } from '../interfaces/object';
+import { LIMIT } from '../constants/api';
+import { Module } from '../interfaces/module';
 
 @Injectable()
-export class ApiGeomService implements IGeomService {
-  public endPoint: endPoints;
-  public objectObs: IobjObs<ObjDataType>;
+export class ApiService<T = IObject> implements IService<T> {
+  public objectObs: IobjObs<T>;
+  constructor(protected _cacheService: CacheService) {}
 
-  constructor(
-    protected _cacheService: CacheService,
-    protected _configJsonService: ConfigJsonService
-  ) {
-    this.init(this.endPoint, this.objectObs);
-  }
-
-  init(endPoint:endPoints, objectObjs: IobjObs<ObjDataType>) {
-    this.endPoint = endPoint;
-    this.objectObs = objectObjs;
-    // this.endPoint = endPoints.sites_groups;
-    // this.objectObs = {
-    //   properties: {},
-    //   endPoint: endPoints.sites_groups,
-    //   objectType: 'sites_group',
-    //   label: 'groupe de site',
-    //   addObjLabel: 'Ajouter',
-    //   editObjLabel: 'Editer',
-    //   id: null,
-    //   moduleCode: 'generic',
-    //   schema: {},
-    //   template: {
-    //     fieldNames: [],
-    //     fieldLabels: {},
-    //     fieldNamesList: [],
-    //     fieldDefinitions: {},
-    //   },
-    //   dataTable: { colNameObj: {} },
-    // };
-  }
   get(
     page: number = 1,
-    limit: number = 10,
+    limit: number = LIMIT,
     params: JsonData = {}
-  ): Observable<IPaginated<ISitesGroup | ISite | IVisit>> {
-    return this._cacheService.request<Observable<IPaginated<ISitesGroup | ISite | IVisit>>>(
-      'get',
-      this.endPoint,
+  ): Observable<IPaginated<T>> {
+    return this._cacheService.request<Observable<IPaginated<T>>>(
+      "get",
+      this.objectObs.endPoint,
       {
         queryParams: { page, limit, ...params },
       }
     );
   }
 
-  getById(id: number): Observable<ISitesGroup | ISite | IVisit> {
-    return this._cacheService.request<Observable<ISitesGroup | ISite>>(
-      'get',
-      `${this.endPoint}/${id}`
+  getById(id: number): Observable<T> {
+    return this._cacheService.request<Observable<T>>(
+      "get",
+      `${this.objectObs.endPoint}/${id}`
     );
   }
-
-  get_geometries(params: JsonData = {}): Observable<GeoJSON.FeatureCollection> {
-    return this._cacheService.request<Observable<GeoJSON.FeatureCollection>>(
-      'get',
-      `${this.endPoint}/geometries`,
+  patch(id: number, updatedData: IObjectProperties<T>): Observable<T> {
+    return this._cacheService.request(
+      "patch",
+      `${this.objectObs.endPoint}/${id}`,
       {
-        queryParams: { ...params },
+        postData: updatedData as {},
       }
     );
   }
 
-  patch(id: number, updatedData: { properties: ISitesGroup | ISite | IVisit }): Observable<Resp> {
-    return this._cacheService.request('patch', `${this.endPoint}/${id}`, {
-      postData: updatedData,
+  create(postData: IObjectProperties<T>): Observable<T> {
+    return this._cacheService.request("post", `${this.objectObs.endPoint}`, {
+      postData: postData as {},
     });
   }
 
-  create(postData: { properties: ISitesGroup | ISite }): Observable<Resp> {
-    return this._cacheService.request('post', `${this.endPoint}`, {
-      postData: postData,
-    });
-  }
-
-  delete(id: number): Observable<Resp> {
-    return this._cacheService.request('delete', `${this.endPoint}/${id}`);
+  delete(id: number): Observable<T> {
+    return this._cacheService.request(
+      "delete",
+      `${this.objectObs.endPoint}/${id}`
+    );
   }
 }
-
 @Injectable()
-export class SitesGroupService extends ApiGeomService {
-  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
-    super(_cacheService, _configJsonService);
-  }
-  init(): void {
-    this.endPoint = endPoints.sites_groups;
-    this.objectObs = {
-      properties: {},
-      endPoint: endPoints.sites_groups,
-      objectType: 'sites_group',
-      label: 'groupe de site',
-      addObjLabel: 'Ajouter un nouveau groupe de site',
-      editObjLabel: 'Editer le groupe de site',
-      addChildLabel: 'Ajouter un site',
-      id: null,
-      moduleCode: 'generic',
-      schema: {},
-      template: {
-        fieldNames: [],
-        fieldLabels: {},
-        fieldNamesList: [],
-        fieldDefinitions: {},
-      },
-      dataTable: { colNameObj: {} },
-    };
-    this._configJsonService
-      .init(this.objectObs.moduleCode)
-      .pipe()
-      .subscribe(() => {
-        const fieldNames = this._configJsonService.configModuleObjectParam(
-          this.objectObs.moduleCode,
-          this.objectObs.objectType,
-          'display_properties'
-        );
-        const fieldNamesList = this._configJsonService.configModuleObjectParam(
-          this.objectObs.moduleCode,
-          this.objectObs.objectType,
-          'display_list'
-        );
-        const schema = this._configJsonService.schema(
-          this.objectObs.moduleCode,
-          this.objectObs.objectType
-        );
-        const fieldLabels = this._configJsonService.fieldLabels(schema);
-        const fieldDefinitions = this._configJsonService.fieldDefinitions(schema);
-        this.objectObs.template.fieldNames = fieldNames;
-        this.objectObs.template.fieldNamesList = fieldNamesList;
-        this.objectObs.schema = schema;
-        this.objectObs.template.fieldLabels = fieldLabels;
-        this.objectObs.template.fieldDefinitions = fieldDefinitions;
-        this.objectObs.template.fieldNamesList = fieldNamesList;
-        this.objectObs.dataTable.colNameObj = Utils.toObject(fieldNamesList, fieldLabels);
-      });
+export class ApiGeomService<T = IGeomObject>
+extends ApiService<T> 
+  implements IGeomService<T> {
+  public endPoint: endPoints;
+  public objectObs: IobjObs<T>;
+
+  constructor(
+    protected _cacheService: CacheService,
+    protected _configJsonService: ConfigJsonService
+  ) {
+    super(_cacheService)
+    this.init(this.endPoint, this.objectObs);
   }
 
-  getSitesChild(
-    page: number = 1,
-    limit: number = 10,
-    params: JsonData = {}
-  ): Observable<IPaginated<ISite>> {
-    return this._cacheService.request<Observable<IPaginated<ISite>>>('get', `sites`, {
-      queryParams: { page, limit, ...params },
-    });
+  init(endPoint: endPoints, objectObjs: IobjObs<T>) {
+    this.endPoint = endPoint;
+    this.objectObs = objectObjs;
+    this.initConfig()
   }
 
-  addObjectType(): string {
-    return 'un nouveau groupe de site';
-  }
-
-  editObjectType(): string {
-    return 'le groupe de site';
-  }
-}
-
-@Injectable()
-export class SitesService extends ApiGeomService {
-  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
-    super(_cacheService, _configJsonService);
-  }
-  opts = [];
-
-  init(): void {
-    this.endPoint = endPoints.sites;
-    this.objectObs = {
-      properties: {},
-      endPoint: endPoints.sites,
-      objectType: 'site',
-      label: 'site',
-      addObjLabel: 'Ajouter un nouveau site',
-      editObjLabel: 'Editer le site',
-      addChildLabel: 'Ajouter une visite',
-      id: null,
-      moduleCode: 'generic',
-      schema: {},
-      template: {
-        fieldNames: [],
-        fieldLabels: {},
-        fieldNamesList: [],
-        fieldDefinitions: {},
-      },
-      dataTable: { colNameObj: {} },
-    };
+  private initConfig(): void {
     this._configJsonService
       .init(this.objectObs.moduleCode)
       .pipe()
@@ -227,15 +113,89 @@ export class SitesService extends ApiGeomService {
         this.objectObs.template.fieldNamesList = fieldNamesList;
         this.objectObs.dataTable.colNameObj = Utils.toObject(fieldNamesList, fieldLabels);
       });
+    }
+  
+  get_geometries(params: JsonData = {}): Observable<GeoJSON.FeatureCollection> {
+    return this._cacheService.request<Observable<GeoJSON.FeatureCollection>>(
+      'get',
+      `${this.endPoint}/geometries`,
+      {
+        queryParams: { ...params },
+      }
+    );
+  }
+}
+
+@Injectable()
+export class SitesGroupService extends ApiGeomService<ISitesGroup> {
+  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
+    super(_cacheService, _configJsonService);
+  }
+  init(): void {
+    const endPoint = endPoints.sites_groups;
+    const objectObs: IobjObs<ISitesGroup> = {
+      properties: {},
+      endPoint: endPoints.sites_groups,
+      objectType: 'sites_group',
+      label: 'groupe de site',
+      addObjLabel: 'Ajouter un nouveau groupe de site',
+      editObjLabel: 'Editer le groupe de site',
+      addChildLabel: 'Ajouter un site',
+      id: null,
+      moduleCode: 'generic',
+      schema: {},
+      template: {
+        fieldNames: [],
+        fieldLabels: {},
+        fieldNamesList: [],
+        fieldDefinitions: {},
+      },
+      dataTable: { colNameObj: {} },
+    };
+    super.init(endPoint, objectObs)
   }
 
-  // getTypeSites(
-  // ): Observable<IPaginated<ISiteType>> {
-  //   return this._cacheService.request<Observable<IPaginated<ISiteType>>>(
-  //     "get",
-  //     "sites/types"
-  //   );
-  // }
+  getSitesChild(
+    page: number = 1,
+    limit: number = 10,
+    params: JsonData = {}
+  ): Observable<IPaginated<ISite>> {
+    return this._cacheService.request<Observable<IPaginated<ISite>>>('get', `sites`, {
+      queryParams: { page, limit, ...params },
+    });
+  }
+}
+
+@Injectable()
+export class SitesService extends ApiGeomService<ISite> {
+  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
+    super(_cacheService, _configJsonService);
+  }
+  opts = [];
+
+  init(): void {
+    const endPoint = endPoints.sites;
+    const objectObs: IobjObs<ISite> = {
+      properties: {},
+      endPoint: endPoints.sites,
+      objectType: 'site',
+      label: 'site',
+      addObjLabel: 'Ajouter un nouveau site',
+      editObjLabel: 'Editer le site',
+      addChildLabel: 'Ajouter une visite',
+      id: null,
+      moduleCode: 'generic',
+      schema: {},
+      template: {
+        fieldNames: [],
+        fieldLabels: {},
+        fieldNamesList: [],
+        fieldDefinitions: {},
+      },
+      dataTable: { colNameObj: {} },
+    };
+    super.init(endPoint, objectObs)
+  }
 
   getTypeSites(
     page: number = 1,
@@ -251,100 +211,35 @@ export class SitesService extends ApiGeomService {
     );
   }
 
-  addObjectType(): string {
-    return ' un nouveau site';
-  }
-
-  editObjectType(): string {
-    return 'le site';
+  getSiteModules(idSite: number): Observable<Module[]> {
+    return this._cacheService.request("get", `sites/${idSite}/modules`);
   }
 }
 
-// @Injectable()
-// export class VisitsService extends ApiGeomService {
-//   constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
-//     super(_cacheService, _configJsonService);
-//   }
-//   init(): void {
-//     this.endPoint = endPoints.visits;
-//     this.objectObs = {
-//       properties: {},
-//       endPoint: endPoints.visits,
-//       objectType: 'visits',
-//       label: 'visite',
-//       addObjLabel: 'Ajouter une nouvelle visite',
-//       editObjLabel: 'Editer la visite',
-//       addChildLabel: 'Ajouter une observation',
-//       id: null,
-//       moduleCode: 'generic',
-//       schema: {},
-//       template: {
-//         fieldNames: [],
-//         fieldLabels: {},
-//         fieldNamesList: [],
-//         fieldDefinitions: {},
-//       },
-//       dataTable: { colNameObj: {} },
-//     };
-//     this._configJsonService
-//       .init(this.objectObs.moduleCode)
-//       .pipe()
-//       .subscribe(() => {
-//         const fieldNames = this._configJsonService.configModuleObjectParam(
-//           this.objectObs.moduleCode,
-//           this.objectObs.objectType,
-//           'display_properties'
-//         );
-//         const fieldNamesList = this._configJsonService.configModuleObjectParam(
-//           this.objectObs.moduleCode,
-//           this.objectObs.objectType,
-//           'display_list'
-//         );
-//         const schema = this._configJsonService.schema(
-//           this.objectObs.moduleCode,
-//           this.objectObs.objectType
-//         );
-//         const fieldLabels = this._configJsonService.fieldLabels(schema);
-//         const fieldDefinitions = this._configJsonService.fieldDefinitions(schema);
-//         this.objectObs.template.fieldNames = fieldNames;
-//         this.objectObs.template.fieldNamesList = fieldNamesList;
-//         this.objectObs.schema = schema;
-//         this.objectObs.template.fieldLabels = fieldLabels;
-//         this.objectObs.template.fieldDefinitions = fieldDefinitions;
-//         this.objectObs.template.fieldNamesList = fieldNamesList;
-//         this.objectObs.dataTable.colNameObj = Utils.toObject(fieldNamesList, fieldLabels);
-//       });
-//   }
-//   addObjectType(): string {
-//     return " une nouvelle visite";
-//   }
-
-//   editObjectType(): string {
-//     return "la visite";
-//   }
-// }
-
 @Injectable()
 export class VisitsService extends ApiService<IVisit> {
-  constructor(_cacheService: CacheService) {
+  constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
     super(_cacheService);
+  }
+  init(): void {
     this.objectObs = {
       properties: {},
       endPoint: endPoints.visits,
-      label: "visite",
-      addObjLabel: "Ajouter une nouvelle visite",
-      editObjLabel: "Editer la visite",
+      objectType: 'visits',
+      label: 'visite',
+      addObjLabel: 'Ajouter une nouvelle visite',
+      editObjLabel: 'Editer la visite',
+      addChildLabel: 'Ajouter une observation',
       id: null,
-      moduleCode: "generic",
+      moduleCode: 'generic',
       schema: {},
-      template: { fieldNames: [], fieldLabels: {} },
+      template: {
+        fieldNames: [],
+        fieldLabels: {},
+        fieldNamesList: [],
+        fieldDefinitions: {},
+      },
+      dataTable: { colNameObj: {} },
     };
-  }
-  addObjectType(): string {
-    return " une nouvelle visite";
-  }
-
-  editObjectType(): string {
-    return "la visite";
   }
 }
