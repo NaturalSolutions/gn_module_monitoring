@@ -17,70 +17,16 @@ import { Module } from '../interfaces/module';
 @Injectable()
 export class ApiService<T = IObject> implements IService<T> {
   public objectObs: IobjObs<T>;
-  constructor(protected _cacheService: CacheService) {}
-
-  get(
-    page: number = 1,
-    limit: number = LIMIT,
-    params: JsonData = {}
-  ): Observable<IPaginated<T>> {
-    return this._cacheService.request<Observable<IPaginated<T>>>(
-      "get",
-      this.objectObs.endPoint,
-      {
-        queryParams: { page, limit, ...params },
-      }
-    );
-  }
-
-  getById(id: number): Observable<T> {
-    return this._cacheService.request<Observable<T>>(
-      "get",
-      `${this.objectObs.endPoint}/${id}`
-    );
-  }
-  patch(id: number, updatedData: IObjectProperties<T>): Observable<T> {
-    return this._cacheService.request(
-      "patch",
-      `${this.objectObs.endPoint}/${id}`,
-      {
-        postData: updatedData as {},
-      }
-    );
-  }
-
-  create(postData: IObjectProperties<T>): Observable<T> {
-    return this._cacheService.request("post", `${this.objectObs.endPoint}`, {
-      postData: postData as {},
-    });
-  }
-
-  delete(id: number): Observable<T> {
-    return this._cacheService.request(
-      "delete",
-      `${this.objectObs.endPoint}/${id}`
-    );
-  }
-}
-@Injectable()
-export class ApiGeomService<T = IGeomObject>
-extends ApiService<T> 
-  implements IGeomService<T> {
   public endPoint: endPoints;
-  public objectObs: IobjObs<T>;
-
   constructor(
     protected _cacheService: CacheService,
     protected _configJsonService: ConfigJsonService
-  ) {
-    super(_cacheService)
-    this.init(this.endPoint, this.objectObs);
-  }
+  ) {}
 
   init(endPoint: endPoints, objectObjs: IobjObs<T>) {
     this.endPoint = endPoint;
     this.objectObs = objectObjs;
-    this.initConfig()
+    this.initConfig();
   }
 
   private initConfig(): void {
@@ -113,8 +59,39 @@ extends ApiService<T>
         this.objectObs.template.fieldNamesList = fieldNamesList;
         this.objectObs.dataTable.colNameObj = Utils.toObject(fieldNamesList, fieldLabels);
       });
-    }
-  
+  }
+  get(page: number = 1, limit: number = LIMIT, params: JsonData = {}): Observable<IPaginated<T>> {
+    return this._cacheService.request<Observable<IPaginated<T>>>('get', this.objectObs.endPoint, {
+      queryParams: { page, limit, ...params },
+    });
+  }
+
+  getById(id: number): Observable<T> {
+    return this._cacheService.request<Observable<T>>('get', `${this.objectObs.endPoint}/${id}`);
+  }
+  patch(id: number, updatedData: IObjectProperties<T>): Observable<T> {
+    return this._cacheService.request('patch', `${this.objectObs.endPoint}/${id}`, {
+      postData: updatedData as {},
+    });
+  }
+
+  create(postData: IObjectProperties<T>): Observable<T> {
+    return this._cacheService.request('post', `${this.objectObs.endPoint}`, {
+      postData: postData as {},
+    });
+  }
+
+  delete(id: number): Observable<T> {
+    return this._cacheService.request('delete', `${this.objectObs.endPoint}/${id}`);
+  }
+}
+@Injectable()
+export class ApiGeomService<T = IGeomObject> extends ApiService<T> implements IGeomService<T> {
+  constructor(protected _cacheService: CacheService, protected _configJsonService: ConfigJsonService) {
+    super(_cacheService, _configJsonService);
+    this.init(this.endPoint, this.objectObs);
+  }
+
   get_geometries(params: JsonData = {}): Observable<GeoJSON.FeatureCollection> {
     return this._cacheService.request<Observable<GeoJSON.FeatureCollection>>(
       'get',
@@ -152,7 +129,7 @@ export class SitesGroupService extends ApiGeomService<ISitesGroup> {
       },
       dataTable: { colNameObj: {} },
     };
-    super.init(endPoint, objectObs)
+    super.init(endPoint, objectObs);
   }
 
   getSitesChild(
@@ -171,7 +148,6 @@ export class SitesService extends ApiGeomService<ISite> {
   constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
     super(_cacheService, _configJsonService);
   }
-  opts = [];
 
   init(): void {
     const endPoint = endPoints.sites;
@@ -194,7 +170,7 @@ export class SitesService extends ApiGeomService<ISite> {
       },
       dataTable: { colNameObj: {} },
     };
-    super.init(endPoint, objectObs)
+    super.init(endPoint, objectObs);
   }
 
   getTypeSites(
@@ -212,20 +188,22 @@ export class SitesService extends ApiGeomService<ISite> {
   }
 
   getSiteModules(idSite: number): Observable<Module[]> {
-    return this._cacheService.request("get", `sites/${idSite}/modules`);
+    return this._cacheService.request('get', `sites/${idSite}/modules`);
   }
 }
 
 @Injectable()
 export class VisitsService extends ApiService<IVisit> {
   constructor(_cacheService: CacheService, _configJsonService: ConfigJsonService) {
-    super(_cacheService);
+    super(_cacheService, _configJsonService);
+    this.init();
   }
   init(): void {
-    this.objectObs = {
+    const endPoint = endPoints.visits;
+    const objectObs: IobjObs<IVisit> = {
       properties: {},
       endPoint: endPoints.visits,
-      objectType: 'visits',
+      objectType: 'visit',
       label: 'visite',
       addObjLabel: 'Ajouter une nouvelle visite',
       editObjLabel: 'Editer la visite',
@@ -241,5 +219,6 @@ export class VisitsService extends ApiService<IVisit> {
       },
       dataTable: { colNameObj: {} },
     };
+    super.init(endPoint, objectObs);
   }
 }
