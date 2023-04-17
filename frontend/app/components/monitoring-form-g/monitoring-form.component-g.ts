@@ -33,7 +33,7 @@ export class MonitoringFormComponentG implements OnInit {
   @Output() bEditChange = new EventEmitter<boolean>();
 
   @Input() sites: {};
-  //@Input() apiService: ApiService;
+  @Input() apiService: ApiGeomService;
   dataForm: IDataForm;
   searchSite = '';
 
@@ -59,7 +59,6 @@ export class MonitoringFormComponentG implements OnInit {
     private _commonService: CommonService,
     private _dynformService: DynamicFormService,
     private _formService: FormService,
-    private _apiGeomService: ApiGeomService,
     private _router: Router,
   ) {}
 
@@ -70,7 +69,7 @@ export class MonitoringFormComponentG implements OnInit {
         tap((data) => {
           this.obj = data;
           this.obj.bIsInitialized = true;
-          this._apiGeomService.init(this.obj.endPoint, this.obj.objSelected);
+          this.apiService.init(this.obj.endPoint, this.obj.objSelected);
         }),
         mergeMap((data: any) => this._configService.init(data.moduleCode))
       )
@@ -297,8 +296,8 @@ export class MonitoringFormComponentG implements OnInit {
     const objToUpdateOrCreate = this._formService.postData(sendValue, this.obj);
     console.log(objToUpdateOrCreate);
     const action = this.obj.id
-      ? this._apiGeomService.patch(this.obj.id, objToUpdateOrCreate)
-      : this._apiGeomService.create(objToUpdateOrCreate);
+      ? this.apiService.patch(this.obj.id, objToUpdateOrCreate)
+      : this.apiService.create(objToUpdateOrCreate);
     const actionLabel = this.obj.id ? 'Modification' : 'Création';
     action.subscribe((objData) => {
       this._commonService.regularToaster('success', this.msgToaster(actionLabel));
@@ -345,7 +344,7 @@ export class MonitoringFormComponentG implements OnInit {
     this.bDeleteSpinner = true;
     this._commonService.regularToaster('info', this.msgToaster('Suppression'));
     // : this.obj.post(this.objForm.value);
-    this._apiGeomService.delete(this.obj.id).subscribe((del) => {
+    this.apiService.delete(this.obj.id).subscribe((del) => {
       this.bDeleteSpinner = this.bDeleteModal = false;
       this.objChanged.emit(this.obj);
       setTimeout(() => {
