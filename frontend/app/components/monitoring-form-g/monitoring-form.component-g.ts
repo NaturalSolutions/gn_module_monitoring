@@ -272,7 +272,7 @@ export class MonitoringFormComponentG implements OnInit {
     const urlPathDetail = [this.obj.urlRelative].concat(urlSegment).join('/');
     this.objChanged.emit(this.obj);
     this.bEditChange.emit(false);
-    this._router.navigateByUrl(urlPathDetail);
+    this.obj.urlRelative ? this._router.navigateByUrl(urlPathDetail): null;
   }
 
   /**
