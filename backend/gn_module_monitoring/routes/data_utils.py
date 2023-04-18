@@ -9,7 +9,6 @@
 
 from flask import request
 from sqlalchemy import and_, inspect, cast
-from sqlalchemy.orm import load_only
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from pypnnomenclature.models import TNomenclatures, BibNomenclaturesTypes

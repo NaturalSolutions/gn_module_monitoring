@@ -431,7 +431,7 @@ TMonitoringModules.sites_groups = DB.relationship(
         cor_module_type,
         cor_type_site.c.id_type_site == cor_module_type.c.id_type_site,
     ),
-    foreign_keys=[cor_type_site.c.id_base_site, cor_module_type.c.id_module, TMonitoringSitesGroups.id_sites_group],
+    foreign_keys=[cor_type_site.c.id_base_site, cor_module_type.c.id_module],
     lazy="select",
     viewonly=True,
 )
