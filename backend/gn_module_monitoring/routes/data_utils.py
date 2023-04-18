@@ -9,6 +9,7 @@
 
 from flask import request
 from sqlalchemy import and_, inspect, cast
+from sqlalchemy.orm import load_only
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from pypnnomenclature.models import TNomenclatures, BibNomenclaturesTypes
@@ -33,7 +34,13 @@ from geonature.utils.errors import GeoNatureError
 from ..blueprint import blueprint
 
 from ..config.repositories import get_config
-from gn_module_monitoring.monitoring.models import TMonitoringSitesGroups, TMonitoringSites, BibTypeSite
+from gn_module_monitoring.utils.routes import get_sites_groups_from_module_id
+from gn_module_monitoring.monitoring.schemas import MonitoringSitesGroupsSchema
+from gn_module_monitoring.monitoring.models import (
+    BibTypeSite,
+    TMonitoringSites,
+    TMonitoringSitesGroups
+)
 
 model_dict = {
     "habitat": Habref,
@@ -92,10 +99,9 @@ def get_init_data(module_code):
 
     # sites_group
     if "sites_group" in config:
-        res_sites_group = (
-            DB.session.query(TMonitoringSitesGroups).filter_by(id_module=id_module).all()
-        )
-        out["sites_group"] = [sites_group.as_dict() for sites_group in res_sites_group]
+        sites_groups = get_sites_groups_from_module_id(id_module)
+        schema = MonitoringSitesGroupsSchema()
+        out["sites_group"] = [schema.dump(sites_group) for sites_group in sites_groups]
 
     # dataset (cruved ??)
     res_dataset = (
