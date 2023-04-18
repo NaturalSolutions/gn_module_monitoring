@@ -1,6 +1,5 @@
 import {
   Component,
-  OnInit,
   ViewChild,
   Input,
   Output,
@@ -8,15 +7,14 @@ import {
 } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatMenuTrigger } from "@angular/material/menu";
-import { Observable } from "rxjs";
 import { SelectObject } from "../../interfaces/object";
 
 @Component({
-  selector: "select-btn",
-  templateUrl: "./select-btn.component.html",
-  styleUrls: ["./select-btn.component.css"],
+  selector: "option-list-btn",
+  templateUrl: "./option-list-btn.component.html",
+  styleUrls: ["./option-list-btn.component.css"],
 })
-export class SelectButtonComponent {
+export class OptionListButtonComponent {
   @ViewChild(MatMenuTrigger) ddTrigger: MatMenuTrigger;
 
   form = new FormControl();

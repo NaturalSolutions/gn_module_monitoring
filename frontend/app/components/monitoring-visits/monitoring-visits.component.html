@@ -4,7 +4,7 @@
   </pnx-monitoring-properties-g>
   <pnx-monitoring-datatable-g [rows]="visits" [colsname]="colsname" (onSort)="setSort($event)" [page]="page"
     (onFilter)="setFilter($event)" (onSetPage)="setPage($event)" [obj]="visits" (onDetailsRow)="seeDetails($event)">
-    <select-btn add-button placeholder="Sélectionner le protocole" label="Ajouter une visite" [optionList]="modules"
-      (onDeployed)="getModules()" (onSaved)="addNewVisit($event)"></select-btn>
+    <option-list-btn add-button placeholder="Sélectionner le protocole" label="Ajouter une visite" [optionList]="modules"
+      (onDeployed)="getModules()" (onSaved)="addNewVisit($event)"></option-list-btn>
   </pnx-monitoring-datatable-g>
 </div>
