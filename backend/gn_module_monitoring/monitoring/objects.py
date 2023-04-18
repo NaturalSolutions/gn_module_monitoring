@@ -27,11 +27,17 @@ class MonitoringSite(MonitoringObjectGeom):
 
     def preprocess_data(self, data):
         type_site_ids = [type_site.id_nomenclature_type_site for type_site in self._model.types_site]
-        if len(data['types_site']) >0 :
+        if len(data['types_site']) >0 and all(isinstance(x,int) for x in data['types_site']):
             for id_type_site in data['types_site']:
                 if int(id_type_site) not in type_site_ids:
                     type_site_ids.append(id_type_site)
-            #TODO: A enlever une fois qu'on aura enelever le champ "id_nomenclature_type_site" du model et de la bdd
             data["id_nomenclature_type_site"]=data["types_site"][0]
+        else :
+            for item in data['types_site']:
+                if int(item['id_nomenclature_type_site']) not in type_site_ids:
+                    type_site_ids.append(id_type_site)
+            data["id_nomenclature_type_site"]=data["types_site"][0]['id_nomenclature_type_site']
+            #TODO: A enlever une fois qu'on aura enelever le champ "id_nomenclature_type_site" du model et de la bdd
+        
 
         data['types_site'] = type_site_ids

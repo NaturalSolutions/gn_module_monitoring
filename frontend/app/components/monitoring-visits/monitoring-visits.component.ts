@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, forkJoin } from 'rxjs';
@@ -15,21 +15,17 @@ import { JsonData } from '../../types/jsondata';
 import { SelectObject } from '../../interfaces/object';
 import { Module } from '../../interfaces/module';
 import { ConfigService } from '../../services/config.service';
-import { MonitoringFormComponentG } from '../monitoring-form-g/monitoring-form.component-g';
-
+import { FormService } from "../../services/form.service";
 @Component({
   selector: 'monitoring-visits',
   templateUrl: './monitoring-visits.component.html',
   styleUrls: ['./monitoring-visits.component.css'],
 })
 export class MonitoringVisitsComponent extends MonitoringGeomComponent implements OnInit {
-  @ViewChild('subscritionObjConfig')
-  monitoringFormComponentG: MonitoringFormComponentG;
   site: ISite;
   @Input() visits: IVisit[];
   @Input() page: IPage;
   // colsname: typeof columnNameVisit = columnNameVisit;
-  objectType: string;
   @Input() bEdit: boolean;
   form: FormGroup;
   colsname: {};
@@ -44,7 +40,7 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
   placeholderText: string = 'Sélectionnez les types de site';
   id_sites_group: number;
   types_site: string[];
-
+  config: JsonData;
 
   constructor(
     private _sites_service: SitesService,
@@ -54,12 +50,12 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
     private router: Router,
     private _Activatedroute: ActivatedRoute,
     private _formBuilder: FormBuilder,
+    private _formService: FormService,
     private _configService: ConfigService,
     private siteService: SitesService,
   ) {
     super();
     this.getAllItemsCallback = this.getVisits;
-    this.objectType = 'sites';
   }
 
   ngOnInit() {
@@ -70,24 +66,30 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
     this._objService.currentObjectTypeParent.subscribe((objParent) => (this.objParent = objParent));
 
     this._objService.changeObjectType(this._visits_service.objectObs);
+    this.initSiteVisit()
+   
+  }
+
+  initSiteVisit(){
     this._Activatedroute.params
-      .pipe(
-        map((params) => params['id'] as number),
-        mergeMap((id: number) =>
-          forkJoin({
-            site: this._sites_service.getById(id),
-            visits: this._visits_service.get(1, this.limit, {
-              id_base_site: id,
-            }),
-          })
-        )
+    .pipe(
+      map((params) => params['id'] as number),
+      mergeMap((id: number) =>
+        forkJoin({
+          site: this._sites_service.getById(id),
+          visits: this._visits_service.get(1, this.limit, {
+            id_base_site: id,
+          }),
+        })
       )
-      .subscribe((data: { site: ISite; visits: IPaginated<IVisit> }) => {
-        this.site = data.site;
-        this.setVisits(data.visits);
-        this.baseFilters = { id_base_site: this.site.id_base_site };
-      });
-      this.isInitialValues = true;
+    )
+    .subscribe((data: { site: ISite; visits: IPaginated<IVisit> }) => {
+      this._objService.changeSelectedObj(data.site, true);
+      this.site = data.site;
+      this.setVisits(data.visits);
+      this.baseFilters = { id_base_site: this.site.id_base_site };
+    });
+    this.isInitialValues = true;
   }
 
   getVisits(page: number, filters: JsonData) {
@@ -144,8 +146,9 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
   }
 
   onSendConfig(config: JsonData): void {
-    config = this.addTypeSiteListIds(config);
-    this.monitoringFormComponentG.getConfigFromBtnSelect(config);
+    this.config = this.addTypeSiteListIds(config);
+    this.updateForm()
+    // this.monitoringFormComponentG.getConfigFromBtnSelect(this.config);
   }
 
   addTypeSiteListIds(config: JsonData): JsonData {
@@ -162,5 +165,31 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
 
   initValueToSend(){
     return this.site['types_site']
+  }
+
+  updateForm(){
+    this.site['specific'] = {};
+    this.site['dataComplement'] = {};
+    for (const key in this.config) {
+      if (this.config[key].config != undefined) {
+        if (Object.keys(this.config[key].config).length !== 0) {
+          Object.assign(this.site['specific'], this.config[key].config.specific);
+        }
+      }
+    }
+    for(var k in this.site.data) this.site[k]=this.site.data[k];
+    Object.assign(this.site['dataComplement'].dataComplement, this.config);
+
+    this._formService.changeDataSub(this.site,
+      this.objParent.objectType,
+      this.objParent.endPoint);
+  }
+
+  // removeLastPart(url: string): string {
+  //   return url.slice(0, url.lastIndexOf('/'));
+  // }
+
+  onObjChanged($event) {
+    this.initSiteVisit();
   }
 }

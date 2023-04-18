@@ -63,7 +63,6 @@ export class MonitoringFormComponentG implements OnInit {
   ) {}
 
   ngOnInit() {
-    // TODO: Avoid two subscribes one inside other (code test above doesn't work. When add type site the observable currentdata is not recall)
     this._formService.currentData
       .pipe(
         tap((data) => {

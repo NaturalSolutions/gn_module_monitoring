@@ -15,7 +15,6 @@
 ></btn-select>
 <pnx-monitoring-form-g
   [objForm]="form"
-  #subscritionObjConfig
   [obj]="site"
   (objChanged)="onObjChanged($event)"
   *ngIf="bEdit"
@@ -25,7 +24,6 @@
   *ngIf="!bEdit"
   [(bEdit)]="bEdit"
   [newParentType]="objParent"
-  [objectType]="objectType"
   [(bEdit)]="bEdit"
   [selectedObj]="site"
 ></pnx-monitoring-properties-g>
@@ -39,4 +37,6 @@
   (onSetPage)="setPage($event)"
   [obj]="visits"
   (onDetailsRow)="seeDetails($event)"
-></pnx-monitoring-datatable-g>
+  
+> <option-list-btn add-button placeholder="Sélectionner le protocole" label="Ajouter une visite" [optionList]="modules"
+(onDeployed)="getModules()" (onSaved)="addNewVisit($event)"></option-list-btn></pnx-monitoring-datatable-g>
