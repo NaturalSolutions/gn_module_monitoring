@@ -12,7 +12,6 @@ from gn_module_monitoring.monitoring.models import TMonitoringSites, TMonitoring
 from gn_module_monitoring.monitoring.schemas import MonitoringSitesGroupsSchema
 from gn_module_monitoring.utils.errors.errorHandler import InvalidUsage
 from gn_module_monitoring.utils.routes import (
-    create_or_update_object_api_sites_sites_group,
     filter_params,
     geojson_query,
     get_limit_page,
@@ -20,6 +19,7 @@ from gn_module_monitoring.utils.routes import (
     paginate,
     sort,
 )
+from gn_module_monitoring.routes.monitoring import create_or_update_object_api_sites_sites_group
 from gn_module_monitoring.utils.utils import to_int
 
 
