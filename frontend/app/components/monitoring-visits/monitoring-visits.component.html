@@ -19,6 +19,7 @@
   (objChanged)="onObjChanged($event)"
   *ngIf="bEdit"
   [(bEdit)]="bEdit"
+  [apiService]="siteService"
 ></pnx-monitoring-form-g>
 <pnx-monitoring-properties-g
   *ngIf="!bEdit"
