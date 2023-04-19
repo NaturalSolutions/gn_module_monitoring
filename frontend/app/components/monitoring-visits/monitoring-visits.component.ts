@@ -178,16 +178,13 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
       }
     }
     for(var k in this.site.data) this.site[k]=this.site.data[k];
-    Object.assign(this.site['dataComplement'].dataComplement, this.config);
+    this.site["types_site"] = this.config.types_site
+    Object.assign(this.site['dataComplement'], this.config);
 
     this._formService.changeDataSub(this.site,
       this.objParent.objectType,
       this.objParent.endPoint);
   }
-
-  // removeLastPart(url: string): string {
-  //   return url.slice(0, url.lastIndexOf('/'));
-  // }
 
   onObjChanged($event) {
     this.initSiteVisit();
