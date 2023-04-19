@@ -86,6 +86,7 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
     .subscribe((data: { site: ISite; visits: IPaginated<IVisit> }) => {
       this._objService.changeSelectedObj(data.site, true);
       this.site = data.site;
+      this.types_site = data.site['types_site']
       this.setVisits(data.visits);
       this.baseFilters = { id_base_site: this.site.id_base_site };
     });
@@ -164,7 +165,8 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
   }
 
   initValueToSend(){
-    return this.site['types_site']
+    this.initSiteVisit()
+    return this.types_site
   }
 
   updateForm(){

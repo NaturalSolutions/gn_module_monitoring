@@ -1,3 +1,4 @@
+import { AbstractControl } from "@angular/forms";
 import { JsonData } from "../types/jsondata";
 import { IPaginated } from "./page";
 import { GeoJSON } from "geojson";
@@ -23,3 +24,5 @@ export type SelectObject = {
   label: string;
 };
 
+
+export type IExtraForm = {frmCtrl :AbstractControl,frmName:string}
