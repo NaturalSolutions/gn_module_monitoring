@@ -4,7 +4,8 @@ from geonature.utils.env import db
 from shapely.geometry import Point
 
 from gn_module_monitoring.monitoring.models import TMonitoringSites
-from gn_module_monitoring.monitoring.schemas import BibTypeSiteSchema,MonitoringSitesSchema
+from gn_module_monitoring.monitoring.schemas import BibTypeSiteSchema, MonitoringSitesSchema
+
 
 @pytest.fixture()
 def sites(users, types_site, site_group_with_sites):
@@ -49,15 +50,14 @@ def site_to_post_with_types(users, types_site, site_group_without_sites):
     user = users["user"]
     geom_4326 = from_shape(Point(43, 24), srid=4326)
     list_nomenclature_id = []
-    specific_dic = {"owner_name":"Propriétaire","threat":"Menaces","owner_tel":"0609090909"}
+    specific_dic = {"owner_name": "Propriétaire", "threat": "Menaces", "owner_tel": "0609090909"}
     schema_type_site = BibTypeSiteSchema()
     mock_db_type_site = [schema_type_site.dump(type) for type in types_site.values()]
 
-    
     for type in mock_db_type_site:
         list_nomenclature_id.append(type["id_nomenclature_type_site"])
 
-    site_to_post_with_types= TMonitoringSites(
+    site_to_post_with_types = TMonitoringSites(
         id_inventor=user.id_role,
         id_digitiser=user.id_role,
         base_site_name=f"New Site",
@@ -69,24 +69,23 @@ def site_to_post_with_types(users, types_site, site_group_without_sites):
         id_sites_group=site_group_without_sites.id_sites_group,
     )
 
-    post_data=dict()
-    post_data["dataComplement"]={}
+    post_data = dict()
+    post_data["dataComplement"] = {}
     for type_site_dic in mock_db_type_site:
         copy_dic = type_site_dic.copy()
         copy_dic.pop("label")
         post_data["dataComplement"][type_site_dic["label"]] = copy_dic
-        
-    post_data["dataComplement"]["types_site"]=list_nomenclature_id
-    post_data["properties"]=MonitoringSitesSchema().dump(site_to_post_with_types)
-    post_data["properties"]["types_site"]=list_nomenclature_id
-    
-    for type_site in mock_db_type_site: 
-        specific_config =  type_site["config"]["specific"]
+
+    post_data["dataComplement"]["types_site"] = list_nomenclature_id
+    post_data["properties"] = MonitoringSitesSchema().dump(site_to_post_with_types)
+    post_data["properties"]["types_site"] = list_nomenclature_id
+
+    for type_site in mock_db_type_site:
+        specific_config = type_site["config"]["specific"]
         for key_specific in specific_config:
             if key_specific in specific_dic.keys():
-                post_data["properties"][key_specific]=specific_dic[key_specific]
+                post_data["properties"][key_specific] = specific_dic[key_specific]
             else:
-                post_data["properties"][key_specific]=None
-
+                post_data["properties"][key_specific] = None
 
     return post_data

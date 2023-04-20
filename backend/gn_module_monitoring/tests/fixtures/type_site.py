@@ -43,7 +43,7 @@ def nomenclature_types_site():
 def types_site(nomenclature_types_site):
     config_type_site = get_test_data("config_type_site.json")
     types_site = {
-        nomenc_type_site.mnemonique: BibTypeSite(
+        nomenc_type_site.label_default: BibTypeSite(
             id_nomenclature_type_site=nomenc_type_site.id_nomenclature, config=config_type_site
         )
         for nomenc_type_site in nomenclature_types_site
