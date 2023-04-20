@@ -39,5 +39,5 @@ class MonitoringSite(MonitoringObjectGeom):
             data["id_nomenclature_type_site"]=data["types_site"][0]['id_nomenclature_type_site']
             #TODO: A enlever une fois qu'on aura enelever le champ "id_nomenclature_type_site" du model et de la bdd
         
-
-        data['types_site'] = type_site_ids
+        # TODO: voir si nécessaire de faire tout se preprocess. Voici le comportement , si une relation existe déjà alors il le garde en bdd même si coté frontend on ne l'a pas
+        # data['types_site'] = type_site_ids
