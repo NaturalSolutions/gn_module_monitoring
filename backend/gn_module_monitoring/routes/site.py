@@ -163,7 +163,7 @@ def delete_site(_id):
     }, 200
 
 @blueprint.route("/sites/<int:_id>", methods=["PATCH"])
-def pacth_sites(_id):
+def patch_sites(_id):
     module_code = "generic"
     object_type = "site"
     customConfig = dict()

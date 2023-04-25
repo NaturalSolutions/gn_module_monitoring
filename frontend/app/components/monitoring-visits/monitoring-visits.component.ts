@@ -170,18 +170,18 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
   }
 
   updateForm(){
-    this.site['specific'] = {};
-    this.site['dataComplement'] = {};
+    this.site.specific = {};
+    this.site.dataComplement = {};
     for (const key in this.config) {
       if (this.config[key].config != undefined) {
         if (Object.keys(this.config[key].config).length !== 0) {
-          Object.assign(this.site['specific'], this.config[key].config.specific);
+          Object.assign(this.site.specific, this.config[key].config.specific);
         }
       }
     }
-    for(var k in this.site.data) this.site[k]=this.site.data[k];
-    this.site["types_site"] = this.config.types_site
-    Object.assign(this.site['dataComplement'], this.config);
+    for(const k in this.site.data) this.site[k]=this.site.data[k];
+    this.site.types_site = this.config.types_site
+    Object.assign(this.site.dataComplement, this.config);
 
     this._formService.changeDataSub(this.site,
       this.objParent.objectType,
