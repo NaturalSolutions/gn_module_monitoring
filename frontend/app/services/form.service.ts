@@ -75,6 +75,19 @@ export class FormService {
     );
   }
 
+  getProperties(formValue, obj): void {
+    const propertiesData = {};
+    const schema = obj[obj.moduleCode];
+    for (const attribut_name of Object.keys(schema)) {
+      const elem = schema[attribut_name];
+      if (!elem.type_widget) {
+        continue;
+      }
+      propertiesData[attribut_name] = this._objService.fromForm(elem, formValue[attribut_name]);
+    }
+
+  }
+
   // TODO: A voir si nécessaire d'utiliser le formatage des post et update data avant éxécution route coté backend
   postData(formValue, obj): { properties: ISitesGroup | ISite | any } {
     const propertiesData = {};

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { tap, mergeMap } from 'rxjs/operators';
+import { tap, mergeMap, catchError, takeWhile, toArray, map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { DynamicFormService } from '@geonature_common/form/dynamic-form-generator/dynamic-form.service';
@@ -12,6 +12,7 @@ import { ApiGeomService } from '../../services/api-geom.service';
 import { ConfigJsonService } from '../../services/config-json.service';
 import { FormService } from '../../services/form.service';
 import { IExtraForm } from '../../interfaces/object';
+import { forkJoin,throwError,zip } from 'rxjs';
 
 @Component({
   selector: 'pnx-monitoring-form-g',
@@ -56,6 +57,8 @@ export class MonitoringFormComponentG implements OnInit {
 
   public queryParams = {};
 
+  joinObs:any;
+
   constructor(
     private _formBuilder: FormBuilder,
     private _route: ActivatedRoute,
@@ -67,6 +70,7 @@ export class MonitoringFormComponentG implements OnInit {
   ) {}
 
   ngOnInit() {
+    const obs = forkJoin({frmCtrl :this._formService.currentExtraFormCtrl,prop: this.apiService.getConfig()})
     this._formService.currentData
       .pipe(
         tap((data) => {
@@ -75,16 +79,27 @@ export class MonitoringFormComponentG implements OnInit {
           this.obj.id = this.obj[this.obj.pk]
         }),
         mergeMap((data: any) => this._configService.init(data.moduleCode)),
-        mergeMap(() => this._formService.currentExtraFormCtrl )
+        mergeMap(()=> {return this._formService.currentExtraFormCtrl.pipe(
+          map(frmCtrl => {return {frmCtrl}})
+          );
+        }),
+        mergeMap((frmCtrl)=> {return this.apiService.getConfig().pipe(
+          map((prop) => {return {frmCtrl:frmCtrl,prop:prop}})
+          )})
       )
-      .subscribe((frmCtrl) => {
-
-        this.isExtraForm ? this.addExtraFormCtrl(frmCtrl) : null;
+      .subscribe((data:{frmCtrl,prop}) => {
+        this.initObj(data.prop)
+        this.isExtraForm ? this.addExtraFormCtrl(data.frmCtrl) : null;
         this.isExtraForm ? this.checkValidExtraFormCtrl() : null;
 
-
+        this.obj.config = this._configService.configModuleObject(this.obj.moduleCode,
+          this.obj.objectType,)
         this.queryParams = this._route.snapshot.queryParams || {};
-        this.bChainInput = this._configService.frontendParams()['bChainInput'];
+        this.bChainInput = this._configService.configModuleObjectParam(
+          this.obj.moduleCode,
+          this.obj.objectType,
+          'chained'
+        );
 
         const schema = this._configService.schema(
           this.obj.moduleCode,
@@ -156,7 +171,11 @@ export class MonitoringFormComponentG implements OnInit {
   /** pour réutiliser des paramètres déjà saisis */
   keepDefinitions() {
     return this.objFormsDefinition.filter((def) =>
-      this.obj.configParam('keep').includes(def.attribut_name)
+    this._configService.configModuleObjectParam(
+      this.obj.moduleCode,
+      this.obj.objectType,
+      'keep'
+    ).includes(def.attribut_name)
     );
   }
 
@@ -189,12 +208,34 @@ export class MonitoringFormComponentG implements OnInit {
   }
 
   keepNames() {
-    return this.obj.configParam('keep') || [];
+    return this._configService.configModuleObjectParam(
+      this.obj.moduleCode,
+      this.obj.objectType,
+      'keep'
+    ) || [];
+  }
+
+  idFieldName(){
+    return this._configService.configModuleObjectParam(
+      this.obj.moduleCode,
+      this.obj.objectType,
+      'id_field_Name'
+    )
   }
 
   resetObjForm() {
+    //NEW- setResolvedProperties
+
     // quand on enchaine les relevés
-    const chainShow = this.obj.configParam('chain_show');
+    // const chainShow = this.obj.configParam('chain_show');
+    
+    //TODO: Ici chain_show est présent que dans le fichier de config visit.json
+    // --> voir à quoi correspond ce chainShow où on utilise les propriétés (id_base_site, num_passage etc)
+    const chainShow = this._configService.configModuleObjectParam(
+      this.obj.moduleCode,
+      this.obj.objectType,
+      'chain_show'
+    );
     if (chainShow) {
       this.chainShow.push(chainShow.map((key) => this.obj.resolvedProperties[key]));
       this.chainShow.push(this.obj.resolvedProperties);
@@ -215,7 +256,7 @@ export class MonitoringFormComponentG implements OnInit {
     );
     this.obj.init({});
 
-    this.obj.properties[this.obj.configParam('id_field_Name')] = null;
+    this.obj.properties[this.idFieldName()] = null;
 
     // pq get ?????
     // this.obj.get(0).subscribe(() => {
@@ -422,5 +463,12 @@ export class MonitoringFormComponentG implements OnInit {
     }
     Object.assign(this.obj.dataComplement, event);
     this._formService.dataToCreate(this.obj, this.obj.urlRelative);
+  }
+
+  initObj(prop){
+    // this.apiService.getConfig().subscribe(prop => this.obj['properties'] = prop)
+    this.obj['properties'] = prop
+    console.log(this.obj)
+    this.obj.resolvedProperties = this._configService.setResolvedProperties(this.obj)
   }
 }

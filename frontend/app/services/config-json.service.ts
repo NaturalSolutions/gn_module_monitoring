@@ -2,15 +2,18 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ModuleService } from '@geonature/services/module.service';
 import { AppConfig } from '@geonature_config/app.config';
-import { of } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { ConfigService } from './config.service';
-
+import { Utils } from "../utils/utils";
+import { DataUtilsService } from './data-utils.service';
+import { concatMap } from 'rxjs/operators';
+import { JsonData } from '../types/jsondata';
 
 
 @Injectable()
 export class ConfigJsonService extends ConfigService {
 
-  constructor(_http: HttpClient, _moduleService: ModuleService) {
+  constructor(_http: HttpClient, _moduleService: ModuleService,private _dataUtilsService: DataUtilsService) {
     super(_http, _moduleService)
   }
 
@@ -57,5 +60,44 @@ export class ConfigJsonService extends ConfigService {
       fieldDefinitions[key] = schema[key]['definition'];
     }
     return fieldDefinitions;
+  }
+
+  //NEW - récup setResolvedProperties from monitoring-object-base.ts
+
+
+  resolveProperty(elem, val,moduleCode): Observable<any> {
+    if (elem.type_widget === "date" || (elem.type_util === "date" && val)) {
+      val = Utils.formatDate(val);
+    }
+    
+    const fieldName = this.config()[moduleCode].default_display_field_names[
+      elem.type_util
+    ];
+    if (val && fieldName && elem.type_widget) {
+      return this._dataUtilsService
+        .getUtil(elem.type_util, val, fieldName, elem.value_field_name);
+    }
+    return of(val);
+  }
+
+  setResolvedProperties(obj): void {
+    const observables = {};
+    const schema = this.schema(obj.moduleCode, obj.objectType);
+    for (const attribut_name of Object.keys(schema)) {
+      observables[attribut_name] = this.resolveProperty(
+        schema[attribut_name],
+        obj.properties[attribut_name],
+        obj.moduleCode
+      );
+    }
+    forkJoin(observables).pipe(
+      concatMap((resolvedProperties) => {
+        for (const attribut_name of Object.keys(resolvedProperties)) {
+          obj.resolvedProperties[attribut_name] =
+            resolvedProperties[attribut_name];
+        }
+        return of(obj.resolvedProperties);
+      })
+    ).subscribe(t => console.log(t));
   }
 }
