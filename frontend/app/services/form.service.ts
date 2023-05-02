@@ -52,7 +52,7 @@ export class FormService {
 
   formValues(obj): Observable<any> {
     // const {properties ,remainaing} = obj
-    const properties = Utils.copy(this.properties);
+    const properties = Utils.copy(obj.properties);
     const observables = {};
     const schema = obj[obj.moduleCode];
     for (const attribut_name of Object.keys(schema)) {

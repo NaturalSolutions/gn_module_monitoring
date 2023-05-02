@@ -1,18 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { tap, mergeMap, catchError, takeWhile, toArray, map } from 'rxjs/operators';
+import { tap, mergeMap, map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { DynamicFormService } from '@geonature_common/form/dynamic-form-generator/dynamic-form.service';
 import { CommonService } from '@geonature_common/service/common.service';
 
-import { MonitoringObject } from '../../class/monitoring-object';
 import { IDataForm } from '../../interfaces/form';
 import { ApiGeomService } from '../../services/api-geom.service';
 import { ConfigJsonService } from '../../services/config-json.service';
 import { FormService } from '../../services/form.service';
 import { IExtraForm } from '../../interfaces/object';
-import { forkJoin,throwError,zip } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'pnx-monitoring-form-g',
@@ -80,14 +79,14 @@ export class MonitoringFormComponentG implements OnInit {
         }),
         mergeMap((data: any) => this._configService.init(data.moduleCode)),
         mergeMap(()=> {return this._formService.currentExtraFormCtrl.pipe(
-          map(frmCtrl => {return {frmCtrl}})
+          map(frmCtrl => {return frmCtrl})
           );
         }),
         mergeMap((frmCtrl)=> {return this.apiService.getConfig().pipe(
-          map((prop) => {return {frmCtrl:frmCtrl,prop:prop}})
+          map((prop) => {return {frmCtrl,prop:prop}})
           )})
       )
-      .subscribe((data:{frmCtrl,prop}) => {
+      .subscribe((data) => {
         this.initObj(data.prop)
         this.isExtraForm ? this.addExtraFormCtrl(data.frmCtrl) : null;
         this.isExtraForm ? this.checkValidExtraFormCtrl() : null;
@@ -248,14 +247,26 @@ export class MonitoringFormComponentG implements OnInit {
     }
 
     // nouvel object
-    this.obj = new MonitoringObject(
-      this.obj.moduleCode,
-      this.obj.objectType,
-      null,
-      this.obj.monitoringObjectService()
-    );
-    this.obj.init({});
+    // this.obj = new MonitoringObject(
+    //   this.obj.moduleCode,
+    //   this.obj.objectType,
+    //   null,
+    //   this.obj.monitoringObjectService()
+    // );
+    // this.obj.init({});
 
+
+    this.obj = {
+      'bIsInitialized':false,
+      'moduleCode' : this.obj.moduleCode,
+      'objectType':this.obj.objectType,
+      'endPoint':this.obj.endPoint,
+      'properties':{},
+      'generic':this.obj.generic
+      // this.obj.monitoringObjectService()
+    }
+    this.obj.config = this._configService.configModuleObject(this.obj.moduleCode,
+      this.obj.objectType,)
     this.obj.properties[this.idFieldName()] = null;
 
     // pq get ?????
@@ -350,6 +361,13 @@ export class MonitoringFormComponentG implements OnInit {
     action.subscribe((objData) => {
       this._commonService.regularToaster('success', this.msgToaster(actionLabel));
       this.bSaveSpinner = this.bSaveAndAddChildrenSpinner = false;
+      
+      Object.entries(objData["properties"]).forEach(([key,value]) => {
+        if (key != 'properties' && key in this.obj['properties']){
+          this.obj['properties'][key] = value
+        }
+      })
+
       if (objData.hasOwnProperty('id')) {
         this.obj.id = objData['id'];
       }
@@ -468,6 +486,11 @@ export class MonitoringFormComponentG implements OnInit {
   initObj(prop){
     // this.apiService.getConfig().subscribe(prop => this.obj['properties'] = prop)
     this.obj['properties'] = prop
+    Object.entries(this.obj).forEach(([key,value]) => {
+      if (key != 'properties' && key in this.obj['properties']){
+        this.obj['properties'][key] = value
+      }
+    })
     console.log(this.obj)
     this.obj.resolvedProperties = this._configService.setResolvedProperties(this.obj)
   }

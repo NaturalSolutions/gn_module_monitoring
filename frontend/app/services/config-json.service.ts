@@ -7,7 +7,7 @@ import { ConfigService } from './config.service';
 import { Utils } from "../utils/utils";
 import { DataUtilsService } from './data-utils.service';
 import { concatMap } from 'rxjs/operators';
-import { JsonData } from '../types/jsondata';
+
 
 
 @Injectable()
@@ -69,8 +69,7 @@ export class ConfigJsonService extends ConfigService {
     if (elem.type_widget === "date" || (elem.type_util === "date" && val)) {
       val = Utils.formatDate(val);
     }
-    
-    const fieldName = this.config()[moduleCode].default_display_field_names[
+    const fieldName = this._config[moduleCode].default_display_field_names[
       elem.type_util
     ];
     if (val && fieldName && elem.type_widget) {
@@ -78,10 +77,20 @@ export class ConfigJsonService extends ConfigService {
         .getUtil(elem.type_util, val, fieldName, elem.value_field_name);
     }
     return of(val);
+    // return val
   }
 
-  setResolvedProperties(obj): void {
+  // TODO: Cette fonction permet de traduire l'affichage de certains champs dans propriété ou le formulaire 
+  // lorsqu'on a des valeurs à récupérer depuis le backend via les config json. 
+  // Du coup , penser à résoudre le problèmes des champs dans le fichier de config.json 
+  // en modifiant le fichier : /gn_module_monitoring/backend/gn_module_monitoring/config/repositories.py
+  //  Function : get_config 
+  setResolvedProperties(obj): any {
     const observables = {};
+    if (obj.resolvedProperties == undefined){
+      obj.resolvedProperties ={}
+    }
+    
     const schema = this.schema(obj.moduleCode, obj.objectType);
     for (const attribut_name of Object.keys(schema)) {
       observables[attribut_name] = this.resolveProperty(
@@ -96,8 +105,8 @@ export class ConfigJsonService extends ConfigService {
           obj.resolvedProperties[attribut_name] =
             resolvedProperties[attribut_name];
         }
-        return of(obj.resolvedProperties);
+        return obj.resolvedProperties
       })
-    ).subscribe(t => console.log(t));
+    );
   }
 }
