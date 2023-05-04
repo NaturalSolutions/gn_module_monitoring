@@ -166,11 +166,11 @@ export class MonitoringDatatableGComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
     // IF prefered ngOnChanges compare to observable   uncomment this:
-    if (changes['rows'] && this.rows && this.rows.length > 0) {
+    if (changes['rows'] && this.rows && this.rows.length > 0 && this.colsname) {
       this.columns = this._dataTableService.colsTable(this.colsname, this.rows[0]);
     }
 
-    if (changes['colsname']) {
+    if (changes['colsname'] && this.colsname) {
       this.filters = {};
     }
 
