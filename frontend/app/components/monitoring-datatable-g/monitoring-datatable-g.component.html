@@ -51,7 +51,7 @@
     (page)="setPage($event)"
     (sort)="onSortEvent($event)"
   >
-    <ngx-datatable-column [cellClass]="'cell-link'" prop="Action" class="object-link">
+    <ngx-datatable-column [cellClass]="'cell-link'" prop="Action" class="object-link" [sortable]="false">
       <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
         <!-- TODO Action Column : changer le (click)="navigateToDetail(row.id)-->
         <a

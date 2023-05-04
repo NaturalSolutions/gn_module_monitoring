@@ -49,5 +49,9 @@
 /* Work around to make ng-content conditional 
 (not supported, maybe in Angular16) */
 .wrapper-button:not(:empty) + .default-button {
-    display: none;
+  display: none;
+}
+
+:host::ng-deep .datatable-header-cell[title=' Action'] * {
+  cursor: default !important;
 }

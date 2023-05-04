@@ -90,7 +90,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   }
 
   onSortEvent($event) {
-    this.filters = {
+      this.filters = {
       ...this.filters,
       sort: $event.column.prop,
       sort_dir: $event.newValue,
