@@ -27,7 +27,7 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
   siteGroupId: number;
   sites: ISite[];
   sitesGroup: ISitesGroup;
-  colsname: {};
+  colsname: Object;
   page: IPage;
   filters = {};
   siteGroupLayer: L.FeatureGroup;
@@ -74,12 +74,15 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
             sitesGroup: this._sitesGroupService.getById(id),
             sites: this._sitesGroupService.getSitesChild(1, this.limit, {
               id_sites_group: id,
-            }),
+            }
+            ),
+            configObj: this._siteService.initConfig()
           })
         ))
       .subscribe(
-        (data: { sitesGroup: ISitesGroup; sites: IPaginated<ISite>}) => {
+        (data: { sitesGroup: ISitesGroup; sites: IPaginated<ISite>, configObj: IobjObs<ISite>} ) => {
           this._objService.changeSelectedObj(data.sitesGroup, true);
+          this.colsname = data.configObj.dataTable.colNameObj;
           this.sitesGroup = data.sitesGroup;
           this.sites = data.sites.items;
           this.page = {
@@ -92,7 +95,6 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
             () => {}
           );
           this.baseFilters = { id_sites_group: this.sitesGroup.id_sites_group };
-          this.colsname = this._siteService.objectObs.dataTable.colNameObj;
         }
       );
   }

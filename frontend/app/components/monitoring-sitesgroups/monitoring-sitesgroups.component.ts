@@ -23,23 +23,17 @@ export class MonitoringSitesGroupsComponent
   implements OnInit
 {
   @Input() page: IPage;
-  @Input() sitesGroups: ISitesGroup[];
   @Input() sitesChild: ISite[];
   @Input() sitesGroupsSelected: ISitesGroup;
 
-  // @Input() rows;
-  @Input() obj;
-  colsname: {};
+
+  sitesGroups: ISitesGroup[];
+  obj;
+  colsname: Object;
   objectType: IobjObs<ISitesGroup>;
   objForm: FormGroup;
   objInitForm: Object = {};
-  // siteGroupEmpty={
-  //   "comments" :'',
-  //   sites_group_code: string;
-  //   sites_group_description: string;
-  //   sites_group_name: string;
-  //   uuid_sites_group: string; //FIXME: see if OK
-  // }
+
 
   constructor(
     private _sites_group_service: SitesGroupService,
@@ -66,7 +60,15 @@ export class MonitoringSitesGroupsComponent
       this._sites_group_service.objectObs,true
     );
     
-    this.getSitesGroups(1);
+    this._Activatedroute.data.subscribe(({data}) => {
+      this.page = {
+        count: data.sitesGroups.count,
+        limit: data.sitesGroups.limit,
+        page: data.sitesGroups.page - 1,
+      }
+      this.sitesGroups = data.sitesGroups.items;
+      this.colsname = data.objectObs.dataTable.colNameObj
+    })
     this.geojsonService.getSitesGroupsGeometries(
       this.onEachFeatureSiteGroups()
     );
@@ -101,7 +103,6 @@ export class MonitoringSitesGroupsComponent
           page: data.page - 1,
         };
         this.sitesGroups = data.items;
-        this.colsname = this._sites_group_service.objectObs.dataTable.colNameObj;
         // IF prefered observable compare to ngOnChanges uncomment this:
         // this._dataTableService.changeColsTable(this.colsname,this.sitesGroups[0])
       });
