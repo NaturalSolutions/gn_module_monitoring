@@ -168,33 +168,6 @@ def get_config(module_code=None, force=False,customSpecConfig=None):
         # preload data # TODO auto from schemas && config recup tax users nomenclatures etc....
         config['data'] = get_data_preload(config, module)
 
-    # if module_code == "generic":
-    #     custom = {}
-    #     config['custom'] = {}
-    #     for field_name in [
-    #         'module_code',
-    #         'id_list_observer',
-    #         'id_list_taxonomy',
-    #         'b_synthese',
-    #         'b_draw_sites_group',
-    #         'taxonomy_display_field_name',
-    #         'id_module'
-    #     ]:
-    #         var_name = '__MODULE.{}'.format(field_name.upper())
-    #         config['custom'][var_name] = getattr(module, field_name)
-    #         config['module'][field_name] = getattr(module, field_name)
-
-    #     config['custom']['__MONITORINGS_PATH'] = get_monitorings_path()
-
-    #     config['default_display_field_names'].update(config.get('display_field_names', {}))
-    #     config['display_field_names'] = config['default_display_field_names']
-
-    #     # Remplacement des variables __MODULE.XXX
-    #     #   par les valeurs spécifiées en base
-    #     customize_config(config, config['custom'])
-
-    #     config['data'] = get_data_preload(config, module)
-
     # mise en cache dans current_app.config[config_cache_name][module_code]
     if not current_app.config.get(config_cache_name, {}):
         current_app.config[config_cache_name] = {}
