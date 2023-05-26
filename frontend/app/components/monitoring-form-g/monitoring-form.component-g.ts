@@ -106,11 +106,7 @@ export class MonitoringFormComponentG implements OnInit {
           this.obj.objectType
         );
         this.queryParams = this._route.snapshot.queryParams || {};
-        this.bChainInput = this._configService.configModuleObjectParam(
-          this.obj.moduleCode,
-          this.obj.objectType,
-          'chained'
-        );
+        this.bChainInput = this._configService.frontendParams().bChainInput;
 
         const schema = this._configService.schema(this.obj.moduleCode, this.obj.objectType);
 
