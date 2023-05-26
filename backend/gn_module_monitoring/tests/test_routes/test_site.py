@@ -149,7 +149,7 @@ class TestSite:
             "page": 1,
             "sort_label": "label_fr",
             "sort_dir": "asc",
-            "label_fr": string_contains
+            "label_fr": string_contains,
         }
         r = self.client.get(
             url_for("monitorings.get_types_site_by_label"), query_string=query_string
@@ -176,7 +176,7 @@ class TestSite:
             res.as_dict()["base_site_name"]
             == site_to_post_with_types["properties"]["base_site_name"]
         )
-    
+
     def test_delete_site(self, sites):
         site = list(sites.values())[0]
         id_base_site = site.id_base_site
@@ -190,3 +190,18 @@ class TestSite:
         with pytest.raises(Exception) as e:
             TMonitoringSites.query.get_or_404(id_base_site)
         assert "404 Not Found" in str(e.value)
+
+    def test_get_config_sites(self, sites):
+        schema = MonitoringSitesSchema()
+
+        r = self.client.get(url_for("monitorings.get_config_sites"))
+        list_sites = [schema.dump(site).keys() for site in sites.values()]
+        attr_post_added = "id_parent"
+        assert all(
+            [
+                attr in site
+                for site in list_sites
+                for attr in r.json.keys()
+                if attr != attr_post_added
+            ]
+        )

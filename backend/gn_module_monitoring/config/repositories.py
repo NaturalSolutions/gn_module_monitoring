@@ -138,6 +138,8 @@ def get_config(module_code=None, force=False,customSpecConfig=None):
     get_config_objects(module_code, config,customSpecConfig=customSpecConfig)
 
     # customize config
+    # TODO: Adapter lorsqu'on entre par site (où est lié les liste des observateurs au moment on on propose lla lsite des observateurs ?
+    # , où est ce qu'on associe les organismes ? Bref tout ce qui est dans t_module_complements)
     if module:
         custom = {}
         config['custom'] = {}
