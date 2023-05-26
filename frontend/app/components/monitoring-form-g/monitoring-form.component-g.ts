@@ -69,10 +69,6 @@ export class MonitoringFormComponentG implements OnInit {
   ) {}
 
   ngOnInit() {
-    const obs = forkJoin({
-      frmCtrl: this._formService.currentExtraFormCtrl,
-      prop: this.apiService.getConfig(),
-    });
     this._formService.currentData
       .pipe(
         tap((data) => {
@@ -243,15 +239,6 @@ export class MonitoringFormComponentG implements OnInit {
       keep[key] = this.obj.properties[key];
     }
 
-    // nouvel object
-    // this.obj = new MonitoringObject(
-    //   this.obj.moduleCode,
-    //   this.obj.objectType,
-    //   null,
-    //   this.obj.monitoringObjectService()
-    // );
-    // this.obj.init({});
-
     this.obj = {
       bIsInitialized: false,
       moduleCode: this.obj.moduleCode,
@@ -259,7 +246,6 @@ export class MonitoringFormComponentG implements OnInit {
       endPoint: this.obj.endPoint,
       properties: {},
       generic: this.obj.generic,
-      // this.obj.monitoringObjectService()
     };
     this.obj.config = this._configService.configModuleObject(
       this.obj.moduleCode,
