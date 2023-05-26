@@ -85,10 +85,6 @@ export class ApiService<T = IObject> implements IService<T> {
     return this._cacheService.request('delete', `${this.objectObs.endPoint}/${id}`);
   }
 
-  getConfig(): Observable<T> {
-    return this._cacheService.request('get', `${this.objectObs.endPoint}/config`);
-  }
-
 }
 @Injectable()
 export class ApiGeomService<T = IGeomObject> extends ApiService<T> implements IGeomService<T> {
@@ -105,6 +101,10 @@ export class ApiGeomService<T = IGeomObject> extends ApiService<T> implements IG
         queryParams: { ...params },
       }
     );
+  }
+
+  getConfig(): Observable<T> {
+    return this._cacheService.request('get', `${this.objectObs.endPoint}/config`);
   }
 }
 
