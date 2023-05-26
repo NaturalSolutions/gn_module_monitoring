@@ -190,11 +190,18 @@ class TestSite:
         with pytest.raises(Exception) as e:
             TMonitoringSites.query.get_or_404(id_base_site)
         assert "404 Not Found" in str(e.value)
-    
-    def test_get_config_sites(self,sites):
+
+    def test_get_config_sites(self, sites):
         schema = MonitoringSitesSchema()
 
         r = self.client.get(url_for("monitorings.get_config_sites"))
-        list_sites = [list(schema.dump(site).keys())  for site in sites.values()]
-        assert all([attr in site for attr in list(r.json.keys())  for site in list_sites])
-
+        list_sites = [schema.dump(site).keys() for site in sites.values()]
+        attr_post_added = "id_parent"
+        assert all(
+            [
+                attr in site
+                for site in list_sites
+                for attr in r.json.keys()
+                if attr != attr_post_added
+            ]
+        )

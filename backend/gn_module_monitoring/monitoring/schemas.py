@@ -62,11 +62,13 @@ class BibTypeSiteSchema(MA.SQLAlchemyAutoSchema):
 class MonitoringSitesSchema(MA.SQLAlchemyAutoSchema):
     class Meta:
         model = TMonitoringSites
+        include_fk = True
         exclude = ("geom_geojson", "geom")
 
     geometry = fields.Method("serialize_geojson", dump_only=True)
     pk = fields.Method("set_pk",dump_only=True)
     types_site = MA.Nested(BibTypeSiteSchema, many=True)
+    medias = MA.Nested(MediaSchema,many=True)
 
     def serialize_geojson(self, obj):
         if obj.geom is not None:
