@@ -53,9 +53,10 @@ def site_to_post_with_types(users, types_site, site_group_without_sites):
     specific_dic = {"owner_name": "Propriétaire", "threat": "Menaces", "owner_tel": "0609090909"}
     schema_type_site = BibTypeSiteSchema()
     mock_db_type_site = [schema_type_site.dump(type) for type in types_site.values()]
+    mock_model_type_site = [type for type in types_site.values()]
 
-    for type in mock_db_type_site:
-        list_nomenclature_id.append(type["id_nomenclature_type_site"])
+    for type in mock_model_type_site:
+        list_nomenclature_id.append(type.id_nomenclature_type_site)
 
     site_to_post_with_types = TMonitoringSites(
         id_inventor=user.id_role,
@@ -65,7 +66,7 @@ def site_to_post_with_types(users, types_site, site_group_without_sites):
         base_site_code=f"New Code",
         geom=geom_4326,
         id_nomenclature_type_site=list_nomenclature_id[0],
-        types_site=list_nomenclature_id,
+        types_site=mock_model_type_site,
         id_sites_group=site_group_without_sites.id_sites_group,
     )
 
