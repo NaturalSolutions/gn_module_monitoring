@@ -55,6 +55,15 @@ export class FormService {
     const properties = Utils.copy(this.properties);
     const observables = {};
     const schema = obj[obj.moduleCode];
+    
+    // ADD specific properties if exist
+    if (obj.specific != undefined){
+      for (const attribut_name of Object.keys(obj.specific)) {
+        properties[attribut_name] = obj[attribut_name];
+      }
+    }
+
+
     for (const attribut_name of Object.keys(schema)) {
       const elem = schema[attribut_name];
       if (!elem.type_widget) {
