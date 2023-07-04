@@ -1,9 +1,9 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { forkJoin } from "rxjs";
+import { Observable, forkJoin } from "rxjs";
 import { tap, map, mergeMap } from "rxjs/operators";
 import * as L from "leaflet";
-import { ISite, ISitesGroup } from "../../interfaces/geom";
+import { ISite, ISiteField, ISitesGroup } from "../../interfaces/geom";
 import { IPage, IPaginated } from "../../interfaces/page";
 import { MonitoringGeomComponent } from "../../class/monitoring-geom-component";
 import { setPopup } from "../../functions/popup";
@@ -15,6 +15,8 @@ import {
 } from "../../services/api-geom.service";
 import { ObjectService } from "../../services/object.service";
 import { IobjObs } from "../../interfaces/objObs";
+import { IBreadCrumb } from "../../interfaces/object";
+import { breadCrumbElementBase } from "../breadcrumbs/breadcrumbs.component";
 
 const LIMIT = 10;
 
@@ -35,6 +37,10 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
   objForm: FormGroup;
   objectType: IobjObs<ISite>;
   objParent: any;
+  breadCrumbElemnt: IBreadCrumb = { label: 'Groupe de site', description: '' };
+  breadCrumbElementBase: IBreadCrumb = breadCrumbElementBase;
+  breadCrumbList: IBreadCrumb[] = [];
+  rows_sites_table: ISiteField[];
 
   constructor(
     public _sitesGroupService: SitesGroupService,
@@ -53,9 +59,6 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
     this.objForm = this._formBuilder.group({});
     // this._sitesGroupService.init()
     this._objService.changeObjectTypeParent(this._sitesGroupService.objectObs, true);
-    this._objService.currentObjectTypeParent.subscribe((objParent) => {
-      this.objParent = objParent;
-    });
     this._objService.changeObjectType(this._siteService.objectObs, true);
     this.initSite();
   }
@@ -70,31 +73,48 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
           });
         }),
         mergeMap((id: number) =>
-          forkJoin({
-            sitesGroup: this._sitesGroupService.getById(id),
+          {return forkJoin({
+            sitesGroup: this._sitesGroupService.getById(id).catch((err) => 
+            {if(err.status == 404)
+              { 
+                this.router.navigate(['/not-found'],{ skipLocationChange: true });
+              return Observable.of(null);
+            }}),
             sites: this._sitesGroupService.getSitesChild(1, this.limit, {
               id_sites_group: id,
             }),
-          })
-        ))
-      .subscribe(
-        (data: { sitesGroup: ISitesGroup; sites: IPaginated<ISite>}) => {
-          this._objService.changeSelectedObj(data.sitesGroup, true);
-          this.sitesGroup = data.sitesGroup;
-          this.sites = data.sites.items;
-          this.page = {
-            count: data.sites.count,
-            page: data.sites.page,
-            limit: data.sites.limit,
-          };
-          this.siteGroupLayer = this._geojsonService.setMapData(
-            data.sitesGroup.geometry,
-            () => {}
-          );
-          this.baseFilters = { id_sites_group: this.sitesGroup.id_sites_group };
-          this.colsname = this._siteService.objectObs.dataTable.colNameObj;
-        }
-      );
+          }).pipe(map((data) => {return data}))
+        }),
+        mergeMap((data)=>{
+          return forkJoin({
+            objObsSite: this._siteService.initConfig(),
+            objObsSiteGp: this._sitesGroupService.initConfig(),
+          }).pipe(map((objObs)=>{
+            return {data, objectObs: objObs}
+          }))
+        })
+      )
+      .subscribe(({data, objectObs}) => {
+        console.log(data);
+        this._objService.changeSelectedObj(data.sitesGroup, true);
+        this._objService.changeSelectedParentObj(data.sitesGroup, true);
+        this.sitesGroup = data.sitesGroup;
+        this.sites = data.sites.items;
+        this.page = {
+          count: data.sites.count,
+          page: data.sites.page,
+          limit: data.sites.limit,
+        };
+        // this.siteGroupLayer = this._geojsonService.setMapData(
+        //   data.sitesGroup.geometry,
+        //   () => {}
+        // );
+        this.rows_sites_table = this._siteService.format_label_types_site(this.sites)
+        this.baseFilters = { id_sites_group: this.sitesGroup.id_sites_group };
+        this.colsname = objectObs.objObsSite.dataTable.colNameObj;
+        this.objParent = objectObs.objObsSiteGp;
+        this.updateBreadCrumb(data.sitesGroup);
+      });
   }
   ngOnDestroy() {
     this._geojsonService.removeFeatureGroup(this._geojsonService.sitesFeatureGroup);
@@ -127,10 +147,26 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
   }
 
   seeDetails($event) {
+    this._objService.changeSelectedParentObj($event, true);
     this._objService.changeObjectTypeParent(this._siteService.objectObs, true);
     this.router.navigate([`site/${$event.id_base_site}`], {
       relativeTo: this._Activatedroute,
     });
+  }
+
+  updateBreadCrumb(sitesGroup) {
+    this.breadCrumbElemnt.description = sitesGroup.sites_group_name;
+    this.breadCrumbElemnt.label = 'Groupe de site';
+    this.breadCrumbElemnt['id'] = sitesGroup.id_sites_group;
+    this.breadCrumbElemnt['objectType'] =
+      this._sitesGroupService.objectObs.objectType || 'sites_group';
+    this.breadCrumbElemnt['url'] = [
+      this.breadCrumbElementBase.url,
+      this.breadCrumbElemnt.id?.toString(),
+    ].join('/');
+
+    this.breadCrumbList = [this.breadCrumbElementBase, this.breadCrumbElemnt];
+    this._objService.changeBreadCrumb(this.breadCrumbList, true);
   }
 
   onObjChanged($event) {

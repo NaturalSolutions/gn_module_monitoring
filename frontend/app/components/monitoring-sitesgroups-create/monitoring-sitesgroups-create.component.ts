@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 
 import { endPoints } from '../../enum/endpoints';
 import { ISitesGroup } from '../../interfaces/geom';
 import { FormService } from '../../services/form.service';
 import { SitesGroupService } from '../../services/api-geom.service';
+import { ObjectService } from '../../services/object.service';
 
 @Component({
   selector: 'monitoring-sitesgroups-create',
@@ -14,11 +14,12 @@ import { SitesGroupService } from '../../services/api-geom.service';
 })
 export class MonitoringSitesGroupsCreateComponent implements OnInit {
   siteGroup: ISitesGroup;
-  form: FormGroup;
+  objForm: FormGroup;
   urlRelative: string;
   constructor(
     private _formService: FormService,
     private _formBuilder: FormBuilder,
+    private _objService: ObjectService,
     public sitesGroupService: SitesGroupService
   ) {}
 
@@ -35,6 +36,7 @@ export class MonitoringSitesGroupsCreateComponent implements OnInit {
       },
       this.urlRelative
     );
-    this.form = this._formBuilder.group({});
+    this._objService.changeSelectedObj({},true)
+    this.objForm = this._formBuilder.group({});
   }
 }

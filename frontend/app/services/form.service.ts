@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
+import { BehaviorSubject,ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 
 import { ISite, ISitesGroup } from '../interfaces/geom';
 import { JsonData } from '../types/jsondata';
 import { Utils } from '../utils/utils';
 import { MonitoringObjectService } from './monitoring-object.service';
-import { FormControl } from '@angular/forms';
-import { IExtraForm } from '../interfaces/object';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { IExtraForm, IFormMap } from '../interfaces/object';
 
 
 @Injectable()
@@ -23,7 +23,11 @@ export class FormService {
   moduleCode: string;
   objecType: string;
 
-  constructor(private _objService: MonitoringObjectService) {}
+  frmrGrp: FormGroup = this._formBuilder.group({});
+  private formMap = new BehaviorSubject<IFormMap>({frmGp:this.frmrGrp ,bEdit:true,obj:{}});
+  currentFormMap = this.formMap.asObservable();
+
+  constructor(private _objService: MonitoringObjectService, private _formBuilder: FormBuilder) {}
 
 
   changeDataSub(
@@ -50,11 +54,24 @@ export class FormService {
     this.formCtrl.next({frmCtrl:formCtrl,frmName:formCtrlName})
   }
 
+  changeFormMapObj(formMapObj:IFormMap){
+    this.formMap.next(formMapObj)
+  }
+
   formValues(obj): Observable<any> {
     // const {properties ,remainaing} = obj
-    const properties = Utils.copy(this.properties);
+    const properties = Utils.copy(obj.properties);
     const observables = {};
     const schema = obj[obj.moduleCode];
+    
+    // ADD specific properties if exist
+    if (obj.specific != undefined){
+      for (const attribut_name of Object.keys(obj.specific)) {
+        properties[attribut_name] = obj[attribut_name];
+      }
+    }
+
+
     for (const attribut_name of Object.keys(schema)) {
       const elem = schema[attribut_name];
       if (!elem.type_widget) {
@@ -67,12 +84,27 @@ export class FormService {
       concatMap((formValues_in) => {
         const formValues = Utils.copy(formValues_in);
         // geometry
-        // if (this.config["geometry_type"]) {
-        //   formValues["geometry"] = this.geometry; // copy???
-        // }
+        if (obj.config["geometry_type"]) {
+          // TODO: change null by the geometry load from the object (if edit) or null if create
+          // formValues["geometry"] = this.geometry; // copy???
+          formValues["geometry"] = null ; // copy???
+        }
         return of(formValues);
       })
     );
+  }
+
+  getProperties(formValue, obj): void {
+    const propertiesData = {};
+    const schema = obj[obj.moduleCode];
+    for (const attribut_name of Object.keys(schema)) {
+      const elem = schema[attribut_name];
+      if (!elem.type_widget) {
+        continue;
+      }
+      propertiesData[attribut_name] = this._objService.fromForm(elem, formValue[attribut_name]);
+    }
+
   }
 
   // TODO: A voir si nécessaire d'utiliser le formatage des post et update data avant éxécution route coté backend
@@ -112,10 +144,10 @@ export class FormService {
     // };
 
     // TODO: A voir q'il faut remettre
-    // if (this.config["geometry_type"]) {
-    //   postData["geometry"] = formValue["geometry"];
-    //   postData["type"] = "Feature";
-    // }
+    if (obj.config["geometry_type"]) {
+      postData["geometry"] = formValue["geometry"];
+      postData["type"] = "Feature";
+    }
     return postData;
   }
 }

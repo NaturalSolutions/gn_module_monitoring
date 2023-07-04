@@ -52,10 +52,12 @@ import {
 import { MonitoringSitesGroupsCreateComponent } from "./components/monitoring-sitesgroups-create/monitoring-sitesgroups-create.component";
 import { MonitoringSitesCreateComponent } from "./components/monitoring-sites-create/monitoring-sites-create.component";
 import { BtnSelectComponent } from "./components/btn-select/btn-select.component";
-import { MonitoringSitesEditComponent } from "./components/monitoring-sites-edit/monitoring-sites-edit.component";
 import { MonitoringVisitsComponent } from "./components/monitoring-visits/monitoring-visits.component";
 import { OptionListButtonComponent } from "./components/option-list-btn/option-list-btn.component";
 import { MatErrorMessagesDirective } from './utils/matErrorMessages.directive';
+import { SitesGroupsReslver } from "./resolver/sites-groups.resolver";
+import { CreateSiteResolver } from "./resolver/create-site.resolver"
+import { PageNotFoundComponent } from "./components/page-not-found/page-not-found.component";
 // my module routing
 const routes: Routes = [
   /** modules  */
@@ -83,6 +85,9 @@ const routes: Routes = [
       {
         path: "",
         component: MonitoringSitesGroupsComponent,
+        resolve: {
+          data: SitesGroupsReslver
+        }
       },
       { path: "create", component: MonitoringSitesGroupsCreateComponent },
       {
@@ -95,22 +100,21 @@ const routes: Routes = [
           {
             path: "create",
             component: MonitoringSitesCreateComponent,
+            resolve: {
+              data: CreateSiteResolver
+            }
           },
           {
             path: "site/:id",
             component: MonitoringVisitsComponent,
-            children: [
-              {
-                path: "edit",
-                component: MonitoringSitesEditComponent,
-              },
-            ]
           },
           
         ],
       },
     ],
   },
+  {path: 'not-found', component: PageNotFoundComponent},
+  {path: '**', redirectTo: 'not-found'}
 ];
 
 @NgModule({
@@ -133,11 +137,11 @@ const routes: Routes = [
     MonitoringFormComponentG,
     MonitoringSitesGroupsCreateComponent,
     MonitoringSitesCreateComponent,
-    MonitoringSitesEditComponent,
     BtnSelectComponent,
     MonitoringVisitsComponent,
     OptionListButtonComponent,
-    MatErrorMessagesDirective
+    MatErrorMessagesDirective,
+    PageNotFoundComponent
   ],
   imports: [
     GN2CommonModule,
@@ -170,7 +174,9 @@ const routes: Routes = [
     FormService,
     ObjectService,
     ApiGeomService,
-    VisitsService
+    VisitsService,
+    SitesGroupsReslver,
+    CreateSiteResolver
   ],
   bootstrap: [ModulesComponent],
   schemas: [

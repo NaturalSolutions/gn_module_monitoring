@@ -1,3 +1,4 @@
+
 <pnx-monitoring-properties-g
   *ngIf="!bEdit"
   [(bEdit)]="bEdit"
@@ -14,12 +15,13 @@
   [objForm]="objForm"
 ></pnx-monitoring-form-g>
 <pnx-monitoring-datatable-g
-  [rows]="sites"
+  *ngIf="!bEdit"
+  [rows]="rows_sites_table"
   [colsname]="colsname"
   (onSort)="setSort($event)"
   [page]="page"
   (onFilter)="setFilter($event)"
   (onSetPage)="setPage($event)"
-  [obj]="sites"
+  [obj]="rows_sites_table"
   (onDetailsRow)="seeDetails($event)"
 ></pnx-monitoring-datatable-g>

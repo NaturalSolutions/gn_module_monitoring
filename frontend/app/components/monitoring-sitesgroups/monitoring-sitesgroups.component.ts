@@ -10,6 +10,9 @@ import { ObjectService } from "../../services/object.service";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { IobjObs } from "../../interfaces/objObs";
 import { ConfigJsonService } from "../../services/config-json.service";
+import { IBreadCrumb } from "../../interfaces/object";
+import { breadCrumbElementBase } from "../breadcrumbs/breadcrumbs.component";
+import { FormService } from "../../services/form.service";
 
 const LIMIT = 10;
 
@@ -33,6 +36,7 @@ export class MonitoringSitesGroupsComponent
   objectType: IobjObs<ISitesGroup>;
   objForm: FormGroup;
   objInitForm: Object = {};
+  breadCrumbElementBase: IBreadCrumb = breadCrumbElementBase;
   // siteGroupEmpty={
   //   "comments" :'',
   //   sites_group_code: string;
@@ -48,7 +52,8 @@ export class MonitoringSitesGroupsComponent
     private _objService: ObjectService,
     private _formBuilder: FormBuilder,
     private _configJsonService: ConfigJsonService,
-    private _Activatedroute: ActivatedRoute // private _routingService: RoutingService
+    private _Activatedroute: ActivatedRoute, // private _routingService: RoutingService
+    private _formService: FormService
   ) {
     super();
     this.getAllItemsCallback = this.getSitesGroups;
@@ -56,6 +61,8 @@ export class MonitoringSitesGroupsComponent
 
   ngOnInit() {
     this.initSiteGroup();
+    this._objService.changeSelectedObj({}, true);
+    // this._formService.changeFormMapObj({frmGp: this._formBuilder.group({}),bEdit:false, objForm: {}})
   }
 
   initSiteGroup() {
@@ -66,7 +73,16 @@ export class MonitoringSitesGroupsComponent
       this._sites_group_service.objectObs,true
     );
     
-    this.getSitesGroups(1);
+    this.updateBreadCrumb();
+    this._Activatedroute.data.subscribe(({data}) => {
+      this.page = {
+        count: data.sitesGroups.count,
+        limit: data.sitesGroups.limit,
+        page: data.sitesGroups.page - 1,
+      }
+      this.sitesGroups = data.sitesGroups.items;
+      this.colsname = data.objectObs.dataTable.colNameObj
+    })
     this.geojsonService.getSitesGroupsGeometries(
       this.onEachFeatureSiteGroups()
     );
@@ -122,6 +138,11 @@ export class MonitoringSitesGroupsComponent
       relativeTo: this._Activatedroute,
     });
   }
+
+  updateBreadCrumb() {
+    this._objService.changeBreadCrumb([this.breadCrumbElementBase], true);
+  }
+
   onSelect($event) {
     this.geojsonService.selectSitesGroupLayer($event);
   }
