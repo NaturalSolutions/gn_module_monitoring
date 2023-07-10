@@ -57,8 +57,9 @@ class MonitoringObjectSerializer(MonitoringObjectBase):
     def unflatten_specific_properties(self, properties):
         data = {}
         for attribut_name in self.config_schema('specific'):
-            val = properties.pop(attribut_name)
-            data[attribut_name] = val
+            if attribut_name != 'html': 
+                val = properties.pop(attribut_name)
+                data[attribut_name] = val
 
         if data:
             properties['data'] = data
