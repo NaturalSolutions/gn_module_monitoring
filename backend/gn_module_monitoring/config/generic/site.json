@@ -23,7 +23,6 @@
   "display_list": [
     "base_site_name",
     "base_site_code",
-    "id_nomenclature_type_site",
     "last_visit",
     "nb_visits",
     "types_site"
@@ -54,7 +53,7 @@
     "id_inventor": {
       "type_widget": "datalist",
       "attribut_label": "Descripteur",
-      "api": "users/menu/__MODULE.ID_LIST_OBSERVER",
+      "api": "users/menu/1",
       "application": "GeoNature",
       "keyValue": "id_role",
       "keyLabel": "nom_complet",
@@ -98,8 +97,28 @@
       "types_site": {
         "type_widget": "datalist",
         "attribut_label": "Type(s) de site",
-        "hidden": true,
-        "schema_dot_table": "gn_monitoring.t_base_sites"
+        "type_util": "types_site",
+        "keyValue": "id_nomenclature_type_site",
+        "keyLabel": "label",
+        "multiple": true,
+        "api" : "__MONITORINGS_PATH/modules/__MODULE.MODULE_CODE/types_sites",
+        "application": "GeoNature",
+        "required": true,
+        "definition": "Permet de n'avoir que les types de site lié au module"
+      },
+      "sites_group": {
+        "type_widget": "datalist",
+        "attribut_label": "Groupe de site",
+        "type_util": "sites_group",
+        "keyValue": "id_sites_group",
+        "keyLabel": "sites_group_name,sites_group_code",
+        "multiple": false,
+        "api" : "monitorings/sites_groups",
+        "application": "GeoNature",
+        "data_path":"items",
+        "required": true,
+        "definition": "Associer un site à un groupe de site"
       }
+      
   }
 }

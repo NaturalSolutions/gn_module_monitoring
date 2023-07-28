@@ -147,8 +147,11 @@ export class MonitoringFormComponentG implements OnInit {
           this.obj.moduleCode,
           this.obj.objectType
         );
-        const schema = this._configService.schema(this.obj.moduleCode, this.obj.objectType);
-        this.obj[this.obj.moduleCode] = schema;
+
+        
+        const schema :any = this._configService.schema(this.obj.moduleCode, this.obj.objectType);
+        const {types_site,...schemaWithoutTypes} =  schema
+        this.obj[this.obj.moduleCode] = schemaWithoutTypes;
         this.obj.specific == undefined ? (this.obj.specific = {}) : null;
         this.obj.bIsInitialized = true;
 
