@@ -18,6 +18,8 @@ import { ConfigService } from '../../services/config.service';
 import { FormService } from '../../services/form.service';
 import { breadCrumbElementBase } from '../breadcrumbs/breadcrumbs.component';
 import { ConfigJsonService } from '../../services/config-json.service';
+import { breadCrumbBase } from '../../class/breadCrumb';
+
 @Component({
   selector: 'monitoring-visits',
   templateUrl: './monitoring-visits.component.html',
@@ -131,20 +133,24 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
           );
         }),
         mergeMap((data) => {
-          return iif(
-            () => data.parentObjSelected == this.siteGroupIdParent,
-            of(data),
-            this._sitesGroupService.getById(this.siteGroupIdParent).pipe(
-              map((objSelectParent) => {
-                return {
-                  site: data.site,
-                  visits: data.visits,
-                  parentObjSelected: objSelectParent,
-                  objConfig: data.objConfig,
-                };
-              })
-            )
-          );
+          if (isNaN(this.siteGroupIdParent)) {
+            return of(data);
+          } else {
+            return iif(
+              () => data.parentObjSelected == this.siteGroupIdParent,
+              of(data),
+              this._sitesGroupService.getById(this.siteGroupIdParent).pipe(
+                map((objSelectParent) => {
+                  return {
+                    site: data.site,
+                    visits: data.visits,
+                    parentObjSelected: objSelectParent,
+                    objConfig: data.objConfig,
+                  };
+                })
+              )
+            );
+          }
         })
       )
       .subscribe((data) => {
@@ -159,7 +165,6 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
         };
         this.baseFilters = { id_base_site: this.site.id_base_site };
         this.colsname = data.objConfig.objObsVisit.dataTable.colNameObj;
-        this.site['id_sites_group'] = this.siteGroupIdParent;
         this.objSelected = this.siteService.format_label_types_site([this.site])[0];
         this.addSpecificConfig();
 
@@ -168,7 +173,11 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
         dataonlyObjConfigAndObj.site['objConfig'] = objConfig.objObsSite;
         dataonlyObjConfigAndObj.visits['objConfig'] = objConfig.objObsVisit;
         this.setDataTableObj(dataonlyObjConfigAndObj);
-        this.updateBreadCrumb(data.site, data.parentObjSelected);
+        if (isNaN(this.siteGroupIdParent)) {
+          this.updateBreadCrumbWithoutGpSite(data.site);
+        } else {
+          this.updateBreadCrumb(data.site, data.parentObjSelected);
+        }
       });
     this.isInitialValues = true;
   }
@@ -331,6 +340,21 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
     ].join('/');
 
     this.breadCrumbList = [this.breadCrumbElementBase, this.breadCrumbParent, this.breadCrumbChild];
+    this._objService.changeBreadCrumb(this.breadCrumbList, true);
+  }
+
+  updateBreadCrumbWithoutGpSite(sites) {
+    this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSites.value;
+    this.breadCrumbChild.description = sites.base_site_name;
+    this.breadCrumbChild.label = 'Site';
+    this.breadCrumbChild['id'] = sites.id_base_site;
+    this.breadCrumbChild['objectType'] = this.siteService.objectObs.objectType || 'site';
+    this.breadCrumbChild['url'] = [
+      this.breadCrumbChild.objectType,
+      this.breadCrumbChild.id?.toString(),
+    ].join('/');
+
+    this.breadCrumbList = [this.breadCrumbElementBase, this.breadCrumbChild];
     this._objService.changeBreadCrumb(this.breadCrumbList, true);
   }
 

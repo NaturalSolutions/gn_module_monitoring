@@ -2,6 +2,7 @@
   <mat-tab-group
     mat-stretch-tabs="false"
     mat-align-tabs="start"
+    [selectedIndex]="activetabIndex"
     (selectedTabChange)="changeActiveTab($event)"
     animationDuration="0ms"
   >

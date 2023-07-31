@@ -96,6 +96,13 @@ def config_object_from_files(module_code, object_type, custom=None):
         {} if module_code == "generic" else json_config_from_file(module_code, object_type)
     )
 
+    # NOTE: Ici on pop la clé "id_sites_group" dans le cas ou l'entre par protocole car l'association de site à un groupe de site doit se faire par l'entrée par site
+    if module_code != "generic" and object_type == "site":
+        generic_config_object["generic"].pop("id_sites_group")
+
+    if module_code == "generic" and object_type == "site":
+        generic_config_object["generic"].pop("types_site")
+
     if module_code == "generic" and object_type == "site" and custom is not None:
         specific_config_object = custom
     config_object = generic_config_object

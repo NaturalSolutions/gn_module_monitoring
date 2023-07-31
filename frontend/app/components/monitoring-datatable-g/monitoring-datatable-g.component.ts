@@ -65,7 +65,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   selected = [];
   filters = {};
 
-  activetabIndex: number = 0;
+  @Input() activetabIndex: number = 0;
   activetabType: string;
 
   @Output() objectsStatusChange: EventEmitter<Object> = new EventEmitter<Object>();
@@ -237,6 +237,7 @@ export class MonitoringDatatableGComponent implements OnInit {
     }
 
     if (changes['rows'] && this.rows && this.rows.length > 0) {
+      this.activetabType = this.dataTableArray[this.activetabIndex].objectType;
       this.rows = this.dataTableObj[this.activetabType].rows;
       this.page = this.dataTableObj[this.activetabType].page;
     }
@@ -262,9 +263,7 @@ export class MonitoringDatatableGComponent implements OnInit {
 
   navigateToAddObj() {
     this._objService.changeObjectType(this.dataTableArray[this.activetabIndex]);
-    this.router.navigate(['create'], {
-      relativeTo: this._Activatedroute,
-    });
+    this.router.navigate([this.router.routerState.snapshot.url, 'create']);
     // TODO: gérer la gestion de l'ajout (et ajout d'objet enfant) d'objet de type "site" depuis la page d'accueil de visualisation de groupe de site/ site
     //
   }

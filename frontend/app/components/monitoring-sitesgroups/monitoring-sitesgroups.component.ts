@@ -11,9 +11,9 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { IobjObs } from '../../interfaces/objObs';
 import { ConfigJsonService } from '../../services/config-json.service';
 import { IBreadCrumb } from '../../interfaces/object';
-import { breadCrumbElementBase } from '../breadcrumbs/breadcrumbs.component';
 import { FormService } from '../../services/form.service';
-import { JsonData } from '../../types/jsondata';
+import { Location } from '@angular/common';
+import { breadCrumbBase } from '../../class/breadCrumb';
 
 const LIMIT = 10;
 
@@ -33,12 +33,13 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   objectType: IobjObs<ISitesGroup>;
   objForm: FormGroup;
   objInitForm: Object = {};
-  breadCrumbElementBase: IBreadCrumb = breadCrumbElementBase;
+  breadCrumbElementBase: IBreadCrumb = breadCrumbBase.baseBreadCrumbSiteGroups.value;
 
   rows;
   dataTableObj: IDataTableObj;
   dataTableArray: {}[] = [];
-
+  activetabIndex: number;
+  currentRoute: string;
   // siteGroupEmpty={
   //   "comments" :'',
   //   sites_group_code: string;
@@ -56,7 +57,8 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
     private _formBuilder: FormBuilder,
     private _configJsonService: ConfigJsonService,
     private _Activatedroute: ActivatedRoute, // private _routingService: RoutingService
-    private _formService: FormService
+    private _formService: FormService,
+    private _location: Location
   ) {
     super();
     this.getAllItemsCallback = this.getSitesOrSitesGroups; //[this.getSitesGroups, this.getSites];
@@ -72,7 +74,6 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
     this._objService.changeObjectTypeParent(this._sites_group_service.objectObs);
     this._objService.changeObjectType(this._sites_group_service.objectObs);
 
-    this.updateBreadCrumb();
     this._Activatedroute.data.subscribe(({ data }) => {
       this.page = {
         count: data.sitesGroups.data.count,
@@ -83,13 +84,24 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
       this.sitesGroups = data.sitesGroups.data.items;
       // this.columns = [data.sitesGroups.data.items, data.sites.data.items]
       this.colsname = data.sitesGroups.objConfig.dataTable.colNameObj;
-      this.setDataTableObj(data);
+      if (data.route == 'sites') {
+        this.activetabIndex = 1;
+        this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSites.value;
+        this.getGeometriesSite();
+      } else {
+        this.activetabIndex = 0;
+        this.geojsonService.getSitesGroupsGeometries(this.onEachFeatureSiteGroups());
+      }
+      const { route, ...dataToTable } = data;
+      this.currentRoute = data.route;
+      this.setDataTableObj(dataToTable);
+      this.updateBreadCrumb();
     });
-    this.geojsonService.getSitesGroupsGeometries(this.onEachFeatureSiteGroups());
   }
 
   ngOnDestroy() {
     this.geojsonService.removeFeatureGroup(this.geojsonService.sitesGroupFeatureGroup);
+    this.geojsonService.removeFeatureGroup(this.geojsonService.sitesFeatureGroup);
   }
 
   onEachFeatureSiteGroups(): Function {
@@ -159,16 +171,16 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   }
   seeDetails($event) {
     // TODO: routerLink
-    this._objService.changeObjectTypeParent(this._sites_group_service.objectObs);
-    this.router.navigate([$event.id_sites_group], {
-      relativeTo: this._Activatedroute,
-    });
+    if (this.activetabIndex == 1) {
+      this._objService.changeObjectTypeParent(this._sitesService.objectObs);
+    } else {
+      this._objService.changeObjectTypeParent(this._sites_group_service.objectObs);
+    }
+    this.router.navigate([this.router.routerState.snapshot.url, $event[$event.id]]);
   }
 
   addSiteGp($event) {
-    this.router.navigate(['/create'], {
-      relativeTo: this._Activatedroute,
-    });
+    this.router.navigate(['monitorings', this.currentRoute, '/create']);
   }
 
   updateBreadCrumb() {
@@ -179,11 +191,23 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
     this.geojsonService.selectSitesGroupLayer($event);
   }
 
-  loadGeoJson($event) {
+  updateActiveTab($event) {
     if ($event == 'site') {
+      // this.router.navigate(['monitorings','sites'], {skipLocationChange: true});
+      this.activetabIndex = 1;
+      this._location.go('/monitorings/sites');
+      this.router.routerState.snapshot.url = '/monitorings/sites';
+      this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSites.value;
+      this.updateBreadCrumb();
       this.geojsonService.removeFeatureGroup(this.geojsonService.sitesGroupFeatureGroup);
       this.getGeometriesSite();
     } else {
+      this.activetabIndex = 0;
+      this._location.go('/monitorings/sites_group');
+      this.router.routerState.snapshot.url = '/monitorings/sites_group';
+      this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSiteGroups.value;
+      this.updateBreadCrumb();
+      // this.router.navigate(['monitorings','sites_group'],  {skipLocationChange: true});
       this.geojsonService.removeFeatureGroup(this.geojsonService.sitesFeatureGroup);
       this.geojsonService.getSitesGroupsGeometries(this.onEachFeatureSiteGroups());
     }
