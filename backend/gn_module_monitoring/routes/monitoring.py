@@ -237,7 +237,13 @@ def update_object_api(module_code, object_type, id):
 @check_cruved_scope("C")
 @json_resp
 def create_object_api(module_code, object_type, id):
-    get_config(module_code, force=True)
+    customConfig = dict()
+    post_data = dict(request.get_json())
+    if "dataComplement" in post_data:
+        for keys in post_data["dataComplement"].keys():
+            if "config" in post_data["dataComplement"][keys]:
+                customConfig.update(post_data["dataComplement"][keys]["config"])
+    get_config(module_code, force=True, customSpecConfig=customConfig)
     return create_or_update_object_api(module_code, object_type, id)
 
 

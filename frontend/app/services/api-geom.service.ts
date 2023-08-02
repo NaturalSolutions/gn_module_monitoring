@@ -219,6 +219,10 @@ export class SitesService extends ApiGeomService<ISite> {
     return this._cacheService.request<Observable<any>>('get', `sites/${idSite}/types`);
   }
 
+  getTypesSiteById(idTypeSite: number): Observable<any> {
+    return this._cacheService.request<Observable<any>>('get', `sites/types/${idTypeSite}`);
+  }
+
   getSiteModules(idSite: number): Observable<Module[]> {
     return this._cacheService.request('get', `sites/${idSite}/modules`);
   }
