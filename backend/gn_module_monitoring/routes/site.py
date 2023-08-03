@@ -88,7 +88,8 @@ def get_type_site_by_id(id_type_site):
 @blueprint.route("/sites/<int:id_site>/types", methods=["GET"])
 def get_all_types_site_from_site_id(id_site):
     types_site = query_all_types_site_from_site_id(id_site)
-    return [res.as_dict() for res in types_site]
+    schema = BibTypeSiteSchema()
+    return [schema.dump(res) for res in types_site]
 
 
 @blueprint.route("/sites", methods=["GET"])
@@ -160,11 +161,11 @@ def get_module_sites(module_code: str):
 def post_sites():
     module_code = "generic"
     object_type = "site"
-    customConfig = dict()
+    customConfig = {"specific":{}}
     post_data = dict(request.get_json())
     for keys in post_data["dataComplement"].keys():
         if "config" in post_data["dataComplement"][keys]:
-            customConfig.update(post_data["dataComplement"][keys]["config"])
+            customConfig["specific"].update(post_data["dataComplement"][keys]["config"]['specific'])
     get_config(module_code, force=True, customSpecConfig=customConfig)
     return create_or_update_object_api_sites_sites_group(module_code, object_type), 201
 
@@ -180,10 +181,10 @@ def delete_site(_id):
 def patch_sites(_id):
     module_code = "generic"
     object_type = "site"
-    customConfig = dict()
+    customConfig = {"specific":{}}
     post_data = dict(request.get_json())
     for keys in post_data["dataComplement"].keys():
         if "config" in post_data["dataComplement"][keys]:
-            customConfig.update(post_data["dataComplement"][keys]["config"])
+            customConfig["specific"].update(post_data["dataComplement"][keys]["config"]['specific'])
     get_config(module_code, force=True, customSpecConfig=customConfig)
     return create_or_update_object_api_sites_sites_group(module_code, object_type, _id), 201

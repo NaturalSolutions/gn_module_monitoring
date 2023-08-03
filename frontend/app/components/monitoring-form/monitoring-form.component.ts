@@ -47,6 +47,7 @@ export class MonitoringFormComponent implements OnInit {
   idsTypesSite: number[] = [];
   lastGeom = {};
   dataComplement = {};
+  schemaGeneric = {}; 
 
   public bSaveSpinner = false;
   public bSaveAndAddChildrenSpinner = false;
@@ -72,18 +73,24 @@ export class MonitoringFormComponent implements OnInit {
   ngOnInit() {
     this._configService
       .init(this.obj.moduleCode)
-      .pipe()
-      .subscribe(() => {
+      .pipe(
+        mergeMap( () =>  iif(()=> this.obj.objectType == 'site',
+        this._siteService.getTypesSiteByIdSite(this.obj.id),
+        of(null)
+        )
+      ))
+      .subscribe((typesSites) => {
         // return this._route.queryParamMap;
         // })
         // .subscribe((queryParams) => {
         this.queryParams = this._route.snapshot.queryParams || {};
         this.bChainInput = this._configService.frontendParams()['bChainInput'];
-        const schema = this.obj.schema();
-        this.obj.objectType == 'site' ? delete schema['types_site'] : null;
-
+        this.schemaGeneric = this.obj.schema();
+        this.obj.objectType == 'site' ? delete this.schemaGeneric ['types_site'] : null;
+        this.bEdit && this.obj.objectType == 'site'? this.initExtraSchema(typesSites) : null ;
         // init objFormsDefinition
 
+        const schema = this.schemaGeneric 
         // meta pour les parametres dynamiques
         // ici pour avoir acces aux nomenclatures
         this.meta = {
@@ -370,6 +377,22 @@ export class MonitoringFormComponent implements OnInit {
     this.procesPatchUpdateForm();
   }
 
+  initExtraSchema(typeSiteObj){
+      let keysConfigToExclude:string[] = []
+      for (const typeSite of typeSiteObj) {
+        this.idsTypesSite.push(typeSite.id_nomenclature_type_site)
+        this.typesSiteConfig[typeSite.label] = typeSite;
+        keysConfigToExclude.push(...Object.keys(this.typesSiteConfig[typeSite.label].config.specific))
+        Object.assign(this.schemaUpdate,this.typesSiteConfig[typeSite.label].config.specific)
+      }
+      this.schemaGeneric = Object.keys(this.schemaGeneric)
+      .filter((key) => !keysConfigToExclude.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = this.schemaGeneric[key];
+        return obj;
+      }, {});
+  }
+
   checkChangedTypeSite() {
     console.log(this.typesSiteConfig);
     if ('types_site' in this.objFormDynamic.controls) {
@@ -557,7 +580,7 @@ export class MonitoringFormComponent implements OnInit {
       .filter((formDef) => formDef.type_widget)
       .sort((a, b) => {
         // medias à la fin
-        return a.attribut_name === 'medias' ? +1 : b.attribut_name === 'medias' ? -1 : 0;
+        return a.attribut_name === 'types_site' ? -1 : b.attribut_name === 'types_site' ? +1 : 0;
       });
   }
 }
