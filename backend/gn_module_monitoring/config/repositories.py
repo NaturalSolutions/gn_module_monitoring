@@ -107,7 +107,11 @@ def config_object_from_files(module_code, object_type, custom=None):
         }
 
     if object_type == "site" and custom is not None:
-        specific_config_object = custom
+        if "specific" in custom and "specific" in specific_config_object:
+            for key in custom["specific"]:
+                if key not in specific_config_object["specific"]:
+                    specific_config_object["specific"][key] = custom["specific"][key]
+
     config_object = generic_config_object
     config_object.update(specific_config_object)
 

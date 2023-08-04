@@ -47,7 +47,7 @@ export class MonitoringFormComponent implements OnInit {
   idsTypesSite: number[] = [];
   lastGeom = {};
   dataComplement = {};
-  schemaGeneric = {}; 
+  schemaGeneric = {};
 
   public bSaveSpinner = false;
   public bSaveAndAddChildrenSpinner = false;
@@ -74,11 +74,14 @@ export class MonitoringFormComponent implements OnInit {
     this._configService
       .init(this.obj.moduleCode)
       .pipe(
-        mergeMap( () =>  iif(()=> this.obj.objectType == 'site',
-        this._siteService.getTypesSiteByIdSite(this.obj.id),
-        of(null)
+        mergeMap(() =>
+          iif(
+            () => this.obj.objectType == 'site',
+            this._siteService.getTypesSiteByIdSite(this.obj.id),
+            of(null)
+          )
         )
-      ))
+      )
       .subscribe((typesSites) => {
         // return this._route.queryParamMap;
         // })
@@ -86,11 +89,11 @@ export class MonitoringFormComponent implements OnInit {
         this.queryParams = this._route.snapshot.queryParams || {};
         this.bChainInput = this._configService.frontendParams()['bChainInput'];
         this.schemaGeneric = this.obj.schema();
-        this.obj.objectType == 'site' ? delete this.schemaGeneric ['types_site'] : null;
-        this.bEdit && this.obj.objectType == 'site'? this.initExtraSchema(typesSites) : null ;
+        this.obj.objectType == 'site' ? delete this.schemaGeneric['types_site'] : null;
+        this.bEdit && this.obj.objectType == 'site' ? this.initExtraSchema(typesSites) : null;
         // init objFormsDefinition
 
-        const schema = this.schemaGeneric 
+        const schema = this.schemaGeneric;
         // meta pour les parametres dynamiques
         // ici pour avoir acces aux nomenclatures
         this.meta = {
@@ -107,8 +110,6 @@ export class MonitoringFormComponent implements OnInit {
             // medias à la fin
             return a.attribut_name === 'medias' ? +1 : b.attribut_name === 'medias' ? -1 : 0;
           });
-
-        this.obj.objectType == 'site' ? this.initObjFormDef() : null;
 
         // display_form pour customiser l'ordre dans le formulaire
         // les éléments de display form sont placé en haut dans l'ordre du tableau
@@ -134,6 +135,7 @@ export class MonitoringFormComponent implements OnInit {
 
         // pour donner la valeur de idParent
         this.initForm();
+        this.obj.objectType == 'site' ? this.initObjFormDef() : null;
         this.obj.objectType == 'site' ? this.initFormDynamic() : null;
       });
   }
@@ -282,6 +284,9 @@ export class MonitoringFormComponent implements OnInit {
 
   /** TODO améliorer site etc.. */
   onSubmit() {
+    if (this.obj.objectType == 'site') {
+      this.dataComplement = { ...this.typesSiteConfig, types_site: this.idsTypesSite };
+    }
     let objFormValueGroup = {};
     this.obj.objectType == 'site'
       ? (objFormValueGroup = { ...this.objForm.value, ...this.objFormDynamic.value })
@@ -377,15 +382,24 @@ export class MonitoringFormComponent implements OnInit {
     this.procesPatchUpdateForm();
   }
 
-  initExtraSchema(typeSiteObj){
-      let keysConfigToExclude:string[] = []
-      for (const typeSite of typeSiteObj) {
-        this.idsTypesSite.push(typeSite.id_nomenclature_type_site)
-        this.typesSiteConfig[typeSite.label] = typeSite;
-        keysConfigToExclude.push(...Object.keys(this.typesSiteConfig[typeSite.label].config.specific))
-        Object.assign(this.schemaUpdate,this.typesSiteConfig[typeSite.label].config.specific)
-      }
-      this.schemaGeneric = Object.keys(this.schemaGeneric)
+  initExtraSchema(typeSiteObj) {
+    let keysConfigToExclude: string[] = [];
+    for (const typeSite of typeSiteObj) {
+      this.idsTypesSite.push(typeSite.id_nomenclature_type_site);
+      this.typesSiteConfig[typeSite.label] = typeSite;
+      keysConfigToExclude.push(
+        ...Object.keys(this.typesSiteConfig[typeSite.label].config.specific)
+      );
+      Object.assign(this.schemaUpdate, this.typesSiteConfig[typeSite.label].config.specific);
+    }
+    this.schemaUpdate = keysConfigToExclude
+      .filter((key) => !Object.keys(this.schemaGeneric).includes(key))
+      .reduce((obj, key) => {
+        obj[key] = this.schemaUpdate[key];
+        return obj;
+      }, {});
+
+    this.schemaGeneric = Object.keys(this.schemaGeneric)
       .filter((key) => !keysConfigToExclude.includes(key))
       .reduce((obj, key) => {
         obj[key] = this.schemaGeneric[key];
@@ -431,13 +445,14 @@ export class MonitoringFormComponent implements OnInit {
   }
 
   updateObj() {
+    this.dataComplement = {};
     const currentIdsTypeSite = this.objFormDynamic.controls.types_site.value;
     let schema = {};
-    let objKeysFormToRemove = [];
+    let objKeysFormToRemove: string[] = [];
     let objKeysFormToAdd = [];
     let schemObjToUpdate = {};
     let objFormToAdd = {};
-    let htmlToIgnore = [];
+    let htmlToIgnore: string[] = [];
     if (this.idsTypesSite.length == 0) {
       schema = this.schemaUpdate;
       this.idsTypesSite = [];
@@ -462,6 +477,7 @@ export class MonitoringFormComponent implements OnInit {
       schema = {};
       const schemaObj = this.obj.schema();
       schema['types_site'] = schemaObj['types_site'];
+      let newTypeSiteConfig = {};
       for (const keysType of Object.keys(this.typesSiteConfig)) {
         // for (const keysConfig of Object.keys(this.typesSiteConfig[keysType].config.specific)){
         if (
@@ -469,6 +485,9 @@ export class MonitoringFormComponent implements OnInit {
         ) {
           objKeysFormToRemove.push(...Object.keys(this.typesSiteConfig[keysType].config.specific));
         } else {
+          newTypeSiteConfig[keysType] = this.typesSiteConfig[keysType];
+          newTypeSiteConfig['types_site'] =
+            this.typesSiteConfig[keysType]['id_nomenclature_type_site'];
           Object.assign(schema, this.typesSiteConfig[keysType].config.specific);
         }
       }
@@ -479,7 +498,7 @@ export class MonitoringFormComponent implements OnInit {
           obj[key] = this.objFormDynamic.value[key];
           return obj;
         }, {});
-      // }
+      this.typesSiteConfig = newTypeSiteConfig;
       this.objFormDynamic.disable();
       this.objFormDynamic.patchValue(objFiltered, { onlySelf: true, emitEvent: false });
       this.objFormDynamic.enable();
@@ -503,10 +522,7 @@ export class MonitoringFormComponent implements OnInit {
       Object.assign(schema, schemaObjFilter);
       this.idsTypesSite = currentIdsTypeSite;
       const objFormToAdd = objKeysFormToAdd
-        .filter(
-          (key) =>
-            !Object.keys(this.objFormDynamic.value).includes(key) && !htmlToIgnore.includes(key)
-        )
+        .filter((key) => !Object.keys(this.objFormDynamic.value).includes(key))
         .reduce((obj, key) => {
           obj[key] = null;
           return obj;
@@ -518,14 +534,14 @@ export class MonitoringFormComponent implements OnInit {
           this.objFormDynamic.enable());
     }
 
-    this.schemaUpdate = schema;
-    this.objFormsDefinitionDynamic = this._dynformService
-      .formDefinitionsdictToArray(schema, this.meta)
-      .filter((formDef) => formDef.type_widget)
-      .sort((a, b) => {
-        // medias à la fin
-        return a.attribut_name === 'medias' ? +1 : b.attribut_name === 'medias' ? -1 : 0;
-      });
+    this.initObjFormDef(schema);
+    // this.objFormsDefinitionDynamic = this._dynformService
+    //   .formDefinitionsdictToArray(schema, this.meta)
+    //   .filter((formDef) => formDef.type_widget)
+    //   .sort((a, b) => {
+    //     // medias à la fin
+    //     return a.attribut_name === 'medias' ? +1 : b.attribut_name === 'medias' ? -1 : 0;
+    //   });
 
     // display_form pour customiser l'ordre dans le formulaire
     // les éléments de display form sont placé en haut dans l'ordre du tableau
@@ -540,19 +556,20 @@ export class MonitoringFormComponent implements OnInit {
       });
       // this.initForm()
     }
-
     this.dataComplement = { ...this.typesSiteConfig, types_site: this.idsTypesSite };
   }
 
   removExtrForm() {
     this.schemaUpdate = {};
-    let objKeysFormToRemove = [];
+    let objKeysFormToRemove: string[] = [];
     const currentIdsTypeSite = this.objFormDynamic.controls.types_site.value;
     // Cas ou plus aucun types site
     if (currentIdsTypeSite.length == 0) {
       this.idsTypesSite = [];
       for (const keysType of Object.keys(this.typesSiteConfig)) {
-        objKeysFormToRemove.push(...Object.keys(this.typesSiteConfig[keysType].config.specific));
+        if (keysType != 'types_site') {
+          objKeysFormToRemove.push(...Object.keys(this.typesSiteConfig[keysType].config.specific));
+        }
       }
     }
 
@@ -572,9 +589,14 @@ export class MonitoringFormComponent implements OnInit {
     this.dataComplement = {};
   }
 
-  initObjFormDef() {
-    const schema = this.obj.schema();
-    this.schemaUpdate['types_site'] = schema['types_site'];
+  initObjFormDef(schema = null) {
+    if (schema) {
+      this.schemaUpdate = schema;
+    } else {
+      const schema = this.obj.schema();
+      this.schemaUpdate['types_site'] = schema['types_site'];
+    }
+
     this.objFormsDefinitionDynamic = this._dynformService
       .formDefinitionsdictToArray(this.schemaUpdate, this.meta)
       .filter((formDef) => formDef.type_widget)
