@@ -84,6 +84,7 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
       this.sitesGroups = data.sitesGroups.data.items;
       // this.columns = [data.sitesGroups.data.items, data.sites.data.items]
       this.colsname = data.sitesGroups.objConfig.dataTable.colNameObj;
+      this.currentRoute = data.route;
       if (data.route == 'sites') {
         this.activetabIndex = 1;
         this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSites.value;
@@ -93,7 +94,7 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
         this.geojsonService.getSitesGroupsGeometries(this.onEachFeatureSiteGroups());
       }
       const { route, ...dataToTable } = data;
-      this.currentRoute = data.route;
+
       this.setDataTableObj(dataToTable);
       this.updateBreadCrumb();
     });
@@ -105,7 +106,7 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   }
 
   onEachFeatureSiteGroups(): Function {
-    const baseUrl = this.router.url;
+    const baseUrl = 'monitorings/' + this.currentRoute;
     return (feature, layer) => {
       const popup = setPopup(
         baseUrl,
@@ -159,7 +160,7 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   }
 
   onEachFeatureSite() {
-    const baseUrl = this.router.url;
+    const baseUrl = 'monitorings/' + this.currentRoute;
     return (feature, layer) => {
       const popup = setPopup(
         baseUrl,
@@ -196,7 +197,8 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
       // this.router.navigate(['monitorings','sites'], {skipLocationChange: true});
       this.activetabIndex = 1;
       this._location.go('/monitorings/sites');
-      this.router.routerState.snapshot.url = '/monitorings/sites';
+      // this.router.routerState.snapshot.url = '/monitorings/sites';
+      this.currentRoute = 'sites';
       this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSites.value;
       this.updateBreadCrumb();
       this.geojsonService.removeFeatureGroup(this.geojsonService.sitesGroupFeatureGroup);
@@ -204,7 +206,8 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
     } else {
       this.activetabIndex = 0;
       this._location.go('/monitorings/sites_group');
-      this.router.routerState.snapshot.url = '/monitorings/sites_group';
+      // this.router.routerState.snapshot.url = '/monitorings/sites_group';
+      this.currentRoute = '/sites_group';
       this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSiteGroups.value;
       this.updateBreadCrumb();
       // this.router.navigate(['monitorings','sites_group'],  {skipLocationChange: true});
