@@ -101,8 +101,22 @@ def get_sites():
         params=params, default_sort="id_base_site", default_direction="desc"
     )
     query = TMonitoringSites.query
-    query = filter_params(query=query, params=params)
-    query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
+    if "types_site" in params:
+        params_types_site = params.pop("types_site")
+        query = (
+            query.join(TMonitoringSites.types_site)
+            .join(BibTypeSite.nomenclature)
+            .filter(TNomenclatures.label_fr.ilike(f"%{params_types_site}%"))
+        )
+    if len(params) != 0:
+        query = filter_params(query=query, params=params)
+    if sort_label == "types_site":
+        if sort_dir == "asc":
+            query = query.order_by(TNomenclatures.label_fr.asc())
+        else:
+            query = query.order_by(TNomenclatures.label_fr.desc())
+    else:
+        query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
     return paginate(
         query=query,
         schema=MonitoringSitesSchema,
