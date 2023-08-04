@@ -102,10 +102,12 @@ export class MonitoringDatatableGComponent implements OnInit {
     this.activetabIndex = tab.index;
     // Réinitialisation des données selectés
     this.activetabType = this.dataTableArray[tab.index].objectType;
-    this.columns = this._dataTableService.colsTable(
-      this.dataTableObj[this.activetabType].columns,
-      this.dataTableObj[this.activetabType].rows[0]
-    );
+    this.dataTableObj[this.activetabType].rows.length > 0
+      ? (this.columns = this._dataTableService.colsTable(
+          this.dataTableObj[this.activetabType].columns,
+          this.dataTableObj[this.activetabType].rows[0]
+        ))
+      : null;
     this.rows = this.dataTableObj[this.activetabType].rows;
     this.page = this.dataTableObj[this.activetabType].page;
     this.objectsStatusChange.emit(this.reInitStatut());
