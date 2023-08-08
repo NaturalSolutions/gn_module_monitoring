@@ -177,11 +177,11 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
     } else {
       this._objService.changeObjectTypeParent(this._sites_group_service.objectObs);
     }
-    this.router.navigate([this.router.routerState.snapshot.url, $event[$event.id]]);
+    this.router.navigate(['monitorings', this.currentRoute, $event[$event.id]]);
   }
 
   addSiteGp($event) {
-    this.router.navigate(['monitorings', this.currentRoute, '/create']);
+    this.router.navigate(['monitorings', this.currentRoute, 'create']);
   }
 
   updateBreadCrumb() {
@@ -194,20 +194,17 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
 
   updateActiveTab($event) {
     if ($event == 'site') {
-      // this.router.navigate(['monitorings','sites'], {skipLocationChange: true});
       this.activetabIndex = 1;
-      this._location.go('/monitorings/sites');
-      // this.router.routerState.snapshot.url = '/monitorings/sites';
       this.currentRoute = 'sites';
+      this._location.go('/monitorings/sites');
       this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSites.value;
       this.updateBreadCrumb();
       this.geojsonService.removeFeatureGroup(this.geojsonService.sitesGroupFeatureGroup);
       this.getGeometriesSite();
     } else {
       this.activetabIndex = 0;
+      this.currentRoute = 'sites_group';
       this._location.go('/monitorings/sites_group');
-      // this.router.routerState.snapshot.url = '/monitorings/sites_group';
-      this.currentRoute = '/sites_group';
       this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSiteGroups.value;
       this.updateBreadCrumb();
       // this.router.navigate(['monitorings','sites_group'],  {skipLocationChange: true});
