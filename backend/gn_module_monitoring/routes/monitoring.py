@@ -285,8 +285,12 @@ def create_object_api(module_code, object_type, id):
 @check_cruved_scope("D")
 @json_resp
 def delete_object_api(module_code, object_type, id):
+    if object_type in ("site", "sites_group"):
+        raise Exception(
+            f"No right to delete {object_type} from protocol. The {object_type} with id: {id} could be linked with others protocols"
+        )
     get_config(module_code, force=True)
-
+    # NOTE: normalement on ne peut plus supprimer les groupes de site / sites par l'entrée protocoles
     return monitoring_definitions.monitoring_object_instance(module_code, object_type, id).delete()
 
 
