@@ -76,7 +76,7 @@ export class MonitoringFormComponent implements OnInit {
       .pipe(
         mergeMap(() =>
           iif(
-            () => this.obj.objectType == 'site',
+            () => this.obj.objectType == 'site' && this.obj.id != undefined,
             this._siteService.getTypesSiteByIdSite(this.obj.id),
             of(null)
           )
@@ -90,7 +90,9 @@ export class MonitoringFormComponent implements OnInit {
         this.bChainInput = this._configService.frontendParams()['bChainInput'];
         this.schemaGeneric = this.obj.schema();
         this.obj.objectType == 'site' ? delete this.schemaGeneric['types_site'] : null;
-        this.bEdit && this.obj.objectType == 'site' ? this.initExtraSchema(typesSites) : null;
+        this.obj.id != undefined && this.obj.objectType == 'site'
+          ? this.initExtraSchema(typesSites)
+          : null;
         // init objFormsDefinition
 
         const schema = this.schemaGeneric;
