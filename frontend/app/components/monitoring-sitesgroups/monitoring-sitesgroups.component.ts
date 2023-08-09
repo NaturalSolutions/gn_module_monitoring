@@ -10,10 +10,13 @@ import { ObjectService } from '../../services/object.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { IobjObs } from '../../interfaces/objObs';
 import { ConfigJsonService } from '../../services/config-json.service';
-import { IBreadCrumb } from '../../interfaces/object';
+import { IBreadCrumb, SelectObject } from '../../interfaces/object';
 import { FormService } from '../../services/form.service';
 import { Location } from '@angular/common';
 import { breadCrumbBase } from '../../class/breadCrumb';
+import { takeUntil } from 'rxjs/operators';
+import { Module } from '../../interfaces/module';
+import { ReplaySubject } from 'rxjs';
 
 const LIMIT = 10;
 
@@ -47,6 +50,10 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   //   sites_group_name: string;
   //   uuid_sites_group: string; //FIXME: see if OK
   // }
+  modules: SelectObject[];
+  modulSelected;
+  siteSelectedId: number;
+  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(
     private _sites_group_service: SitesGroupService,
@@ -103,6 +110,8 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   ngOnDestroy() {
     this.geojsonService.removeFeatureGroup(this.geojsonService.sitesGroupFeatureGroup);
     this.geojsonService.removeFeatureGroup(this.geojsonService.sitesFeatureGroup);
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
   }
 
   onEachFeatureSiteGroups(): Function {
@@ -180,8 +189,10 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
     this.router.navigate(['monitorings', this.currentRoute, $event[$event.id]]);
   }
 
-  addSiteGp($event) {
-    this.router.navigate(['monitorings', this.currentRoute, 'create']);
+  addSiteGpChild($event) {
+    this.router.navigate(['monitorings', this.currentRoute, $event[$event.pk], 'create'], {
+      replaceUrl: true,
+    });
   }
 
   updateBreadCrumb() {
@@ -247,5 +258,42 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
 
       this.dataTableObj = objTemp as IDataTableObj;
     }
+  }
+
+  onAddChildren(event) {
+    if (event.objectType == 'site') {
+      this.siteSelectedId = event.rowSelected[event.rowSelected['pk']];
+      this.getModules();
+    }
+  }
+
+  onSaveAddChildren($event: SelectObject) {
+    this.addNewVisit($event);
+  }
+
+  getModules() {
+    this._sitesService
+      .getSiteModules(this.siteSelectedId)
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(
+        (data: Module[]) => (
+          (this.modules = data.map((item) => {
+            return { id: item.module_code, label: item.module_label };
+          })),
+          this._objService.changeListOption(this.modules)
+        )
+      );
+  }
+
+  addNewVisit(event) {
+    this.modulSelected = event;
+    this._configJsonService.init(this.modulSelected.id).subscribe(() => {
+      const moduleCode = this.modulSelected.id;
+      const keys = Object.keys(this._configJsonService.config()[moduleCode]);
+      const parent_paths = ['sites_group', 'site'].filter((item) => keys.includes(item));
+      this.router.navigate([`monitorings/create_object/${moduleCode}/visit`], {
+        queryParams: { id_base_site: this.siteSelectedId, parents_path: parent_paths },
+      });
+    });
   }
 }

@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, forkJoin, iif, of } from 'rxjs';
+import { Observable, ReplaySubject, forkJoin, iif, of } from 'rxjs';
 import { exhaustMap, map, mergeMap, take, tap } from 'rxjs/operators';
 
 import { MonitoringGeomComponent } from '../../class/monitoring-geom-component';
@@ -55,6 +55,9 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
   rows;
   dataTableObj: IDataTableObj;
   dataTableArray: {}[] = [];
+
+  modulSelected;
+  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(
     private _sitesGroupService: SitesGroupService,
@@ -222,6 +225,7 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
       });
     });
   }
+
   partialfuncToFilt(
     pageNumber: number,
     limit: number,
@@ -399,5 +403,10 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
 
       this.dataTableObj = objTemp as IDataTableObj;
     }
+  }
+
+  ngOnDestroy() {
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
   }
 }
