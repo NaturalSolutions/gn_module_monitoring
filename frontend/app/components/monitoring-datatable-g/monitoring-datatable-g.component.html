@@ -103,6 +103,20 @@
                     ></option-list-btn>
                   </ng-template>
                   <!--  -->
+                  <a
+                    class="nav-link link cell-link"
+                    (click)="editSelectedItem(row)"
+                    matTooltip="{{ dataTableArray[i].editObjLabel }}"
+                  >
+                    <i class="fa fa-edit" aria-hidden="true"></i>
+                  </a>
+                  <a
+                    class="nav-link link cell-link"
+                    (click)="navigateToDetail(row)"
+                    matTooltip="{{ dataTableArray[i].deleteObjLabel }}"
+                  >
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </a>
                 </ng-template>
               </ngx-datatable-column>
 

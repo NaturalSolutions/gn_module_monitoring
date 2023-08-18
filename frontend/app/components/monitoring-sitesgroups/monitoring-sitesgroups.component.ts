@@ -195,6 +195,21 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
     this.router.navigate(['monitorings', this.currentRoute, $event[$event.id]]);
   }
 
+  editChild($event) {
+    // TODO: routerLink
+    if (this.activetabIndex == 1) {
+      this._objService.changeObjectTypeParent(this._sitesService.objectObs);
+    } else {
+      this._objService.changeObjectTypeParent(this._sites_group_service.objectObs);
+    }
+    this._formService.changeDataSub(
+      $event,
+      this._sites_group_service.objectObs.objectType,
+      this._sites_group_service.objectObs.endPoint
+    );
+    this.router.navigate(['monitorings', this.currentRoute, $event[$event.id], { edit: true }]);
+  }
+
   addSiteGpChild($event) {
     this.router.navigate(['monitorings', this.currentRoute, $event[$event.pk], 'create'], {
       replaceUrl: true,

@@ -57,6 +57,9 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Output() addEvent = new EventEmitter<any>();
   @Output() tabChanged = new EventEmitter<any>();
 
+  @Output() onDeleteEvent = new EventEmitter<any>();
+  @Output() onEditEvent = new EventEmitter<any>();
+
   private filterSubject: Subject<string> = new Subject();
   displayFilter: boolean = false;
   objectsStatus: ItemsObjectTable = {};
@@ -294,6 +297,11 @@ export class MonitoringDatatableGComponent implements OnInit {
   navigateToDetail(row) {
     row['id'] = row.pk;
     this.onDetailsRow.emit(row);
+  }
+
+  editSelectedItem(row) {
+    row['id'] = row.pk;
+    this.onEditEvent.emit(row);
   }
 
   // TODO: Comprendre le fonctionnement de ObjectStatuts et RowsStatus
