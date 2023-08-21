@@ -12,10 +12,13 @@
     [obj]="sitesGroups"
     (onDetailsRow)="seeDetails($event)"
     (onEditEvent)="editChild($event)"
+    (onDeleteEvent)="onDelete($event)"
     (addEvent)="addSiteGpChild($event)"
     (tabChanged)="updateActiveTab($event)"
     [activetabIndex]="activetabIndex"
     (addFromTable)="onAddChildren($event)"
     (saveOptionChildren)="onSaveAddChildren($event)"
+    [bDeleteModalEmitter]="bDeleteModalEmitter"
+    [bDeleteSpinnerEmitter]="bDeleteSpinnerEmitter"
   ></pnx-monitoring-datatable-g>
 </div>

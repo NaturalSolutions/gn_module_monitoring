@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter } from '@angular/core';
 import { SitesGroupService, SitesService } from '../../services/api-geom.service';
 import { IPaginated, IPage } from '../../interfaces/page';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -56,6 +56,9 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   siteResolvedProperties;
+
+  bDeleteModalEmitter = new EventEmitter<boolean>();
+  bDeleteSpinnerEmitter = new EventEmitter<boolean>();
 
   constructor(
     private _sites_group_service: SitesGroupService,
@@ -210,6 +213,17 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
     this.router.navigate(['monitorings', this.currentRoute, $event[$event.id], { edit: true }]);
   }
 
+  onDelete(event) {
+    this._sites_group_service.delete(event.id_sites_group).subscribe((del) => {
+      // this.bDeleteSpinner = this.bDeleteModal = false;
+      setTimeout(() => {
+        this.bDeleteModalEmitter.emit(false);
+        this.bDeleteSpinnerEmitter.emit(false);
+        window.location.reload();
+      }, 100);
+    });
+  }
+
   addSiteGpChild($event) {
     this.router.navigate(['monitorings', this.currentRoute, $event[$event.pk], 'create'], {
       replaceUrl: true,
@@ -239,7 +253,6 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
       this._location.go('/monitorings/sites_group');
       this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSiteGroups.value;
       this.updateBreadCrumb();
-      // this.router.navigate(['monitorings','sites_group'],  {skipLocationChange: true});
       this.geojsonService.removeFeatureGroup(this.geojsonService.sitesFeatureGroup);
       this.geojsonService.getSitesGroupsGeometries(this.onEachFeatureSiteGroups());
     }

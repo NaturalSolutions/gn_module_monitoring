@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatatableComponent } from '@swimlane/ngx-datatable';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import { IColumn } from '../../interfaces/column';
@@ -20,6 +20,7 @@ import { DataTableService } from '../../services/data-table.service';
 import { ObjectService } from '../../services/object.service';
 import { Utils } from '../../utils/utils';
 import { SelectObject } from '../../interfaces/object';
+import { CommonService } from '@geonature_common/service/common.service';
 
 interface ItemObjectTable {
   id: number | null;
@@ -47,7 +48,6 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Output() addFromTable = new EventEmitter<Object>();
   @Output() saveOptionChildren = new EventEmitter<SelectObject>();
   @Output() bEditChanged = new EventEmitter<boolean>();
-
   @Input() currentUser;
 
   @Output() onSort = new EventEmitter<any>();
@@ -60,6 +60,13 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Output() onDeleteEvent = new EventEmitter<any>();
   @Output() onEditEvent = new EventEmitter<any>();
 
+  @Input() bDeleteModalEmitter: EventEmitter<boolean>;
+  @Input() bDeleteSpinnerEmitter: EventEmitter<boolean>;
+  bDeleteModal: boolean = false;
+  bDeleteSpinner: boolean = false;
+
+  private subscription: Subscription;
+
   private filterSubject: Subject<string> = new Subject();
   displayFilter: boolean = false;
   objectsStatus: ItemsObjectTable = {};
@@ -69,6 +76,8 @@ export class MonitoringDatatableGComponent implements OnInit {
   row_save;
   selected = [];
   filters = {};
+
+  rowSelected;
 
   @Input() activetabIndex: number = 0;
   activetabType: string;
@@ -83,11 +92,18 @@ export class MonitoringDatatableGComponent implements OnInit {
     private _dataTableService: DataTableService,
     private _objService: ObjectService,
     private router: Router,
-    private _Activatedroute: ActivatedRoute
+    private _Activatedroute: ActivatedRoute,
+    private _commonService: CommonService
   ) {}
 
   ngOnInit() {
+    this.subscribeToParentEmitter();
     this.initDatatable();
+  }
+  subscribeToParentEmitter(): void {
+    this.subscription = this.bDeleteModalEmitter.subscribe((data: boolean) => {
+      this.bDeleteModal = this.bDeleteSpinner = false;
+    });
   }
 
   initDatatable() {
@@ -221,6 +237,9 @@ export class MonitoringDatatableGComponent implements OnInit {
 
   ngOnDestroy() {
     this.filterSubject.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   // tooltip(column) {
@@ -302,6 +321,27 @@ export class MonitoringDatatableGComponent implements OnInit {
   editSelectedItem(row) {
     row['id'] = row.pk;
     this.onEditEvent.emit(row);
+  }
+
+  msgToaster(action) {
+    // return `${action} ${this.obj.labelDu()} ${this.obj.description()} effectuée`.trim();
+    return `${action}  effectuée`.trim();
+  }
+
+  onDelete(row) {
+    row['id'] = row[row.pk];
+    this._commonService.regularToaster('info', this.msgToaster('Suppression'));
+    this.onDeleteEvent.emit(row);
+  }
+
+  alertMessage(row) {
+    row['id'] = row[row.pk];
+    this.rowSelected = row;
+    const varNameObjet = this.dataTableArray[this.activetabIndex].config.description_field_name;
+
+    this.rowSelected['name_object'] = row[varNameObjet];
+    this.bDeleteModal = true;
+    this.bDeleteSpinner = true;
   }
 
   // TODO: Comprendre le fonctionnement de ObjectStatuts et RowsStatus

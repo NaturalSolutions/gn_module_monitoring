@@ -264,14 +264,10 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
   }
 
   editChild($event) {
-    // TODO: voir pour changer le skipLocation et supprimer le params "edit" une fois la route initialisée
-    this.router.navigate(
-      [
-        `monitorings/object/${$event.module.module_code}/visit/${$event.id_base_visit}`,
-        { edit: true },
-      ],
-      { skipLocationChange: true }
-    );
+    this.router.navigate([
+      `monitorings/object/${$event.module.module_code}/visit/${$event.id_base_visit}`,
+      { edit: true },
+    ]);
   }
 
   partialfuncToFilt(
@@ -400,7 +396,7 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
     this.breadCrumbChild.description = sites.base_site_name;
     this.breadCrumbChild.label = 'Site';
     this.breadCrumbChild['id'] = sites.id_base_site;
-    this.breadCrumbChild['objectType'] = this.siteService.objectObs.objectType || 'site';
+    this.breadCrumbChild['objectType'] = this.siteService.objectObs.objectType + 's' || 'sites';
     this.breadCrumbChild['url'] = [
       this.breadCrumbChild.objectType,
       this.breadCrumbChild.id?.toString(),
