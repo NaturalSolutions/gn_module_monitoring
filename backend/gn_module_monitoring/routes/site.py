@@ -30,6 +30,8 @@ from gn_module_monitoring.utils.routes import (
     paginate,
     sort,
     query_all_types_site_from_site_id,
+    filter_according_to_column_type_for_site,
+    sort_according_to_column_type_for_site,
 )
 
 
@@ -104,44 +106,11 @@ def get_sites():
     sort_label, sort_dir = get_sort(
         params=params, default_sort="id_base_site", default_direction="desc"
     )
-    cols_relationship= TMonitoringSites.attribute_names_relationship()
+
     query = TMonitoringSites.query
-    if "types_site" in params:
-        params_types_site = params.pop("types_site")
-        query = (
-            query.join(TMonitoringSites.types_site)
-            .join(BibTypeSite.nomenclature)
-            .filter(TNomenclatures.label_fr.ilike(f"%{params_types_site}%"))
-        )
-    # FIXME : non fonctionnel pour le moment
-    elif "last_visit" in params:
-            subquery = db.session.query(
-                TMonitoringSites,
-                func.to_char(TMonitoringSites.last_visit,'YYYY-MM-DD').label("last_visit_string"),
-            ).subquery()
-            param_last_visit = params.pop("last_visit")
-            query =  query.filter(subquery.c.last_visit_string.ilike(f"%{param_last_visit}%"))
-    elif "id_inventor" in params:
-            params_inventor = params.pop("id_inventor")
-            query = (query.join(
-                    User,
-                   User.id_role == TMonitoringSites.id_inventor,
-                ).filter(User.nom_complet.ilike(f"%{params_inventor}%")))
-            
-    if len(params) != 0:
-        query = filter_params(query=query, params=params)
-    if sort_label == "types_site":
-        if sort_dir == "asc":
-            query = query.order_by(TNomenclatures.label_fr.asc())
-        else:
-            query = query.order_by(TNomenclatures.label_fr.desc())
-    elif "id_inventor" in params:
-            if sort_dir == "asc":
-                query = query.order_by(User.nom_complet.asc())
-            else:
-                query = query.order_by(User.nom_complet.desc())
-    else:
-        query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
+    query = filter_according_to_column_type_for_site(query, params)
+    query = sort_according_to_column_type_for_site(query, sort_label, sort_dir)
+
     return paginate(
         query=query,
         schema=MonitoringSitesSchema,
