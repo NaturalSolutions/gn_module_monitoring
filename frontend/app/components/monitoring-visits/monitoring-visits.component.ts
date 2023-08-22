@@ -270,6 +270,15 @@ export class MonitoringVisitsComponent extends MonitoringGeomComponent implement
     ]);
   }
 
+  // TODO: voir s'il faut pouvoir supprimer les visites depuis l'entrée par sites
+  // onDelete($event){
+  //  this._objServiceMonitoring
+  //     .deleteObject($event.rowSelected.module.module_code,$event.objectType, $event.rowSelected.id).subscribe(del =>{
+  //       this.bDeleteModalEmitter.emit(false);
+  //       this.initSiteVisit()
+  //     });
+  // }
+
   partialfuncToFilt(
     pageNumber: number,
     limit: number,

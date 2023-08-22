@@ -58,7 +58,6 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   siteResolvedProperties;
 
   bDeleteModalEmitter = new EventEmitter<boolean>();
-  bDeleteSpinnerEmitter = new EventEmitter<boolean>();
 
   constructor(
     private _sites_group_service: SitesGroupService,
@@ -214,14 +213,33 @@ export class MonitoringSitesGroupsComponent extends MonitoringGeomComponent impl
   }
 
   onDelete(event) {
-    this._sites_group_service.delete(event.id_sites_group).subscribe((del) => {
-      // this.bDeleteSpinner = this.bDeleteModal = false;
-      setTimeout(() => {
-        this.bDeleteModalEmitter.emit(false);
-        this.bDeleteSpinnerEmitter.emit(false);
-        window.location.reload();
-      }, 100);
-    });
+    if (event.objectType == 'sites_group') {
+      this._sites_group_service.delete(event.rowSelected.id_sites_group).subscribe((del) => {
+        setTimeout(() => {
+          this.bDeleteModalEmitter.emit(false);
+          this.activetabIndex = 0;
+          this.currentRoute = 'sites_group';
+          this.router.navigate(['/monitorings/sites_group', { delete: true }]);
+          this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSiteGroups.value;
+          this.updateBreadCrumb();
+          this.geojsonService.removeFeatureGroup(this.geojsonService.sitesGroupFeatureGroup);
+          this.geojsonService.getSitesGroupsGeometries(this.onEachFeatureSiteGroups());
+        }, 100);
+      });
+    } else {
+      this._sitesService.delete(event.rowSelected.id_base_site).subscribe((del) => {
+        setTimeout(() => {
+          this.bDeleteModalEmitter.emit(false);
+          this.activetabIndex = 1;
+          this.currentRoute = 'sites';
+          this.router.navigate(['/monitorings/sites', { delete: true }]);
+          this.breadCrumbElementBase = breadCrumbBase.baseBreadCrumbSites.value;
+          this.updateBreadCrumb();
+          this.geojsonService.removeFeatureGroup(this.geojsonService.sitesFeatureGroup);
+          this.getGeometriesSite();
+        }, 100);
+      });
+    }
   }
 
   addSiteGpChild($event) {

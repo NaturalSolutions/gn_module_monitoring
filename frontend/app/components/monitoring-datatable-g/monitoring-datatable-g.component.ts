@@ -61,7 +61,6 @@ export class MonitoringDatatableGComponent implements OnInit {
   @Output() onEditEvent = new EventEmitter<any>();
 
   @Input() bDeleteModalEmitter: EventEmitter<boolean>;
-  @Input() bDeleteSpinnerEmitter: EventEmitter<boolean>;
   bDeleteModal: boolean = false;
   bDeleteSpinner: boolean = false;
 
@@ -101,9 +100,11 @@ export class MonitoringDatatableGComponent implements OnInit {
     this.initDatatable();
   }
   subscribeToParentEmitter(): void {
-    this.subscription = this.bDeleteModalEmitter.subscribe((data: boolean) => {
-      this.bDeleteModal = this.bDeleteSpinner = false;
-    });
+    if (this.bDeleteModalEmitter) {
+      this.subscription = this.bDeleteModalEmitter.subscribe((data: boolean) => {
+        this.bDeleteModal = this.bDeleteSpinner = false;
+      });
+    }
   }
 
   initDatatable() {
@@ -331,7 +332,7 @@ export class MonitoringDatatableGComponent implements OnInit {
   onDelete(row) {
     row['id'] = row[row.pk];
     this._commonService.regularToaster('info', this.msgToaster('Suppression'));
-    this.onDeleteEvent.emit(row);
+    this.onDeleteEvent.emit({ rowSelected: row, objectType: this.activetabType });
   }
 
   alertMessage(row) {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReplaySubject, forkJoin, of } from 'rxjs';
 import { tap, map, mergeMap, takeUntil } from 'rxjs/operators';
@@ -52,6 +52,8 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
   checkEditParam: boolean;
 
   private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+
+  bDeleteModalEmitter = new EventEmitter<boolean>();
 
   constructor(
     public _sitesGroupService: SitesGroupService,
@@ -198,6 +200,15 @@ export class MonitoringSitesComponent extends MonitoringGeomComponent implements
     this._objService.changeObjectTypeParent(this._siteService.objectObs);
     this.router.navigate([`site/${$event.id_base_site}`, { edit: true }], {
       relativeTo: this._Activatedroute,
+    });
+  }
+
+  onDelete(event) {
+    this._siteService.delete(event.rowSelected.id_base_site).subscribe((del) => {
+      setTimeout(() => {
+        this.bDeleteModalEmitter.emit(false);
+        this.initSite();
+      }, 100);
     });
   }
 

@@ -134,13 +134,16 @@
                   >
                     <i class="fa fa-edit" aria-hidden="true"></i>
                   </a>
-                  <a
-                    class="nav-link link cell-link"
-                    (click)="alertMessage(row)"
-                    matTooltip="{{ dataTableArray[i].deleteObjLabel }}"
-                  >
-                    <i class="fa fa-trash" aria-hidden="true"></i>
-                  </a>
+
+                  <ng-container *ngIf="!dataTableArray[i].deleteObjLabel.includes('visite')">
+                    <a
+                      class="nav-link link cell-link"
+                      (click)="alertMessage(row)"
+                      matTooltip="{{ dataTableArray[i].deleteObjLabel }}"
+                    >
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </a>
+                  </ng-container>
                 </ng-template>
               </ngx-datatable-column>
 
