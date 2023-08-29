@@ -136,9 +136,7 @@
                   </a>
 
                   <ng-container
-                    *ngIf="
-                      !dataTableArray[i].deleteObjLabel.includes('visite') && row['nb_visits'] == 0
-                    "
+                    *ngIf="dataTableArray[i].objectType == 'visit' ? true : row['nb_visits'] == 0"
                   >
                     <a
                       class="nav-link link cell-link"
