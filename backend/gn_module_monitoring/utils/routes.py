@@ -1,5 +1,6 @@
 from typing import Tuple
 
+from sqlalchemy import and_
 from flask import Response
 from flask.json import jsonify
 from geonature.utils.env import DB
@@ -14,6 +15,8 @@ from gn_module_monitoring.monitoring.models import (
     TModules,
     TNomenclatures,
 )
+from geonature.core.gn_permissions.models import PermObject, PermissionAvailable
+from geonature.utils.errors import GeoNatureError
 from marshmallow import Schema
 from sqlalchemy import cast, func, text
 from sqlalchemy.dialects.postgresql import JSON
@@ -162,3 +165,30 @@ def sort_according_to_column_type_for_site(query, sort_label, sort_dir):
     else:
         query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
     return query
+
+
+def get_object_list_monitorings():
+    """
+    récupère objets permissions liés au module MONITORINGS
+
+    :return:
+    """
+    try:
+        object_list_monitorings = (
+            DB.session.query(
+                PermObject.code_object,
+            )
+            .join(PermissionAvailable, PermissionAvailable.id_object == PermObject.id_object)
+            .join(
+                TModules,
+                and_(
+                    TModules.id_module == PermissionAvailable.id_module,
+                    TModules.module_code == "MONITORINGS",
+                ),
+            )
+            .group_by(PermObject.code_object)
+            .all()
+        )
+        return object_list_monitorings
+    except Exception as e:
+        raise GeoNatureError("MONITORINGS - get_object_list_monitorings : {}".format(str(e)))

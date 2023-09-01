@@ -8,6 +8,8 @@ from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.config.repositories import get_config
 from gn_module_monitoring.modules.repositories import get_module
 from gn_module_monitoring.monitoring.definitions import monitoring_definitions
+from gn_module_monitoring import MODULE_CODE
+from geonature.core.gn_permissions.decorators import check_cruved_scope
 from gn_module_monitoring.monitoring.models import TMonitoringSites, TMonitoringSitesGroups
 from gn_module_monitoring.monitoring.schemas import MonitoringSitesGroupsSchema
 from gn_module_monitoring.utils.errors.errorHandler import InvalidUsage
@@ -33,6 +35,7 @@ def get_config_sites_groups(id=None, module_code="generic", object_type="sites_g
 
 
 @blueprint.route("/sites_groups", methods=["GET"])
+@check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def get_sites_groups():
     params = MultiDict(request.args)
     limit, page = get_limit_page(params=params)
@@ -51,6 +54,7 @@ def get_sites_groups():
 
 
 @blueprint.route("/sites_groups/<int:id_sites_group>", methods=["GET"])
+@check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def get_sites_group_by_id(id_sites_group: int):
     schema = MonitoringSitesGroupsSchema()
     result = TMonitoringSitesGroups.query.get_or_404(id_sites_group)
@@ -58,6 +62,7 @@ def get_sites_group_by_id(id_sites_group: int):
 
 
 @blueprint.route("/sites_groups/geometries", methods=["GET"])
+@check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def get_sites_group_geometries():
     subquery = (
         db.session.query(
@@ -79,6 +84,7 @@ def get_sites_group_geometries():
 
 
 @blueprint.route("/sites_groups/<int:_id>", methods=["PATCH"])
+@check_cruved_scope("U", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def patch(_id):
     # ###############################""
     # FROM route/monitorings
@@ -89,6 +95,7 @@ def patch(_id):
 
 
 @blueprint.route("/sites_groups/<int:_id>", methods=["DELETE"])
+@check_cruved_scope("D", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def delete(_id):
     item_schema = MonitoringSitesGroupsSchema()
     item = TMonitoringSitesGroups.find_by_id(_id)
@@ -98,6 +105,7 @@ def delete(_id):
 
 
 @blueprint.route("/sites_groups", methods=["POST"])
+@check_cruved_scope("P", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def post():
     module_code = "generic"
     object_type = "sites_group"

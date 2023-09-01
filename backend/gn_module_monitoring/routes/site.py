@@ -16,7 +16,8 @@ from gn_module_monitoring.monitoring.models import (
     TMonitoringSites,
     TNomenclatures,
 )
-
+from gn_module_monitoring import MODULE_CODE
+from geonature.core.gn_permissions.decorators import check_cruved_scope
 from gn_module_monitoring.monitoring.schemas import BibTypeSiteSchema, MonitoringSitesSchema
 from gn_module_monitoring.routes.monitoring import (
     create_or_update_object_api_sites_sites_group,
@@ -99,6 +100,7 @@ def get_all_types_site_from_site_id(id_site):
 
 
 @blueprint.route("/sites", methods=["GET"])
+@check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
 def get_sites():
     params = MultiDict(request.args)
     # TODO: add filter support
@@ -120,6 +122,7 @@ def get_sites():
 
 
 @blueprint.route("/sites/<int:id_base_site>", methods=["GET"])
+@check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
 def get_site_by_id(id_base_site):
     site = TMonitoringSites.query.get_or_404(id_base_site)
     schema = MonitoringSitesSchema()
@@ -129,6 +132,7 @@ def get_site_by_id(id_base_site):
 
 
 @blueprint.route("/sites/geometries", methods=["GET"])
+@check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
 def get_all_site_geometries():
     params = MultiDict(request.args)
     subquery = (
@@ -168,6 +172,7 @@ def get_module_sites(module_code: str):
 
 
 @blueprint.route("/sites", methods=["POST"])
+@check_cruved_scope("C", module_code=MODULE_CODE, object_code="GNM_SITES")
 def post_sites():
     module_code = "generic"
     object_type = "site"
@@ -183,6 +188,7 @@ def post_sites():
 
 
 @blueprint.route("/sites/<int:_id>", methods=["DELETE"])
+@check_cruved_scope("D", module_code=MODULE_CODE, object_code="GNM_SITES")
 def delete_site(_id):
     TMonitoringSites.query.filter_by(id_g=_id).delete()
     db.session.commit()
@@ -190,6 +196,7 @@ def delete_site(_id):
 
 
 @blueprint.route("/sites/<int:_id>", methods=["PATCH"])
+@check_cruved_scope("U", module_code=MODULE_CODE, object_code="GNM_SITES")
 def patch_sites(_id):
     module_code = "generic"
     object_type = "site"
