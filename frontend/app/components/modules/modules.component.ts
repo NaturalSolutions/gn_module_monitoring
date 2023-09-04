@@ -10,6 +10,7 @@ import { AuthService, User } from '@geonature/components/auth/auth.service';
 import { TPermission } from '../../types/permission';
 import { ObjectsPermissionMonitorings } from '../../enum/objectPermission';
 import { PermissionService } from '../../services/permission.service';
+import { TOOLTIPMESSAGEALERT } from '../../constants/guard';
 
 @Component({
   selector: 'pnx-monitoring-modules',
@@ -18,7 +19,7 @@ import { PermissionService } from '../../services/permission.service';
 })
 export class ModulesComponent implements OnInit {
   currentUser: User;
-  isDisableAccessSite: boolean = false;
+  canAccessSite: boolean = false;
   currentPermission: TPermission = {
     [ObjectsPermissionMonitorings.GNM_GRP_SITES]: {
       canCreate: false,
@@ -45,6 +46,8 @@ export class ModulesComponent implements OnInit {
   assetsDirectory: string;
 
   bLoading = false;
+
+  toolTipNotAllowed: string = TOOLTIPMESSAGEALERT;
 
   constructor(
     private _auth: AuthService,
@@ -87,8 +90,8 @@ export class ModulesComponent implements OnInit {
         this.description = this._configService.descriptionModule();
         this.titleModule = this._configService.titleModule();
 
-        this.isDisableAccessSite =
-          this.currentPermission.GNM_SITES.canRead && this.currentPermission.GNM_GRP_SITES.canRead;
+        this.canAccessSite =
+          this.currentPermission.GNM_SITES.canRead || this.currentPermission.GNM_GRP_SITES.canRead;
       });
 
     this.currentUser = this._auth.getCurrentUser();

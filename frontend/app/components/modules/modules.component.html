@@ -14,15 +14,12 @@
     <div class="col-md-4 col-sm-12 des-module">{{ description }}</div>
     <!-- <div class="w-100 d-none d-sm-block"></div> -->
     <div class="btn-module col-md-8 col-sm-12 text-center">
-      <div
-        matTooltip="Vous n'avez pas les accès nécessaires"
-        [matTooltipDisabled]="!isDisableAccessSite"
-      >
+      <div [matTooltip]="toolTipNotAllowed" [matTooltipDisabled]="canAccessSite">
         <button
           mat-flat-button
           color="primary"
-          [ngClass]="{ isDisableBtn: isDisableAccessSite }"
-          [disabled]="isDisableAccessSite"
+          [ngClass]="{ isDisableBtn: !canAccessSite }"
+          [disabled]="!canAccessSite"
           [routerLink]="'sites_group'"
           *ngIf="currentUser"
         >
