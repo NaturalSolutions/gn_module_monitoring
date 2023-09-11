@@ -44,6 +44,32 @@ def paginate(query: Query, schema: Schema, limit: int, page: int) -> Response:
     return jsonify(data)
 
 
+def paginate_scope(
+    query: Query, schema: Schema, limit: int, page: int, object_code: str
+) -> Response:
+    result = query.paginate(page=page, error_out=False, per_page=limit)
+    pagination_schema = paginate_schema(schema)
+    datas_allowed = pagination_schema().dump(
+        dict(items=result.items, count=result.total, limit=limit, page=page)
+    )
+    cruved_item_dict = {}
+    cruved_items = [
+        (item.id_g, item.query._get_cruved_scope(object_code=object_code)) for item in result.items
+    ]
+    for cruved_item in cruved_items:
+        for item in result.items:
+            if item.id_g == cruved_item[0]:
+                cruved_item_dict[item.id_g] = {}
+                for action, scope_value in cruved_item[1].items():
+                    cruved_item_dict[item.id_g][action] = item.has_instance_permission(scope_value)
+
+    for id, cruved_item in cruved_item_dict.items():
+        for i, data in enumerate(datas_allowed["items"]):
+            if data[data["pk"]] == id:
+                datas_allowed["items"][i]["permissions"] = cruved_item
+    return jsonify(datas_allowed)
+
+
 def filter_params(query: MonitoringQuery, params: MultiDict) -> MonitoringQuery:
     if len(params) != 0:
         query = query.filter_by_params(params)

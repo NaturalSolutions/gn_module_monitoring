@@ -36,6 +36,10 @@ class MonitoringSitesGroupsSchema(MA.SQLAlchemyAutoSchema):
     medias = MA.Nested(MediaSchema, many=True)
     pk = fields.Method("set_pk", dump_only=True)
     geometry = fields.Method("serialize_geojson", dump_only=True)
+    id_digitiser = fields.Method("get_id_digitiser")
+
+    def get_id_digitiser(self, obj):
+        return obj.id_digitiser
 
     def set_pk(self, obj):
         return self.Meta.model.get_id()

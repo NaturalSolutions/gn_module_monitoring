@@ -1,6 +1,7 @@
 """
     Modèles SQLAlchemy pour les modules de suivi
 """
+from flask import g
 from sqlalchemy import join, select, func, and_
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import (
@@ -27,7 +28,11 @@ from geonature.utils.env import DB
 from geonature.core.gn_commons.models import TModules, cor_module_dataset
 from pypnusershub.db.models import User
 from geonature.core.gn_monitoring.models import corVisitObserver
-from gn_module_monitoring.monitoring.queries import Query as MonitoringQuery
+from gn_module_monitoring.monitoring.queries import (
+    Query as MonitoringQuery,
+    SitesQuery,
+    SitesGroupsQuery,
+)
 
 
 class GenericModel:
@@ -177,7 +182,7 @@ class TObservations(DB.Model):
 
 
 @serializable
-class TMonitoringObservations(TObservations):
+class TMonitoringObservations(TObservations, GenericModel):
     __tablename__ = "t_observation_complements"
     __table_args__ = {"schema": "gn_monitoring"}
     __mapper_args__ = {
@@ -251,7 +256,7 @@ class TMonitoringSites(TBaseSites, GenericModel):
     __mapper_args__ = {
         "polymorphic_identity": "monitoring_site",
     }
-    query_class = MonitoringQuery
+    query_class = SitesQuery
 
     id_base_site = DB.Column(
         DB.ForeignKey("gn_monitoring.t_base_sites.id_base_site"), nullable=False, primary_key=True
@@ -302,15 +307,46 @@ class TMonitoringSites(TBaseSites, GenericModel):
     )
     types_site = DB.relationship("BibTypeSite", secondary=cor_type_site, lazy="joined")
 
+    @hybrid_property
+    def organism_actors(self):
+        # return self.inventor.id_organisme
+        actors_organism_list = []
+        if isinstance(self.inventor, list):
+            for actor in self.inventor:
+                if actor.id_organisme is not None:
+                    actors_organism_list.append(actor.id_organisme)
+        else:
+            if self.inventor.id_organisme is not None:
+                actors_organism_list.append(self.inventor.id_organisme)
+
+    def has_instance_permission(self, scope):
+        if scope == 0:
+            return False
+        elif scope in (1, 2):
+            if (
+                g.current_user.id_role == self.id_digitiser
+                or g.current_user.id_role == self.id_inventor
+            ):  # or g.current_user in self.user_actors:
+                return True
+            if scope == 2 and g.current_user.organisme in self.organism_actors:
+                return True
+        elif scope == 3:
+            return True
+
 
 @serializable
 class TMonitoringSitesGroups(DB.Model, GenericModel):
     __tablename__ = "t_sites_groups"
     __table_args__ = {"schema": "gn_monitoring"}
-    query_class = MonitoringQuery
+    query_class = SitesGroupsQuery
 
     id_sites_group = DB.Column(DB.Integer, primary_key=True, nullable=False, unique=True)
 
+    id_digitiser = DB.Column(DB.Integer, DB.ForeignKey("utilisateurs.t_roles.id_role"))
+
+    digitiser = DB.relationship(
+        User, primaryjoin=(User.id_role == id_digitiser), foreign_keys=[id_digitiser]
+    )
     uuid_sites_group = DB.Column(UUID(as_uuid=True), default=uuid4)
 
     sites_group_name = DB.Column(DB.Unicode)
@@ -350,6 +386,31 @@ class TMonitoringSitesGroups(DB.Model, GenericModel):
             )
         )
     )
+
+    @hybrid_property
+    def organism_actors(self):
+        # return self.digitiser.id_organisme
+        actors_organism_list = []
+        if isinstance(self.digitiser, list):
+            for actor in self.digitiser:
+                if actor.id_organisme is not None:
+                    actors_organism_list.append(actor.id_organisme)
+        else:
+            if self.digitiser.id_organisme is not None:
+                actors_organism_list.append(self.digitiser.id_organisme)
+
+    def has_instance_permission(self, scope):
+        if scope == 0:
+            return False
+        elif scope in (1, 2):
+            if (
+                g.current_user.id_role == self.id_digitiser
+            ):  # or g.current_user in self.user_actors:
+                return True
+            if scope == 2 and g.current_user.organisme in self.organism_actors:
+                return True
+        elif scope == 3:
+            return True
 
 
 @serializable

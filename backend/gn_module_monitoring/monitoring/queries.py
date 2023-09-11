@@ -1,7 +1,9 @@
+from flask import g
 from flask_sqlalchemy import BaseQuery
-from sqlalchemy import Unicode, and_, Unicode, func
+from sqlalchemy import Unicode, and_, Unicode, func, or_, false
 from sqlalchemy.types import DateTime
 from werkzeug.datastructures import MultiDict
+from geonature.core.gn_permissions.tools import get_scopes_by_action
 
 
 class Query(BaseQuery):
@@ -38,3 +40,62 @@ class Query(BaseQuery):
             order_by = order_by.desc()
 
         return self.order_by(order_by)
+
+    def _get_cruved_scope(self, object_code, user=None):
+        if user is None:
+            user = g.current_user
+        cruved = get_scopes_by_action(
+            id_role=user.id_role, module_code="MONITORINGS", object_code=object_code
+        )
+        return cruved
+
+    def _get_read_scope(self, object_code, user=None):
+        if user is None:
+            user = g.current_user
+        cruved = get_scopes_by_action(
+            id_role=user.id_role, module_code="MONITORINGS", object_code=object_code
+        )
+        return cruved["R"]
+
+    def filter_by_readable(self, object_code, user=None):
+        """
+        Return the object where the user has autorization via its CRUVED
+        """
+        return self.filter_by_scope(self._get_read_scope(object_code=object_code, user=user))
+
+
+class SitesQuery(Query):
+    def filter_by_scope(self, scope, user=None):
+        model = self._get_model()
+        if user is None:
+            user = g.current_user
+        if scope == 0:
+            self = self.filter(false())
+        elif scope in (1, 2):
+            ors = [
+                model.id_digitiser == user.id_role,
+                model.id_inventor == user.id_role,
+            ]
+            # if organism is None => do not filter on id_organism even if level = 2
+            if scope == 2 and user.id_organisme is not None:
+                ors += [model.organism_actors.any(id_organisme=user.id_organisme)]
+            self = self.filter(or_(*ors))
+        return self
+
+
+class SitesGroupsQuery(Query):
+    def filter_by_scope(self, scope, user=None):
+        model = self._get_model()
+        if user is None:
+            user = g.current_user
+        if scope == 0:
+            self = self.filter(false())
+        elif scope in (1, 2):
+            ors = [
+                model.id_digitiser == user.id_role,
+            ]
+            # if organism is None => do not filter on id_organism even if level = 2
+            if scope == 2 and user.id_organisme is not None:
+                ors += [model.organism_actors.any(id_organisme=user.id_organisme)]
+            self = self.filter(or_(*ors))
+        return self

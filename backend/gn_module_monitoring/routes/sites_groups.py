@@ -19,6 +19,7 @@ from gn_module_monitoring.utils.routes import (
     get_limit_page,
     get_sort,
     paginate,
+    paginate_scope,
     sort,
 )
 from gn_module_monitoring.routes.monitoring import (
@@ -37,6 +38,7 @@ def get_config_sites_groups(id=None, module_code="generic", object_type="sites_g
 @blueprint.route("/sites_groups", methods=["GET"])
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def get_sites_groups():
+    object_code = "GNM_GRP_SITES"
     params = MultiDict(request.args)
     limit, page = get_limit_page(params=params)
     sort_label, sort_dir = get_sort(
@@ -45,12 +47,21 @@ def get_sites_groups():
     query = filter_params(query=TMonitoringSitesGroups.query, params=params)
 
     query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
-    return paginate(
-        query=query,
+
+    query_allowed = query.filter_by_readable(object_code=object_code)
+    return paginate_scope(
+        query=query_allowed,
         schema=MonitoringSitesGroupsSchema,
         limit=limit,
         page=page,
+        object_code=object_code,
     )
+    # return paginate(
+    #     query=query,
+    #     schema=MonitoringSitesGroupsSchema,
+    #     limit=limit,
+    #     page=page,
+    # )
 
 
 @blueprint.route("/sites_groups/<int:id_sites_group>", methods=["GET"])

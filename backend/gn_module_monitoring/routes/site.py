@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, g
 from flask.json import jsonify
 import json
 from geonature.core.gn_commons.schemas import ModuleSchema
@@ -6,7 +6,9 @@ from geonature.utils.env import db
 from sqlalchemy.orm import Load, joinedload
 from sqlalchemy.sql import func
 from werkzeug.datastructures import MultiDict
+from werkzeug.exceptions import Forbidden
 
+from geonature.core.gn_permissions import decorators as permissions
 from pypnusershub.db.models import User
 from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.config.repositories import get_config
@@ -29,6 +31,7 @@ from gn_module_monitoring.utils.routes import (
     get_limit_page,
     get_sort,
     paginate,
+    paginate_scope,
     sort,
     query_all_types_site_from_site_id,
     filter_according_to_column_type_for_site,
@@ -102,6 +105,7 @@ def get_all_types_site_from_site_id(id_site):
 @blueprint.route("/sites", methods=["GET"])
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
 def get_sites():
+    object_code = "GNM_SITES"
     params = MultiDict(request.args)
     # TODO: add filter support
     limit, page = get_limit_page(params=params)
@@ -113,18 +117,30 @@ def get_sites():
     query = filter_according_to_column_type_for_site(query, params)
     query = sort_according_to_column_type_for_site(query, sort_label, sort_dir)
 
-    return paginate(
-        query=query,
+    quer_allowed = query.filter_by_readable(object_code=object_code)
+    return paginate_scope(
+        query=quer_allowed,
         schema=MonitoringSitesSchema,
         limit=limit,
         page=page,
+        object_code=object_code,
     )
+    # return paginate(
+    #     query=query,
+    #     schema=MonitoringSitesSchema,
+    #     limit=limit,
+    #     page=page,
+    # )
 
 
 @blueprint.route("/sites/<int:id_base_site>", methods=["GET"])
-@check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
-def get_site_by_id(id_base_site):
+@permissions.check_cruved_scope(
+    "R", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
+)
+def get_site_by_id(scope, id_base_site):
     site = TMonitoringSites.query.get_or_404(id_base_site)
+    if not site.has_instance_permission(scope=scope):
+        raise Forbidden(f"User {g.current_user} cannot read site {site.id_base_site}")
     schema = MonitoringSitesSchema()
     response = schema.dump(site)
     response["geometry"] = json.loads(response["geometry"])
@@ -188,16 +204,26 @@ def post_sites():
 
 
 @blueprint.route("/sites/<int:_id>", methods=["DELETE"])
-@check_cruved_scope("D", module_code=MODULE_CODE, object_code="GNM_SITES")
-def delete_site(_id):
+@permissions.check_cruved_scope(
+    "D", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
+)
+def delete_site(scope, _id):
+    site = TMonitoringSites.query.get_or_404(_id)
+    if not site.has_instance_permission(scope=scope):
+        raise Forbidden(f"User {g.current_user} cannot delete site {site.id_base_site}")
     TMonitoringSites.query.filter_by(id_g=_id).delete()
     db.session.commit()
     return {"success": "Item is successfully deleted"}, 200
 
 
 @blueprint.route("/sites/<int:_id>", methods=["PATCH"])
-@check_cruved_scope("U", module_code=MODULE_CODE, object_code="GNM_SITES")
-def patch_sites(_id):
+@permissions.check_cruved_scope(
+    "U", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
+)
+def patch_sites(scope, _id):
+    site = TMonitoringSites.query.get_or_404(_id)
+    if not site.has_instance_permission(scope=scope):
+        raise Forbidden(f"User {g.current_user} cannot update site {site.id_base_site}")
     module_code = "generic"
     object_type = "site"
     customConfig = {"specific": {}}
