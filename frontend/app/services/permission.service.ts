@@ -38,20 +38,16 @@ export class PermissionService {
       Object.keys(listObjectCruved[objKey]).forEach((action) => {
         switch (action) {
           case 'C':
-            this.defaultPermission[objKey].canCreate =
-              listObjectCruved[objKey][action] > 0 ? true : false;
+            this.defaultPermission[objKey].canCreate = listObjectCruved[objKey][action];
             break;
           case 'R':
-            this.defaultPermission[objKey].canRead =
-              listObjectCruved[objKey][action] > 0 ? true : false;
+            this.defaultPermission[objKey].canRead = listObjectCruved[objKey][action];
             break;
           case 'U':
-            this.defaultPermission[objKey].canUpdate =
-              listObjectCruved[objKey][action] > 0 ? true : false;
+            this.defaultPermission[objKey].canUpdate = listObjectCruved[objKey][action];
             break;
           case 'D':
-            this.defaultPermission[objKey].canDelete =
-              listObjectCruved[objKey][action] > 0 ? true : false;
+            this.defaultPermission[objKey].canDelete = listObjectCruved[objKey][action];
             break;
           default:
             break;
