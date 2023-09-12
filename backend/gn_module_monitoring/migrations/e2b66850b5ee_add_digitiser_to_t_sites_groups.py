@@ -25,22 +25,27 @@ foreign_key = "id_role"
 
 
 def upgrade():
-    statement = sa.text(
-        f"""
-        ALTER TABLE {monitorings_schema}.{table} ADD
-        {column} int;
-        ALTER TABLE {monitorings_schema}.{table} fk_t_sites_groups_id_digitiser FOREIGN KEY ({column}) REFERENCES {monitorings_schema}.{table_foreign}({foreign_key}) ON UPDATE CASCADE;
-        """
+    op.add_column(
+        table,
+        sa.Column(
+            column,
+            sa.Integer(),
+            sa.ForeignKey(
+                f"{foreign_schema}.{table_foreign}.{foreign_key}",
+                name="fk_t_sites_groups_id_digitiser",
+                onupdate="CASCADE",
+            ),
+            nullable=False,
+        ),
+        schema=monitorings_schema,
     )
-    op.execute(statement)
 
 
 def downgrade():
     statement = sa.text(
         f"""
         ALTER TABLE {monitorings_schema}.{table} DROP CONSTRAINT fk_t_sites_groups_id_digitiser;
-        ALTER TABLE {monitorings_schema}.{table}
-        DROP COLUMN {column};
         """
     )
     op.execute(statement)
+    op.drop_column(table, column, schema=monitorings_schema)

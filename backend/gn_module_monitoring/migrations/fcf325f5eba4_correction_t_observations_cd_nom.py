@@ -21,18 +21,8 @@ column = "cd_nom"
 
 
 def upgrade():
-    statement = sa.text(
-        f"""
-        ALTER TABLE {monitorings_schema}.{table} ALTER COLUMN {column} DROP NOT NULL;
-        """
-    )
-    op.execute(statement)
+    op.alter_column(table, column, nullable=True, schema=monitorings_schema)
 
 
 def downgrade():
-    statement = sa.text(
-        f"""
-        ALTER TABLE {monitorings_schema}.{table} ALTER COLUMN {column} SET NOT NULL;
-        """
-    )
-    op.execute(statement)
+    op.alter_column(table, column, nullable=False, schema=monitorings_schema)
