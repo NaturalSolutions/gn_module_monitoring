@@ -33,6 +33,7 @@ from gn_module_monitoring.monitoring.queries import (
     SitesQuery,
     SitesGroupsQuery,
 )
+from geonature.core.gn_permissions.tools import has_any_permissions_by_action
 
 
 class GenericModel:
@@ -82,6 +83,11 @@ class GenericModel:
         # ]
 
 
+class PermissionModel(GenericModel):
+    def has_permission(self, module_code, object_code):
+        return has_any_permissions_by_action(module_code=module_code, object_code=object_code)
+
+
 cor_module_type = DB.Table(
     "cor_module_type",
     DB.Column(
@@ -118,7 +124,7 @@ cor_type_site = DB.Table(
 
 
 @serializable
-class BibTypeSite(DB.Model, GenericModel):
+class BibTypeSite(DB.Model, PermissionModel):
     __tablename__ = "bib_type_site"
     __table_args__ = {"schema": "gn_monitoring"}
     query_class = MonitoringQuery
@@ -156,7 +162,7 @@ class TMonitoringObservationDetails(DB.Model):
 
 
 @serializable
-class TObservations(DB.Model):
+class TObservations(DB.Model, PermissionModel):
     __tablename__ = "t_observations"
     __table_args__ = {"schema": "gn_monitoring"}
 
@@ -182,7 +188,7 @@ class TObservations(DB.Model):
 
 
 @serializable
-class TMonitoringObservations(TObservations, GenericModel):
+class TMonitoringObservations(TObservations, PermissionModel):
     __tablename__ = "t_observation_complements"
     __table_args__ = {"schema": "gn_monitoring"}
     __mapper_args__ = {
@@ -202,7 +208,7 @@ TBaseVisits.dataset = DB.relationship(TDatasets)
 
 
 @serializable
-class TMonitoringVisits(TBaseVisits, GenericModel):
+class TMonitoringVisits(TBaseVisits, PermissionModel):
     __tablename__ = "t_visit_complements"
     __table_args__ = {"schema": "gn_monitoring"}
     __mapper_args__ = {
@@ -250,7 +256,7 @@ class TMonitoringVisits(TBaseVisits, GenericModel):
 
 
 @geoserializable(geoCol="geom", idCol="id_base_site")
-class TMonitoringSites(TBaseSites, GenericModel):
+class TMonitoringSites(TBaseSites, PermissionModel):
     __tablename__ = "t_site_complements"
     __table_args__ = {"schema": "gn_monitoring"}
     __mapper_args__ = {
@@ -335,7 +341,7 @@ class TMonitoringSites(TBaseSites, GenericModel):
 
 
 @serializable
-class TMonitoringSitesGroups(DB.Model, GenericModel):
+class TMonitoringSitesGroups(DB.Model, PermissionModel):
     __tablename__ = "t_sites_groups"
     __table_args__ = {"schema": "gn_monitoring"}
     query_class = SitesGroupsQuery
@@ -414,7 +420,7 @@ class TMonitoringSitesGroups(DB.Model, GenericModel):
 
 
 @serializable
-class TMonitoringModules(TModules):
+class TMonitoringModules(TModules, PermissionModel):
     __tablename__ = "t_module_complements"
     __table_args__ = {"schema": "gn_monitoring"}
     __mapper_args__ = {

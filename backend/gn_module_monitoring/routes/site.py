@@ -3,6 +3,7 @@ from flask.json import jsonify
 import json
 from geonature.core.gn_commons.schemas import ModuleSchema
 from geonature.utils.env import db
+from sqlalchemy import and_
 from sqlalchemy.orm import Load, joinedload
 from sqlalchemy.sql import func
 from werkzeug.datastructures import MultiDict
@@ -25,6 +26,7 @@ from gn_module_monitoring.routes.monitoring import (
     create_or_update_object_api_sites_sites_group,
     get_config_object,
 )
+from gn_module_monitoring.routes.modules import get_modules
 from gn_module_monitoring.utils.routes import (
     filter_params,
     geojson_query,
@@ -36,6 +38,7 @@ from gn_module_monitoring.utils.routes import (
     query_all_types_site_from_site_id,
     filter_according_to_column_type_for_site,
     sort_according_to_column_type_for_site,
+    get_objet_with_permission_boolean,
 )
 
 
@@ -171,14 +174,22 @@ def get_all_site_geometries():
 
 
 @blueprint.route("/sites/<int:id_base_site>/modules", methods=["GET"])
+@check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
 def get_module_by_id_base_site(id_base_site: int):
+    modules_object = get_modules()
+    modules = get_objet_with_permission_boolean(modules_object, depth=0)
+    ids_modules_allowed = [module["id_module"] for module in modules if module["cruved"]["R"]]
     query = TMonitoringModules.query.options(
         Load(TMonitoringModules).raiseload("*"),
         joinedload(TMonitoringModules.types_site).options(joinedload(BibTypeSite.sites)),
-    ).filter(TMonitoringModules.types_site.any(BibTypeSite.sites.any(id_base_site=id_base_site)))
-
-    result = query.all()
+    ).filter(
+        and_(
+            TMonitoringModules.id_module.in_(ids_modules_allowed),
+            TMonitoringModules.types_site.any(BibTypeSite.sites.any(id_base_site=id_base_site)),
+        )
+    )
     schema = ModuleSchema()
+    result = query.all()
     # TODO: Is it usefull to put a limit here? Will there be more than 200 modules?
     # If limit here, implement paginated/infinite scroll on frontend side
     return [schema.dump(res) for res in result]

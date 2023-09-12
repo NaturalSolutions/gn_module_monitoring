@@ -75,8 +75,11 @@ def get_sites_group_by_id(id_sites_group: int):
 @blueprint.route("/sites_groups/geometries", methods=["GET"])
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def get_sites_group_geometries():
+    object_code = "GNM_GRP_SITES"
+    query = TMonitoringSitesGroups.query
+    query_allowed = query.filter_by_readable(object_code=object_code)
     subquery = (
-        db.session.query(
+        query_allowed.with_entities(
             TMonitoringSitesGroups.id_sites_group,
             TMonitoringSitesGroups.sites_group_name,
             func.st_convexHull(func.st_collect(TMonitoringSites.geom)),

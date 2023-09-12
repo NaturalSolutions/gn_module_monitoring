@@ -52,6 +52,7 @@ def paginate_scope(
     datas_allowed = pagination_schema().dump(
         dict(items=result.items, count=result.total, limit=limit, page=page)
     )
+    # TODO: améliorer cette partie --> voir la méthode get_objet_with_permission_boolean
     cruved_item_dict = {}
     cruved_items = [
         (item.id_g, item.query._get_cruved_scope(object_code=object_code)) for item in result.items
@@ -218,3 +219,20 @@ def get_object_list_monitorings():
         return object_list_monitorings
     except Exception as e:
         raise GeoNatureError("MONITORINGS - get_object_list_monitorings : {}".format(str(e)))
+
+
+def get_objet_with_permission_boolean(objects, depth: int = 0, module_code=None, object_code=None):
+    objects_out = []
+    for object in objects:
+        object_out = object.as_dict(depth=depth)
+        if hasattr(object, "module_code"):
+            object_out["cruved"] = object.has_permission(
+                module_code=object.module_code, object_code=object_code
+            )
+        else:
+            object_out["cruved"] = object.has_permission(
+                module_code=module_code, object_code=object_code
+            )
+        objects_out.append(object_out)
+
+    return objects_out
