@@ -150,9 +150,12 @@ def get_site_by_id(scope, id_base_site):
 @blueprint.route("/sites/geometries", methods=["GET"])
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
 def get_all_site_geometries():
+    object_code = "GNM_SITES"
     params = MultiDict(request.args)
+    query = TMonitoringSites.query
+    query_allowed = query.filter_by_readable(object_code=object_code)
     subquery = (
-        TMonitoringSites.query.with_entities(
+        query_allowed.with_entities(
             TMonitoringSites.id_base_site,
             TMonitoringSites.base_site_name,
             TMonitoringSites.geom,
