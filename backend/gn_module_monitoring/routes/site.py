@@ -98,16 +98,16 @@ def get_type_site_by_id(id_type_site):
     return schema.dump(res)
 
 
-@blueprint.route("/sites/<int:id_site>/types", methods=["GET"])
+@blueprint.route("/sites/<int:id_site>/types", methods=["GET"],defaults={"id": None, "object_type":"site"})
 def get_all_types_site_from_site_id(id_site):
     types_site = query_all_types_site_from_site_id(id_site)
     schema = BibTypeSiteSchema()
     return [schema.dump(res) for res in types_site]
 
 
-@blueprint.route("/sites", methods=["GET"])
+@blueprint.route("/sites", methods=["GET"],defaults={"object_type":"site"})
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
-def get_sites():
+def get_sites(object_type):
     object_code = "GNM_SITES"
     params = MultiDict(request.args)
     # TODO: add filter support
@@ -120,13 +120,12 @@ def get_sites():
     query = filter_according_to_column_type_for_site(query, params)
     query = sort_according_to_column_type_for_site(query, sort_label, sort_dir)
 
-    quer_allowed = query.filter_by_readable(object_code=object_code)
+    query_allowed = query.filter_by_readable(object_code=object_code)
     return paginate_scope(
-        query=quer_allowed,
+        query=query_allowed,
         schema=MonitoringSitesSchema,
         limit=limit,
-        page=page,
-        object_code=object_code,
+        page=page
     )
     # return paginate(
     #     query=query,
@@ -136,12 +135,12 @@ def get_sites():
     # )
 
 
-@blueprint.route("/sites/<int:id_base_site>", methods=["GET"])
+@blueprint.route("/sites/<int:id>", methods=["GET"],defaults={"object_type":"site"})
 @permissions.check_cruved_scope(
     "R", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
 )
-def get_site_by_id(scope, id_base_site):
-    site = TMonitoringSites.query.get_or_404(id_base_site)
+def get_site_by_id(scope,id, object_type):
+    site = TMonitoringSites.query.get_or_404(id)
     if not site.has_instance_permission(scope=scope):
         raise Forbidden(f"User {g.current_user} cannot read site {site.id_base_site}")
     schema = MonitoringSitesSchema()
@@ -150,9 +149,9 @@ def get_site_by_id(scope, id_base_site):
     return response
 
 
-@blueprint.route("/sites/geometries", methods=["GET"])
+@blueprint.route("/sites/geometries", methods=["GET"],defaults={"object_type":"site"})
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
-def get_all_site_geometries():
+def get_all_site_geometries(object_type):
     object_code = "GNM_SITES"
     params = MultiDict(request.args)
     query = TMonitoringSites.query
@@ -195,15 +194,16 @@ def get_module_by_id_base_site(id_base_site: int):
     return [schema.dump(res) for res in result]
 
 
+# TODO: vérfier si c'est utilisé
 @blueprint.route("/sites/module/<string:module_code>", methods=["GET"])
 def get_module_sites(module_code: str):
     # TODO: load with site_categories.json API
     return jsonify({"module_code": module_code})
 
 
-@blueprint.route("/sites", methods=["POST"])
+@blueprint.route("/sites", methods=["POST"],defaults={"object_type":"site"})
 @check_cruved_scope("C", module_code=MODULE_CODE, object_code="GNM_SITES")
-def post_sites():
+def post_sites(object_type):
     module_code = "generic"
     object_type = "site"
     customConfig = {"specific": {}}
@@ -217,11 +217,11 @@ def post_sites():
     return create_or_update_object_api_sites_sites_group(module_code, object_type), 201
 
 
-@blueprint.route("/sites/<int:_id>", methods=["DELETE"])
+@blueprint.route("/sites/<int:_id>", methods=["DELETE"],defaults={"object_type":"site"})
 @permissions.check_cruved_scope(
     "D", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
 )
-def delete_site(scope, _id):
+def delete_site(scope, _id, object_type):
     site = TMonitoringSites.query.get_or_404(_id)
     if not site.has_instance_permission(scope=scope):
         raise Forbidden(f"User {g.current_user} cannot delete site {site.id_base_site}")
@@ -230,16 +230,15 @@ def delete_site(scope, _id):
     return {"success": "Item is successfully deleted"}, 200
 
 
-@blueprint.route("/sites/<int:_id>", methods=["PATCH"])
+@blueprint.route("/sites/<int:_id>", methods=["PATCH"],defaults={"object_type":"site"})
 @permissions.check_cruved_scope(
     "U", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
 )
-def patch_sites(scope, _id):
+def patch_sites(scope, _id, object_type):
     site = TMonitoringSites.query.get_or_404(_id)
     if not site.has_instance_permission(scope=scope):
         raise Forbidden(f"User {g.current_user} cannot update site {site.id_base_site}")
     module_code = "generic"
-    object_type = "site"
     customConfig = {"specific": {}}
     post_data = dict(request.get_json())
     # TODO: vérifier si utile et si oui mettre dans route POST

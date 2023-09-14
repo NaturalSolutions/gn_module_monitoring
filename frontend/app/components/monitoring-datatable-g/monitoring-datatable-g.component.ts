@@ -83,8 +83,6 @@ export class MonitoringDatatableGComponent implements OnInit {
   rowSelected;
 
   canCreateObj: boolean;
-  canUpdateObj: boolean;
-  canDeleteObj: boolean;
   canCreateChild: boolean;
 
   toolTipNotAllowed: string = TOOLTIPMESSAGEALERT;
@@ -145,6 +143,7 @@ export class MonitoringDatatableGComponent implements OnInit {
     this.page = this.dataTableObj[this.activetabType].page;
     this.objectsStatusChange.emit(this.reInitStatut());
     this.tabChanged.emit(this.activetabType);
+    this.initPermissionAction()
   }
 
   reInitStatut() {
@@ -254,35 +253,28 @@ export class MonitoringDatatableGComponent implements OnInit {
       case 'sites_group':
         objectType = ObjectsPermissionMonitorings.GNM_GRP_SITES;
         objectTypeChild = ObjectsPermissionMonitorings.GNM_SITES;
+        this.canCreateChild = this.permission[objectTypeChild].canCreate ? true : false;
         break;
       case 'site':
         objectType = ObjectsPermissionMonitorings.GNM_SITES;
         objectTypeChild = 'visit';
+        this.canCreateChild = true;
         break;
       case 'visit':
         objectType = 'visit';
         objectTypeChild = 'undefined';
-        this.canDeleteObj = true;
-        this.canUpdateObj = true;
+        this.canCreateObj = true;
         this.canCreateChild = true;
         break;
       default:
         objectType = 'undefined';
         objectTypeChild = 'undefined';
         this.canCreateObj = false;
-        this.canDeleteObj = false;
-        this.canUpdateObj = false;
         this.canCreateChild = false;
     }
 
-    if (objectType != 'undefined') {
+    if (!['undefined','visit'].includes(objectType)) {
       this.canCreateObj = this.permission[objectType].canCreate ? true : false;
-      this.canUpdateObj = this.permission[objectType].canUpdate ? true : false;
-      this.canDeleteObj = this.permission[objectType].canDelete ? true : false;
-    }
-
-    if (objectTypeChild != 'visit') {
-      this.canCreateChild = this.permission[objectTypeChild].canCreate ? true : false;
     }
   }
 

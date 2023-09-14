@@ -137,15 +137,15 @@
                   </ng-template>
                   <!--  -->
                   <a
-                    [ngClass]="{ isDisableBtn: !row.permissions['U'] }"
+                    [ngClass]="{ isDisableBtn: !row.cruved['U'] }"
                     class="nav-link link cell-link"
-                    (click)="row.permissions['U'] ? editSelectedItem(row) : null"
+                    (click)="row.cruved['U'] ? editSelectedItem(row) : null"
                     [matTooltip]="
-                      row.permissions['U'] ? dataTableArray[i].editObjLabel : toolTipNotAllowed
+                      row.cruved['U'] ? dataTableArray[i].editObjLabel : toolTipNotAllowed
                     "
                   >
                     <i
-                      [ngClass]="{ isDisableIcon: !row.permissions['U'] }"
+                      [ngClass]="{ isDisableIcon: !row.cruved['U'] }"
                       class="fa fa-edit"
                       aria-hidden="true"
                     ></i>
@@ -155,15 +155,15 @@
                     *ngIf="dataTableArray[i].objectType == 'visit' ? true : row['nb_visits'] == 0"
                   >
                     <a
-                      [ngClass]="{ isDisableBtn: !row.permissions['D'] }"
+                      [ngClass]="{ isDisableBtn: !row.cruved['D'] }"
                       class="nav-link link cell-link"
-                      (click)="row.permissions['D'] ? alertMessage(row) : null"
+                      (click)="row.cruved['D'] ? alertMessage(row) : null"
                       [matTooltip]="
-                        row.permissions['D'] ? dataTableArray[i].deleteObjLabel : toolTipNotAllowed
+                        row.cruved['D'] ? dataTableArray[i].deleteObjLabel : toolTipNotAllowed
                       "
                     >
                       <i
-                        [ngClass]="{ isDisableIcon: !row.permissions['D'] }"
+                        [ngClass]="{ isDisableIcon: !row.cruved['D'] }"
                         class="fa fa-trash"
                         aria-hidden="true"
                       ></i>

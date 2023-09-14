@@ -32,6 +32,7 @@ from gn_module_monitoring.monitoring.queries import (
     Query as MonitoringQuery,
     SitesQuery,
     SitesGroupsQuery,
+    VisitQuery
 )
 from geonature.core.gn_permissions.tools import has_any_permissions_by_action
 
@@ -84,7 +85,7 @@ class GenericModel:
 
 
 class PermissionModel(GenericModel):
-    def has_permission(self, module_code, object_code):
+    def has_permission(self, module_code=None, object_code=None):
         return has_any_permissions_by_action(module_code=module_code, object_code=object_code)
 
 
@@ -214,7 +215,7 @@ class TMonitoringVisits(TBaseVisits, PermissionModel):
     __mapper_args__ = {
         "polymorphic_identity": "monitoring_visit",
     }
-    query_class = MonitoringQuery
+    query_class = VisitQuery
     id_base_visit = DB.Column(
         DB.ForeignKey("gn_monitoring.t_base_visits.id_base_visit"),
         nullable=False,
@@ -253,6 +254,51 @@ class TMonitoringVisits(TBaseVisits, PermissionModel):
         foreign_keys=[TBaseVisits.id_module],
         uselist=False,
     )
+    # TODO: ca y est deja dans TBaseVisit (mais voir comment y accéder)
+    # digitiser = DB.relationship(
+    #     User, primaryjoin=(User.id_role == TBaseVisits.id_digitiser), foreign_keys=[TBaseVisits.id_digitiser]
+    # )
+
+    # observers = DB.relationship(
+    #     User,
+    #     secondary=corVisitObserver,
+    #     primaryjoin=(corVisitObserver.c.id_base_visit == id_base_visit),
+    #     secondaryjoin=(corVisitObserver.c.id_role == User.id_role),
+    #     foreign_keys=[corVisitObserver.c.id_base_visit, corVisitObserver.c.id_role],
+    # )
+
+    @hybrid_property
+    def observers_list(self):
+        # return self.digitiser.id_organisme
+        observers_list = []
+        observers_list.append(DB.session(self).query(corVisitObserver.id_role).filter(corVisitObserver.c.id_base_visit == self.id_base_visit).all())
+
+
+    @hybrid_property
+    def organism_actors(self):
+        # return self.digitiser.id_organisme
+        actors_organism_list = []
+        if isinstance(self.digitiser, list):
+            for actor in self.digitiser:
+                if actor.id_organisme is not None:
+                    actors_organism_list.append(actor.id_organisme)
+        else:
+            if self.digitiser.id_organisme is not None:
+                actors_organism_list.append(self.digitiser.id_organisme)
+
+    def has_instance_permission(self, scope):
+        if scope == 0:
+            return False
+        elif scope in (1, 2):
+            if (
+                g.current_user.id_role == self.id_digitiser
+                or  g.current_user.id_role in self.observers.id_role
+            ):  # or g.current_user in self.user_actors:
+                return True
+            if scope == 2 and g.current_user.organisme in self.organism_actors:
+                return True
+        elif scope == 3:
+            return True
 
 
 @geoserializable(geoCol="geom", idCol="id_base_site")

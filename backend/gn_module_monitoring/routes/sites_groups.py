@@ -35,9 +35,9 @@ def get_config_sites_groups(id=None, module_code="generic", object_type="sites_g
     return obj["properties"]
 
 
-@blueprint.route("/sites_groups", methods=["GET"])
+@blueprint.route("/sites_groups", methods=["GET"],defaults={"object_type":"sites_group"})
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def get_sites_groups():
+def get_sites_groups(object_type:str):
     object_code = "GNM_GRP_SITES"
     params = MultiDict(request.args)
     limit, page = get_limit_page(params=params)
@@ -53,8 +53,7 @@ def get_sites_groups():
         query=query_allowed,
         schema=MonitoringSitesGroupsSchema,
         limit=limit,
-        page=page,
-        object_code=object_code,
+        page=page
     )
     # return paginate(
     #     query=query,
@@ -64,17 +63,17 @@ def get_sites_groups():
     # )
 
 
-@blueprint.route("/sites_groups/<int:id_sites_group>", methods=["GET"])
+@blueprint.route("/sites_groups/<int:id_sites_group>", methods=["GET"], defaults={"object_type":"sites_group"})
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def get_sites_group_by_id(id_sites_group: int):
+def get_sites_group_by_id(id_sites_group: int,object_type:str):
     schema = MonitoringSitesGroupsSchema()
     result = TMonitoringSitesGroups.query.get_or_404(id_sites_group)
     return jsonify(schema.dump(result))
 
 
-@blueprint.route("/sites_groups/geometries", methods=["GET"])
+@blueprint.route("/sites_groups/geometries", methods=["GET"], defaults={"object_type":"sites_group"})
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def get_sites_group_geometries():
+def get_sites_group_geometries(object_type:str):
     object_code = "GNM_GRP_SITES"
     query = TMonitoringSitesGroups.query
     query_allowed = query.filter_by_readable(object_code=object_code)
@@ -97,20 +96,19 @@ def get_sites_group_geometries():
     return jsonify(result)
 
 
-@blueprint.route("/sites_groups/<int:_id>", methods=["PATCH"])
+@blueprint.route("/sites_groups/<int:_id>", methods=["PATCH"],defaults={"object_type":"sites_group"})
 @check_cruved_scope("U", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def patch(_id):
+def patch(_id:int, object_type:str):
     # ###############################""
     # FROM route/monitorings
     module_code = "generic"
-    object_type = "sites_group"
     get_config(module_code, force=True)
     return create_or_update_object_api_sites_sites_group(module_code, object_type, _id), 201
 
 
-@blueprint.route("/sites_groups/<int:_id>", methods=["DELETE"])
+@blueprint.route("/sites_groups/<int:_id>", methods=["DELETE"], defaults={"object_type":"sites_group"})
 @check_cruved_scope("D", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def delete(_id):
+def delete(_id:int, object_type:str):
     item_schema = MonitoringSitesGroupsSchema()
     item = TMonitoringSitesGroups.find_by_id(_id)
     TMonitoringSitesGroups.query.filter_by(id_g=_id).delete()
@@ -118,11 +116,10 @@ def delete(_id):
     return item_schema.dump(item), 201
 
 
-@blueprint.route("/sites_groups", methods=["POST"])
+@blueprint.route("/sites_groups", methods=["POST"], defaults={"object_type":"sites_group"})
 @check_cruved_scope("P", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def post():
+def post(object_type:str):
     module_code = "generic"
-    object_type = "sites_group"
     get_config(module_code, force=True)
     return create_or_update_object_api_sites_sites_group(module_code, object_type), 201
 

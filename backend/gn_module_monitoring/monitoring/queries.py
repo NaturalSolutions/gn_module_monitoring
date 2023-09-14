@@ -49,19 +49,19 @@ class Query(BaseQuery):
         )
         return cruved
 
-    def _get_read_scope(self, object_code, user=None):
+    def _get_read_scope(self, module_code="MONITORINGS",object_code=None, user=None):
         if user is None:
             user = g.current_user
         cruved = get_scopes_by_action(
-            id_role=user.id_role, module_code="MONITORINGS", object_code=object_code
+            id_role=user.id_role, module_code=module_code, object_code=object_code
         )
         return cruved["R"]
 
-    def filter_by_readable(self, object_code, user=None):
+    def filter_by_readable(self, module_code="MONITORINGS",object_code=None, user=None):
         """
         Return the object where the user has autorization via its CRUVED
         """
-        return self.filter_by_scope(self._get_read_scope(object_code=object_code, user=user))
+        return self.filter_by_scope(self._get_read_scope(module_code=module_code, object_code=object_code, user=user))
 
 
 class SitesQuery(Query):
@@ -85,6 +85,25 @@ class SitesQuery(Query):
 
 class SitesGroupsQuery(Query):
     def filter_by_scope(self, scope, user=None):
+        model = self._get_model()
+        if user is None:
+            user = g.current_user
+        if scope == 0:
+            self = self.filter(false())
+        elif scope in (1, 2):
+            ors = [
+                model.id_digitiser == user.id_role,
+            ]
+            # if organism is None => do not filter on id_organism even if level = 2
+            if scope == 2 and user.id_organisme is not None:
+                ors += [model.organism_actors.any(id_organisme=user.id_organisme)]
+            self = self.filter(or_(*ors))
+        return self
+
+
+class VisitQuery(Query):
+    def filter_by_scope(self, scope, user=None):
+        # Problem pas le même comportement que pour les sites et groupes de site
         model = self._get_model()
         if user is None:
             user = g.current_user

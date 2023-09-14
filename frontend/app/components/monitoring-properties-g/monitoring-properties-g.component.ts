@@ -80,7 +80,7 @@ export class MonitoringPropertiesGComponent implements OnInit {
 
   initPermission() {
     let objectType: ObjectsPermissionMonitorings | string;
-    switch (this.newParentType) {
+    switch (this.newParentType.objectType) {
       case 'sites_group':
         objectType = ObjectsPermissionMonitorings.GNM_GRP_SITES;
         break;
@@ -93,10 +93,10 @@ export class MonitoringPropertiesGComponent implements OnInit {
       default:
         objectType = 'undefined';
         this.canUpdateObj = false;
-
-        if (objectType != 'undefined')
-          this.canUpdateObj = this.permission[objectType].canUpdate ? true : false;
+        break
     }
+    if (!['undefined','visit'].includes(objectType))
+    this.canUpdateObj = this.permission[objectType].canUpdate ? true : false;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
