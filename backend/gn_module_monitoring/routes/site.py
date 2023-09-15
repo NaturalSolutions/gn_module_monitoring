@@ -98,10 +98,8 @@ def get_type_site_by_id(id_type_site):
     return schema.dump(res)
 
 
-@blueprint.route(
-    "/sites/<int:id_site>/types", methods=["GET"], defaults={"id": None, "object_type": "site"}
-)
-def get_all_types_site_from_site_id(id_site):
+@blueprint.route("/sites/<int:id_site>/types", methods=["GET"], defaults={"object_type": "site"})
+def get_all_types_site_from_site_id(id_site, object_type):
     types_site = query_all_types_site_from_site_id(id_site)
     schema = BibTypeSiteSchema()
     return [schema.dump(res) for res in types_site]
