@@ -81,8 +81,8 @@ class SitesQuery(Query):
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
                 ors += [
-                    Models.TMonitoringSites.inventor.any(id_organisme=user.id_organisme),
-                    Models.TMonitoringSites.digitiser.any(id_organisme=user.id_organisme),
+                    Models.TMonitoringSites.inventor.has(id_organisme=user.id_organisme),
+                    Models.TMonitoringSites.digitiser.has(id_organisme=user.id_organisme),
                 ]
             self = self.filter(or_(*ors))
         return self
@@ -101,7 +101,7 @@ class SitesGroupsQuery(Query):
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
                 ors += [
-                    Models.TMonitoringSitesGroups.digitiser.any(id_organisme=user.id_organisme)
+                    Models.TMonitoringSitesGroups.digitiser.has(id_organisme=user.id_organisme)
                 ]
             self = self.filter(or_(*ors))
         return self
@@ -121,6 +121,26 @@ class VisitQuery(Query):
             ]
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
-                ors += [Models.TMonitoringVisits.observers.any(id_organisme=user.id_organisme)]
+                ors += [
+                    Models.TMonitoringVisits.observers.any(id_organisme=user.id_organisme),
+                    Models.TMonitoringVisits.digitiser.has(id_organisme=user.id_organisme),
+                ]
+            self = self.filter(or_(*ors))
+        return self
+
+
+class ObservationsQuery(Query):
+    def filter_by_scope(self, scope, user=None):
+        if user is None:
+            user = g.current_user
+        if scope == 0:
+            self = self.filter(false())
+        elif scope in (1, 2):
+            ors = [
+                Models.TObservations.id_digitiser == user.id_role,
+            ]
+            # if organism is None => do not filter on id_organism even if level = 2
+            if scope == 2 and user.id_organisme is not None:
+                ors += [Models.TObservations.digitiser.any(id_organisme=user.id_organisme)]
             self = self.filter(or_(*ors))
         return self
