@@ -1,8 +1,8 @@
-"""Add digitiser to t_sites_groups
+"""add_id_digitiser_to_t_observations
 
-Revision ID: e2b66850b5ee
-Revises: fc90d31c677f
-Create Date: 2023-09-11 12:17:17.280948
+Revision ID: a5dce2633e4c
+Revises: e2b66850b5ee
+Create Date: 2023-09-15 16:44:29.133863
 
 """
 from alembic import op
@@ -10,13 +10,14 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "e2b66850b5ee"
-down_revision = "2003e18f248a"
+revision = "a5dce2633e4c"
+down_revision = "e2b66850b5ee"
 branch_labels = None
 depends_on = None
 
+
 monitorings_schema = "gn_monitoring"
-table = "t_sites_groups"
+table = "t_observations"
 column = "id_digitiser"
 
 foreign_schema = "utilisateurs"
@@ -44,7 +45,7 @@ def upgrade():
 def downgrade():
     statement = sa.text(
         f"""
-        ALTER TABLE {monitorings_schema}.{table} DROP CONSTRAINT fk_{table}_{column};
+        ALTER TABLE {monitorings_schema}.{table} DROP CONSTRAINT fk_t_sites_groups_id_digitiser;
         """
     )
     op.execute(statement)
