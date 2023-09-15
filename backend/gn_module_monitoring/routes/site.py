@@ -98,14 +98,16 @@ def get_type_site_by_id(id_type_site):
     return schema.dump(res)
 
 
-@blueprint.route("/sites/<int:id_site>/types", methods=["GET"],defaults={"id": None, "object_type":"site"})
+@blueprint.route(
+    "/sites/<int:id_site>/types", methods=["GET"], defaults={"id": None, "object_type": "site"}
+)
 def get_all_types_site_from_site_id(id_site):
     types_site = query_all_types_site_from_site_id(id_site)
     schema = BibTypeSiteSchema()
     return [schema.dump(res) for res in types_site]
 
 
-@blueprint.route("/sites", methods=["GET"],defaults={"object_type":"site"})
+@blueprint.route("/sites", methods=["GET"], defaults={"object_type": "site"})
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
 def get_sites(object_type):
     object_code = "GNM_SITES"
@@ -122,10 +124,7 @@ def get_sites(object_type):
 
     query_allowed = query.filter_by_readable(object_code=object_code)
     return paginate_scope(
-        query=query_allowed,
-        schema=MonitoringSitesSchema,
-        limit=limit,
-        page=page
+        query=query_allowed, schema=MonitoringSitesSchema, limit=limit, page=page
     )
     # return paginate(
     #     query=query,
@@ -135,11 +134,11 @@ def get_sites(object_type):
     # )
 
 
-@blueprint.route("/sites/<int:id>", methods=["GET"],defaults={"object_type":"site"})
+@blueprint.route("/sites/<int:id>", methods=["GET"], defaults={"object_type": "site"})
 @permissions.check_cruved_scope(
     "R", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
 )
-def get_site_by_id(scope,id, object_type):
+def get_site_by_id(scope, id, object_type):
     site = TMonitoringSites.query.get_or_404(id)
     if not site.has_instance_permission(scope=scope):
         raise Forbidden(f"User {g.current_user} cannot read site {site.id_base_site}")
@@ -149,7 +148,7 @@ def get_site_by_id(scope,id, object_type):
     return response
 
 
-@blueprint.route("/sites/geometries", methods=["GET"],defaults={"object_type":"site"})
+@blueprint.route("/sites/geometries", methods=["GET"], defaults={"object_type": "site"})
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_SITES")
 def get_all_site_geometries(object_type):
     object_code = "GNM_SITES"
@@ -201,7 +200,7 @@ def get_module_sites(module_code: str):
     return jsonify({"module_code": module_code})
 
 
-@blueprint.route("/sites", methods=["POST"],defaults={"object_type":"site"})
+@blueprint.route("/sites", methods=["POST"], defaults={"object_type": "site"})
 @check_cruved_scope("C", module_code=MODULE_CODE, object_code="GNM_SITES")
 def post_sites(object_type):
     module_code = "generic"
@@ -217,7 +216,7 @@ def post_sites(object_type):
     return create_or_update_object_api_sites_sites_group(module_code, object_type), 201
 
 
-@blueprint.route("/sites/<int:_id>", methods=["DELETE"],defaults={"object_type":"site"})
+@blueprint.route("/sites/<int:_id>", methods=["DELETE"], defaults={"object_type": "site"})
 @permissions.check_cruved_scope(
     "D", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
 )
@@ -230,7 +229,7 @@ def delete_site(scope, _id, object_type):
     return {"success": "Item is successfully deleted"}, 200
 
 
-@blueprint.route("/sites/<int:_id>", methods=["PATCH"],defaults={"object_type":"site"})
+@blueprint.route("/sites/<int:_id>", methods=["PATCH"], defaults={"object_type": "site"})
 @permissions.check_cruved_scope(
     "U", get_scope=True, module_code=MODULE_CODE, object_code="GNM_SITES"
 )

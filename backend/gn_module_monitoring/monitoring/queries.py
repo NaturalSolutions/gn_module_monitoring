@@ -5,6 +5,8 @@ from sqlalchemy.types import DateTime
 from werkzeug.datastructures import MultiDict
 from geonature.core.gn_permissions.tools import get_scopes_by_action
 import gn_module_monitoring.monitoring.models as Models
+
+
 class Query(BaseQuery):
     def _get_entity(self, entity):
         if hasattr(entity, "_entities"):
@@ -48,7 +50,7 @@ class Query(BaseQuery):
         )
         return cruved
 
-    def _get_read_scope(self, module_code="MONITORINGS",object_code=None, user=None):
+    def _get_read_scope(self, module_code="MONITORINGS", object_code=None, user=None):
         if user is None:
             user = g.current_user
         cruved = get_scopes_by_action(
@@ -56,11 +58,13 @@ class Query(BaseQuery):
         )
         return cruved["R"]
 
-    def filter_by_readable(self, module_code="MONITORINGS",object_code=None, user=None):
+    def filter_by_readable(self, module_code="MONITORINGS", object_code=None, user=None):
         """
         Return the object where the user has autorization via its CRUVED
         """
-        return self.filter_by_scope(self._get_read_scope(module_code=module_code, object_code=object_code, user=user))
+        return self.filter_by_scope(
+            self._get_read_scope(module_code=module_code, object_code=object_code, user=user)
+        )
 
 
 class SitesQuery(Query):
@@ -76,8 +80,10 @@ class SitesQuery(Query):
             ]
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
-                ors += [Models.TMonitoringSites.inventor.any(id_organisme=user.id_organisme),
-                       Models.TMonitoringSites.digitiser.any(id_organisme=user.id_organisme), ]
+                ors += [
+                    Models.TMonitoringSites.inventor.any(id_organisme=user.id_organisme),
+                    Models.TMonitoringSites.digitiser.any(id_organisme=user.id_organisme),
+                ]
             self = self.filter(or_(*ors))
         return self
 
@@ -94,7 +100,9 @@ class SitesGroupsQuery(Query):
             ]
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
-                ors += [Models.TMonitoringSitesGroups.digitiser.any(id_organisme=user.id_organisme)]
+                ors += [
+                    Models.TMonitoringSitesGroups.digitiser.any(id_organisme=user.id_organisme)
+                ]
             self = self.filter(or_(*ors))
         return self
 
@@ -109,14 +117,10 @@ class VisitQuery(Query):
         elif scope in (1, 2):
             ors = [
                 Models.TMonitoringVisits.id_digitiser == user.id_role,
-                Models.TMonitoringVisits.observers.any(id_role=user.id_role)
+                Models.TMonitoringVisits.observers.any(id_role=user.id_role),
             ]
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
-                ors += [
-                  Models.TMonitoringVisits.observers.any(id_organisme=user.id_organisme)
-                ]
+                ors += [Models.TMonitoringVisits.observers.any(id_organisme=user.id_organisme)]
             self = self.filter(or_(*ors))
         return self
-    
-

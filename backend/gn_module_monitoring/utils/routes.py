@@ -26,6 +26,7 @@ from werkzeug.datastructures import MultiDict
 from gn_module_monitoring.monitoring.queries import Query as MonitoringQuery
 from gn_module_monitoring.monitoring.schemas import paginate_schema
 
+
 def get_limit_page(params: MultiDict) -> Tuple[int]:
     return int(params.pop("limit", 50)), int(params.pop("page", 1))
 
@@ -51,7 +52,7 @@ def paginate_scope(
     datas_allowed = pagination_schema().dump(
         dict(items=result.items, count=result.total, limit=limit, page=page)
     )
-    cruved_item_dict = get_objet_with_permission_boolean(result.items,object_code=object_code)
+    cruved_item_dict = get_objet_with_permission_boolean(result.items, object_code=object_code)
     for cruved_item in cruved_item_dict:
         for i, data in enumerate(datas_allowed["items"]):
             if data[data["pk"]] == cruved_item[data["pk"]]:
@@ -213,7 +214,7 @@ def get_objet_with_permission_boolean(objects, depth: int = 0, module_code=None,
             # set_permission_global_session(object.module.module_code,object_type)
             object_out["cruved"] = object.has_permission(
                 module_code=object.module.module_code, object_code=object_code
-            )          
+            )
         else:
             object_out["cruved"] = object.has_permission(
                 module_code=module_code, object_code=object_code
@@ -221,6 +222,7 @@ def get_objet_with_permission_boolean(objects, depth: int = 0, module_code=None,
         objects_out.append(object_out)
 
     return objects_out
+
 
 # from gn_module_monitoring.monitoring.definitions import MonitoringPermissions_dict
 # from gn_module_monitoring import MODULE_CODE

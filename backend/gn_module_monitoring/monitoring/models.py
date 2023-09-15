@@ -32,7 +32,7 @@ from gn_module_monitoring.monitoring.queries import (
     Query as MonitoringQuery,
     SitesQuery,
     SitesGroupsQuery,
-    VisitQuery
+    VisitQuery,
 )
 from geonature.core.gn_permissions.tools import has_any_permissions_by_action
 
@@ -267,22 +267,20 @@ class TMonitoringVisits(TBaseVisits, PermissionModel):
             if self.digitiser.id_organisme is not None:
                 actors_organism_list.append(self.digitiser.id_organisme)
         return actors_organism_list
-    
+
     def has_instance_permission(self, scope):
         if scope == 0:
             return False
         elif scope in (1, 2):
             if (
                 g.current_user.id_role == self.id_digitiser
-                or  g.current_user.id_role in self.observers.id_role
+                or g.current_user.id_role in self.observers.id_role
             ):  # or g.current_user in self.user_actors:
                 return True
             if scope == 2 and g.current_user.organisme in self.organism_actors:
                 return True
         elif scope == 3:
             return True
-
-
 
 
 @geoserializable(geoCol="geom", idCol="id_base_site")
@@ -370,7 +368,6 @@ class TMonitoringSites(TBaseSites, PermissionModel):
             return True
 
 
-    
 @serializable
 class TMonitoringSitesGroups(DB.Model, PermissionModel):
     __tablename__ = "t_sites_groups"
