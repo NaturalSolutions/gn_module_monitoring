@@ -2,7 +2,7 @@
     Modèles SQLAlchemy pour les modules de suivi
 """
 from flask import g
-from sqlalchemy import join, select, func, and_
+from sqlalchemy import join, select, func, and_, or_, false
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import (
     column_property,
@@ -254,25 +254,6 @@ class TMonitoringVisits(TBaseVisits, PermissionModel):
         foreign_keys=[TBaseVisits.id_module],
         uselist=False,
     )
-    # TODO: ca y est deja dans TBaseVisit (mais voir comment y accéder)
-    # digitiser = DB.relationship(
-    #     User, primaryjoin=(User.id_role == TBaseVisits.id_digitiser), foreign_keys=[TBaseVisits.id_digitiser]
-    # )
-
-    # observers = DB.relationship(
-    #     User,
-    #     secondary=corVisitObserver,
-    #     primaryjoin=(corVisitObserver.c.id_base_visit == id_base_visit),
-    #     secondaryjoin=(corVisitObserver.c.id_role == User.id_role),
-    #     foreign_keys=[corVisitObserver.c.id_base_visit, corVisitObserver.c.id_role],
-    # )
-
-    @hybrid_property
-    def observers_list(self):
-        # return self.digitiser.id_organisme
-        observers_list = []
-        observers_list.append(DB.session(self).query(corVisitObserver.id_role).filter(corVisitObserver.c.id_base_visit == self.id_base_visit).all())
-
 
     @hybrid_property
     def organism_actors(self):
@@ -285,7 +266,8 @@ class TMonitoringVisits(TBaseVisits, PermissionModel):
         else:
             if self.digitiser.id_organisme is not None:
                 actors_organism_list.append(self.digitiser.id_organisme)
-
+        return actors_organism_list
+    
     def has_instance_permission(self, scope):
         if scope == 0:
             return False
@@ -299,6 +281,8 @@ class TMonitoringVisits(TBaseVisits, PermissionModel):
                 return True
         elif scope == 3:
             return True
+
+
 
 
 @geoserializable(geoCol="geom", idCol="id_base_site")
@@ -386,6 +370,7 @@ class TMonitoringSites(TBaseSites, PermissionModel):
             return True
 
 
+    
 @serializable
 class TMonitoringSitesGroups(DB.Model, PermissionModel):
     __tablename__ = "t_sites_groups"

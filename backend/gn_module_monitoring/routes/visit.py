@@ -29,7 +29,8 @@ def get_visits(object_type):
     modules_object = get_modules()
     modules = get_objet_with_permission_boolean(modules_object,object_code=OBJECT_CODE)
     ids_modules_allowed = [module["id_module"] for module in modules if module["cruved"]["R"]]
-    query = TMonitoringVisits.query.options(joinedload(TMonitoringVisits.module)).filter(TMonitoringVisits.id_module.in_(ids_modules_allowed))
+    query =  TMonitoringVisits.query
+    query = query.options(joinedload(TMonitoringVisits.module)).filter(TMonitoringVisits.id_module.in_(ids_modules_allowed))
     query = filter_params(query=query, params=params)
     query = sort(query=query, sort=sort_label, sort_dir=sort_dir)
     query_allowed = query
@@ -40,5 +41,6 @@ def get_visits(object_type):
         query=query_allowed,
         schema=MonitoringVisitsSchema,
         limit=limit,
-        page=page
+        page=page,
+        object_code=OBJECT_CODE
     )

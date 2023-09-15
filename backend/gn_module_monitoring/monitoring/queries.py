@@ -4,8 +4,7 @@ from sqlalchemy import Unicode, and_, Unicode, func, or_, false
 from sqlalchemy.types import DateTime
 from werkzeug.datastructures import MultiDict
 from geonature.core.gn_permissions.tools import get_scopes_by_action
-
-
+import gn_module_monitoring.monitoring.models as Models
 class Query(BaseQuery):
     def _get_entity(self, entity):
         if hasattr(entity, "_entities"):
@@ -66,37 +65,36 @@ class Query(BaseQuery):
 
 class SitesQuery(Query):
     def filter_by_scope(self, scope, user=None):
-        model = self._get_model()
         if user is None:
             user = g.current_user
         if scope == 0:
             self = self.filter(false())
         elif scope in (1, 2):
             ors = [
-                model.id_digitiser == user.id_role,
-                model.id_inventor == user.id_role,
+                Models.TMonitoringSites.id_digitiser == user.id_role,
+                Models.TMonitoringSites.id_inventor == user.id_role,
             ]
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
-                ors += [model.organism_actors.any(id_organisme=user.id_organisme)]
+                ors += [Models.TMonitoringSites.inventor.any(id_organisme=user.id_organisme),
+                       Models.TMonitoringSites.digitiser.any(id_organisme=user.id_organisme), ]
             self = self.filter(or_(*ors))
         return self
 
 
 class SitesGroupsQuery(Query):
     def filter_by_scope(self, scope, user=None):
-        model = self._get_model()
         if user is None:
             user = g.current_user
         if scope == 0:
             self = self.filter(false())
         elif scope in (1, 2):
             ors = [
-                model.id_digitiser == user.id_role,
+                Models.TMonitoringSitesGroups.id_digitiser == user.id_role,
             ]
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
-                ors += [model.organism_actors.any(id_organisme=user.id_organisme)]
+                ors += [Models.TMonitoringSitesGroups.digitiser.any(id_organisme=user.id_organisme)]
             self = self.filter(or_(*ors))
         return self
 
@@ -104,17 +102,21 @@ class SitesGroupsQuery(Query):
 class VisitQuery(Query):
     def filter_by_scope(self, scope, user=None):
         # Problem pas le même comportement que pour les sites et groupes de site
-        model = self._get_model()
         if user is None:
             user = g.current_user
         if scope == 0:
             self = self.filter(false())
         elif scope in (1, 2):
             ors = [
-                model.id_digitiser == user.id_role,
+                Models.TMonitoringVisits.id_digitiser == user.id_role,
+                Models.TMonitoringVisits.observers.any(id_role=user.id_role)
             ]
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
-                ors += [model.organism_actors.any(id_organisme=user.id_organisme)]
+                ors += [
+                  Models.TMonitoringVisits.observers.any(id_organisme=user.id_organisme)
+                ]
             self = self.filter(or_(*ors))
         return self
+    
+
