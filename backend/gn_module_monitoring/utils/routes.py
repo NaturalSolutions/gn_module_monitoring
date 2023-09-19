@@ -202,22 +202,22 @@ def get_object_list_monitorings():
         raise GeoNatureError("MONITORINGS - get_object_list_monitorings : {}".format(str(e)))
 
 
-def get_objet_with_permission_boolean(objects, depth: int = 0, module_code=None, object_code=None):
+def get_objet_with_permission_boolean(objects, depth: int = 0, module_code=None, object_code=None, id_role=None):
+    if id_role is None:
+       id_role =  g.current_user.id_role
     objects_out = []
     for object in objects:
+        cruved_object = object.query._get_cruved_scope(object_code=object_code)
         object_out = object.as_dict(depth=depth)
         if hasattr(object, "module_code"):
-            object_out["cruved"] = object.has_permission(
-                module_code=object.module_code, object_code=object_code
+            object_out["cruved"] = object.has_permission(cruved_object=cruved_object
             )
         elif hasattr(object, "module") and hasattr(object.module, "module_code"):
-            # set_permission_global_session(object.module.module_code,object_type)
-            object_out["cruved"] = object.has_permission(
-                module_code=object.module.module_code, object_code=object_code
+            object_out["cruved"] = object.has_permission(cruved_object=cruved_object
             )
         else:
             object_out["cruved"] = object.has_permission(
-                module_code=module_code, object_code=object_code
+                cruved_object=cruved_object
             )
         objects_out.append(object_out)
 

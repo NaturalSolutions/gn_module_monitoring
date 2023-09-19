@@ -21,6 +21,7 @@ import {
 import { EMPTY, from, iif, of } from 'rxjs';
 import { FormService } from '../../services/form.service';
 import { Router } from '@angular/router';
+import { TOOLTIPMESSAGEALERT } from '../../constants/guard';
 
 @Component({
   selector: 'pnx-monitoring-form',
@@ -67,6 +68,9 @@ export class MonitoringFormComponent implements OnInit {
   public chainShow = [];
 
   public queryParams = {};
+  
+  canDelete:boolean;
+  toolTipNotAllowed: string = TOOLTIPMESSAGEALERT;
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -81,6 +85,7 @@ export class MonitoringFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.initPermission()
     this._configService
       .init(this.obj.moduleCode)
       .pipe(
@@ -651,5 +656,9 @@ export class MonitoringFormComponent implements OnInit {
       .sort((a, b) => {
         return a.attribut_name === 'types_site' ? -1 : b.attribut_name === 'types_site' ? +1 : 0;
       });
+  }
+
+  initPermission(){
+    this.canDelete = this.obj.objectType == 'module' ? this.currentUser?.moduleCruved[this.obj.objectType]['D'] > 0 : (this.obj.cruved['D'] && !['site', 'sites_group'].includes(this.obj.objectType))
   }
 }

@@ -42,7 +42,7 @@ class MonitoringSitesGroupsSchema(MA.SQLAlchemyAutoSchema):
         return obj.id_digitiser
 
     def set_pk(self, obj):
-        return self.Meta.model.get_id()
+        return self.Meta.model.get_id_name()
 
     def serialize_geojson(self, obj):
         if obj.geom_geojson is not None:
@@ -80,7 +80,7 @@ class MonitoringSitesSchema(MA.SQLAlchemyAutoSchema):
             return geojson.dumps(obj.as_geofeature().get("geometry"))
 
     def set_pk(self, obj):
-        return self.Meta.model.get_id()
+        return self.Meta.model.get_id_name()
 
     def get_id_sites_group(self, obj):
         return obj.id_sites_group
@@ -101,4 +101,4 @@ class MonitoringVisitsSchema(MA.SQLAlchemyAutoSchema):
     module = MA.Nested(ModuleSchema)
 
     def set_pk(self, obj):
-        return self.Meta.model.get_id()
+        return self.Meta.model.get_id_name()

@@ -18,10 +18,10 @@ from gn_module_monitoring.routes.modules import get_modules
 from gn_module_monitoring.monitoring.definitions import MonitoringPermissions_dict
 
 # Retrieves visits that do not depend on modules
-OBJECT_CODE = MonitoringPermissions_dict["visite"]
+OBJECT_CODE = MonitoringPermissions_dict["visit"]
 
 
-@blueprint.route("/visits", methods=["GET"], defaults={"object_type": "visite"})
+@blueprint.route("/visits", methods=["GET"], defaults={"object_type": "visit"})
 def get_visits(object_type):
     params = MultiDict(request.args)
     limit, page = get_limit_page(params=params)

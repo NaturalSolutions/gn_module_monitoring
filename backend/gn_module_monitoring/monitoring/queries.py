@@ -42,11 +42,11 @@ class Query(BaseQuery):
 
         return self.order_by(order_by)
 
-    def _get_cruved_scope(self, object_code, user=None):
+    def _get_cruved_scope(self, module_code=None,object_code=None, user=None):
         if user is None:
             user = g.current_user
         cruved = get_scopes_by_action(
-            id_role=user.id_role, module_code="MONITORINGS", object_code=object_code
+            id_role=user.id_role, module_code=module_code, object_code=object_code
         )
         return cruved
 
@@ -141,6 +141,6 @@ class ObservationsQuery(Query):
             ]
             # if organism is None => do not filter on id_organism even if level = 2
             if scope == 2 and user.id_organisme is not None:
-                ors += [Models.TObservations.digitiser.any(id_organisme=user.id_organisme)]
+                ors += [Models.TObservations.digitiser.has(id_organisme=user.id_organisme)]
             self = self.filter(or_(*ors))
         return self

@@ -51,7 +51,7 @@ class GenericModel:
             setattr(cls, "id_g", pk_value)
 
     @classmethod
-    def get_id(cls) -> None:
+    def get_id_name(cls) -> None:
         pk_string = class_mapper(cls).primary_key[0].name
         # print('======= ==>', pk_string)
         if hasattr(cls, "id_g") == False:
@@ -86,8 +86,12 @@ class GenericModel:
 
 
 class PermissionModel(GenericModel):
-    def has_permission(self, module_code=None, object_code=None):
-        return has_any_permissions_by_action(module_code=module_code, object_code=object_code)
+    def has_permission(self, cruved_object={'C':False,'R':False,'U':False,'D':False,'E':False,'V':False}):
+        cruved_object_out = {}
+        for action_key , action_value in cruved_object.items():
+            cruved_object_out[action_key] = self.has_instance_permission(scope=action_value)
+        return cruved_object_out
+     
 
 
 cor_module_type = DB.Table(
@@ -167,7 +171,6 @@ class TMonitoringObservationDetails(DB.Model):
 class TObservations(DB.Model, PermissionModel):
     __tablename__ = "t_observations"
     __table_args__ = {"schema": "gn_monitoring"}
-    query_class = ObservationsQuery
     id_observation = DB.Column(DB.Integer, primary_key=True, nullable=False, unique=True)
     id_base_visit = DB.Column(DB.ForeignKey("gn_monitoring.t_base_visits.id_base_visit"))
     id_digitiser = DB.Column(DB.Integer, DB.ForeignKey("utilisateurs.t_roles.id_role"))
@@ -201,6 +204,8 @@ class TMonitoringObservations(TObservations, PermissionModel):
         "polymorphic_identity": "monitoring_observation",
     }
 
+    query_class = ObservationsQuery
+
     data = DB.Column(JSONB)
 
     id_observation = DB.Column(
@@ -208,6 +213,33 @@ class TMonitoringObservations(TObservations, PermissionModel):
         primary_key=True,
         nullable=False,
     )
+
+    @hybrid_property
+    def organism_actors(self):
+        # return self.digitiser.id_organisme
+        actors_organism_list = []
+        if isinstance(self.digitiser, list):
+            for actor in self.digitiser:
+                if actor.id_organisme is not None:
+                    actors_organism_list.append(actor.id_organisme)
+        elif isinstance(self.digitiser, User):
+                actors_organism_list.append(self.digitiser.id_organisme)
+        else:
+            return 
+        return actors_organism_list
+
+    def has_instance_permission(self, scope):
+        if scope == 0:
+            return False
+        elif scope in (1, 2):
+            if (
+                g.current_user.id_role == self.id_digitiser
+            ):  # or g.current_user in self.user_actors:
+                return True
+            if scope == 2 and g.current_user.organisme in self.organism_actors:
+                return True
+        elif scope == 3:
+            return True
 
 
 TBaseVisits.dataset = DB.relationship(TDatasets)
@@ -268,9 +300,14 @@ class TMonitoringVisits(TBaseVisits, PermissionModel):
             for actor in self.digitiser:
                 if actor.id_organisme is not None:
                     actors_organism_list.append(actor.id_organisme)
+        elif isinstance(self.observers, list):
+              for actor in self.observers:
+                if actor.id_organisme is not None:
+                    actors_organism_list.append(actor.id_organisme)
+        elif isinstance(self.digitiser, User):
+            actors_organism_list.append(self.digitiser.id_organisme)
         else:
-            if self.digitiser.id_organisme is not None:
-                actors_organism_list.append(self.digitiser.id_organisme)
+            return actors_organism_list
         return actors_organism_list
 
     def has_instance_permission(self, scope):
@@ -279,7 +316,7 @@ class TMonitoringVisits(TBaseVisits, PermissionModel):
         elif scope in (1, 2):
             if (
                 g.current_user.id_role == self.id_digitiser
-                or g.current_user.id_role in self.observers.id_role
+                or  any(observer.id_role == g.current_user.id_role for observer in self.observers)
             ):  # or g.current_user in self.user_actors:
                 return True
             if scope == 2 and g.current_user.organisme in self.organism_actors:
@@ -355,7 +392,7 @@ class TMonitoringSites(TBaseSites, PermissionModel):
                 if actor.id_organisme is not None:
                     actors_organism_list.append(actor.id_organisme)
         else:
-            if self.inventor.id_organisme is not None:
+            if hasattr(self.inventor,'id_organisme'):
                 actors_organism_list.append(self.inventor.id_organisme)
 
     def has_instance_permission(self, scope):
@@ -434,9 +471,11 @@ class TMonitoringSitesGroups(DB.Model, PermissionModel):
             for actor in self.digitiser:
                 if actor.id_organisme is not None:
                     actors_organism_list.append(actor.id_organisme)
-        else:
-            if self.digitiser.id_organisme is not None:
+        elif isinstance(self.digitiser, User):
                 actors_organism_list.append(self.digitiser.id_organisme)
+        else:
+            return 
+        return actors_organism_list
 
     def has_instance_permission(self, scope):
         if scope == 0:
@@ -459,6 +498,7 @@ class TMonitoringModules(TModules, PermissionModel):
     __mapper_args__ = {
         "polymorphic_identity": "monitoring_module",
     }
+    query_class = MonitoringQuery
 
     id_module = DB.Column(
         DB.ForeignKey("gn_commons.t_modules.id_module"),

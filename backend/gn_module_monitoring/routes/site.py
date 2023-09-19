@@ -122,7 +122,7 @@ def get_sites(object_type):
 
     query_allowed = query.filter_by_readable(object_code=object_code)
     return paginate_scope(
-        query=query_allowed, schema=MonitoringSitesSchema, limit=limit, page=page
+        query=query_allowed, schema=MonitoringSitesSchema, limit=limit, page=page,object_code=object_code
     )
     # return paginate(
     #     query=query,
