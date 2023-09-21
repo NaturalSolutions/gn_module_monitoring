@@ -78,31 +78,13 @@ export class MonitoringPropertiesGComponent implements OnInit {
     this.bEditChange.emit(true);
   }
 
-  initPermission() {
-    let objectType: ObjectsPermissionMonitorings | string;
-    switch (this.newParentType.objectType) {
-      case 'sites_group':
-        objectType = ObjectsPermissionMonitorings.GNM_GRP_SITES;
-        break;
-      case 'site':
-        objectType = ObjectsPermissionMonitorings.GNM_SITES;
-        break;
-      case 'visit':
-        objectType = 'visit';
-        break;
-      default:
-        objectType = 'undefined';
-        this.canUpdateObj = false;
-        break
-    }
-    if (!['undefined','visit'].includes(objectType))
-    this.canUpdateObj = this.permission[objectType].canUpdate ? true : false;
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.newParentType && this.newParentType.template.fieldNames.length != 0) {
-      this.initPermission();
       this.initProperties();
+      if(this.selectedObj){
+        this.canUpdateObj = this.selectedObj['cruved']['U'] 
+      }
       if (
         this.newParentType.template_specific &&
         this.newParentType.template_specific.fieldNames &&

@@ -91,6 +91,10 @@ class PermissionModel(GenericModel):
         for action_key , action_value in cruved_object.items():
             cruved_object_out[action_key] = self.has_instance_permission(scope=action_value)
         return cruved_object_out
+    def get_permission_by_action(self,module_code=None, object_code=None):
+       return  has_any_permissions_by_action(
+            module_code=module_code, object_code=object_code
+        )
      
 
 

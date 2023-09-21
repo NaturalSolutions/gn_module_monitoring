@@ -210,11 +210,7 @@ def get_objet_with_permission_boolean(objects, depth: int = 0, module_code=None,
         cruved_object = object.query._get_cruved_scope(object_code=object_code)
         object_out = object.as_dict(depth=depth)
         if hasattr(object, "module_code"):
-            object_out["cruved"] = object.has_permission(cruved_object=cruved_object
-            )
-        elif hasattr(object, "module") and hasattr(object.module, "module_code"):
-            object_out["cruved"] = object.has_permission(cruved_object=cruved_object
-            )
+            object_out["cruved"] = object.get_permission_by_action(module_code=object.module_code,object_code=object_code)
         else:
             object_out["cruved"] = object.has_permission(
                 cruved_object=cruved_object

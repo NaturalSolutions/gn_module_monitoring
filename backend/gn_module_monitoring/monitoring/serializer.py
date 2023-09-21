@@ -61,7 +61,7 @@ class MonitoringObjectSerializer(MonitoringObjectBase):
 
     def get_readable_list_object(self,relation_name,children_type):
         childs_model = getattr(self._model, relation_name)
-        if isinstance(childs_model[0],PermissionModel) and not isinstance(childs_model[0],TMonitoringModules):
+        if len(childs_model)>0 and isinstance(childs_model[0],PermissionModel) and not isinstance(childs_model[0],TMonitoringModules):
             all_object_readable = childs_model[0].query.filter_by_readable(module_code=self._module_code ,object_code=MonitoringDef.MonitoringPermissions_dict[children_type]).all()
             child_object_readable = [v for v in childs_model if v in all_object_readable]
             return child_object_readable

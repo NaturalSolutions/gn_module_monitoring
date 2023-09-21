@@ -1,9 +1,10 @@
-from flask import jsonify, request
+from flask import jsonify, request,g
 from geonature.utils.env import db
 from marshmallow import ValidationError
 from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
-
+from werkzeug.exceptions import Forbidden
+from geonature.core.gn_permissions import decorators as permissions
 from gn_module_monitoring.blueprint import blueprint
 from gn_module_monitoring.config.repositories import get_config
 from gn_module_monitoring.modules.repositories import get_module
@@ -21,6 +22,7 @@ from gn_module_monitoring.utils.routes import (
     paginate,
     paginate_scope,
     sort,
+    get_objet_with_permission_boolean
 )
 from gn_module_monitoring.routes.monitoring import (
     create_or_update_object_api_sites_sites_group,
@@ -64,10 +66,18 @@ def get_sites_groups(object_type: str):
     "/sites_groups/<int:id_sites_group>", methods=["GET"], defaults={"object_type": "sites_group"}
 )
 @check_cruved_scope("R", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def get_sites_group_by_id(id_sites_group: int, object_type: str):
+@permissions.check_cruved_scope(
+    "R", get_scope=True, module_code=MODULE_CODE, object_code="GNM_GRP_SITES"
+)
+def get_sites_group_by_id(scope,id_sites_group: int, object_type: str):
+    sites_group = TMonitoringSitesGroups.query.get_or_404(id_sites_group)
+    if not sites_group.has_instance_permission(scope=scope):
+        raise Forbidden(f"User {g.current_user} cannot read site group {sites_group.id_sites_group}")
     schema = MonitoringSitesGroupsSchema()
     result = TMonitoringSitesGroups.query.get_or_404(id_sites_group)
-    return jsonify(schema.dump(result))
+    response = schema.dump(result)
+    response['cruved']=get_objet_with_permission_boolean([result], object_code="GNM_GRP_SITES")[0]['cruved']
+    return jsonify(response)
 
 
 @blueprint.route(
@@ -100,10 +110,16 @@ def get_sites_group_geometries(object_type: str):
 @blueprint.route(
     "/sites_groups/<int:_id>", methods=["PATCH"], defaults={"object_type": "sites_group"}
 )
-@check_cruved_scope("U", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def patch(_id: int, object_type: str):
+@permissions.check_cruved_scope(
+    "U", get_scope=True, module_code=MODULE_CODE, object_code="GNM_GRP_SITES"
+)
+def patch(scope,_id: int, object_type: str):
     # ###############################""
     # FROM route/monitorings
+    sites_group = TMonitoringSitesGroups.query.get_or_404(_id)
+    if not sites_group.has_instance_permission(scope=scope):
+        raise Forbidden(f"User {g.current_user} cannot update site group {sites_group.id_sites_group}")
+
     module_code = "generic"
     get_config(module_code, force=True)
     return create_or_update_object_api_sites_sites_group(module_code, object_type, _id), 201
@@ -112,8 +128,13 @@ def patch(_id: int, object_type: str):
 @blueprint.route(
     "/sites_groups/<int:_id>", methods=["DELETE"], defaults={"object_type": "sites_group"}
 )
-@check_cruved_scope("D", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
-def delete(_id: int, object_type: str):
+@permissions.check_cruved_scope(
+    "D", get_scope=True, module_code=MODULE_CODE, object_code="GNM_GRP_SITES"
+)
+def delete(scope,_id: int, object_type: str):
+    sites_group = TMonitoringSitesGroups.query.get_or_404(_id)
+    if not sites_group.has_instance_permission(scope=scope):
+        raise Forbidden(f"User {g.current_user} cannot delete site group {sites_group.id_sites_group}")
     item_schema = MonitoringSitesGroupsSchema()
     item = TMonitoringSitesGroups.find_by_id(_id)
     TMonitoringSitesGroups.query.filter_by(id_g=_id).delete()
@@ -122,7 +143,7 @@ def delete(_id: int, object_type: str):
 
 
 @blueprint.route("/sites_groups", methods=["POST"], defaults={"object_type": "sites_group"})
-@check_cruved_scope("P", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
+@check_cruved_scope("C", module_code=MODULE_CODE, object_code="GNM_GRP_SITES")
 def post(object_type: str):
     module_code = "generic"
     get_config(module_code, force=True)
