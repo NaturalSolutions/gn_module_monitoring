@@ -99,12 +99,6 @@ const routes: Routes = [
         resolve: {
           data: SitesGroupsReslver,
         },
-        // TODO: voir si on bloque l'accès en lecture
-        // canActivate: [PermissionGuard],
-        // data: {
-        //   expectedPermission: 'Read',
-        //   objectPermission: [ObjectsPermissionMonitorings.GNM_GRP_SITES],
-        // },
       },
       {
         path: 'create',
@@ -121,6 +115,13 @@ const routes: Routes = [
           {
             path: '',
             component: MonitoringSitesComponent,
+            canActivate: [PermissionGuard],
+            data: {
+              expectedPermission: 'Read',
+              objectPermission: [
+                ObjectsPermissionMonitorings.GNM_GRP_SITES,
+              ],
+            },
           },
           {
             path: 'create',
@@ -137,6 +138,13 @@ const routes: Routes = [
           {
             path: 'site/:id',
             component: MonitoringVisitsComponent,
+            canActivate: [PermissionGuard],
+            data: {
+              expectedPermission: 'Read',
+              objectPermission: [
+                ObjectsPermissionMonitorings.GNM_SITES,
+              ],
+            },
           },
         ],
       },
@@ -145,6 +153,13 @@ const routes: Routes = [
   {
     path: 'sites',
     component: MonitoringMapListComponent,
+    canActivate: [PermissionGuard],
+    data: {
+      expectedPermission: 'Read',
+      objectPermission: [
+        ObjectsPermissionMonitorings.GNM_SITES,
+      ],
+    },
     children: [
       {
         path: '',
@@ -158,6 +173,11 @@ const routes: Routes = [
         component: MonitoringSitesCreateComponent,
         resolve: {
           data: CreateSiteResolver,
+        },
+        canActivate: [PermissionGuard],
+        data: {
+          expectedPermission: 'Create',
+          objectPermission: [ObjectsPermissionMonitorings.GNM_SITES],
         },
       },
       {

@@ -33,16 +33,15 @@ export class PermissionGuard implements CanActivate {
             break;
           case 'Create':
             isAllowed = objectPermission.some((objectPerm) => {
-              return permissionUserObject[objectPerm].canCreate == true;
+              return permissionUserObject[objectPerm].canCreate == true && permissionUserObject[objectPerm].canRead == true ;
             });
             break;
           case 'Update':
             isAllowed = objectPermission.some((objectPerm) => {
-              return permissionUserObject[objectPerm].canUpdate == true;
+              return permissionUserObject[objectPerm].canUpdate == true  && permissionUserObject[objectPerm].canRead == true;
             });
             break;
         }
-
         if (!isAllowed) {
           this.commonService.translateToaster(
             'warning',
