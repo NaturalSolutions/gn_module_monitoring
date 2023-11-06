@@ -77,7 +77,8 @@ export class ConfigService {
       visit: 'GNM_VISITES',
       observation: 'GNM_OBSERVATIONS',
       module: 'GNM_MODULES',
-      individual: 'ALL'
+      individual: 'ALL',
+      marking: 'ALL'
     };
 
     const module = this._moduleService.getModule(module_code);
