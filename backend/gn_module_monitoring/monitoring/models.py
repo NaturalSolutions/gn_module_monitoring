@@ -310,7 +310,7 @@ class TMonitoringModules(TModules):
         primaryjoin=(corIndividualModule.c.id_module == id_module),
         secondaryjoin=(corIndividualModule.c.id_individual == TIndividuals.id_individual),
         foreign_keys=[corIndividualModule.c.id_individual, corIndividualModule.c.id_module],
-        viewonly=True,
+        # viewonly=True,
     )
     data = DB.Column(JSONB)
 
