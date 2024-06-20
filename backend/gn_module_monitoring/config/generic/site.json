@@ -23,8 +23,8 @@
     "base_site_name",
     "base_site_code",
     "last_visit",
-    "id_inventor",
     "nb_visits",
+    "nb_individuals",
     "types_site"
   ],
   "sorts": [
@@ -49,6 +49,15 @@
     "base_site_description": {
       "type_widget": "textarea",
       "attribut_label": "Description"
+    },    
+    "id_nomenclature_type_site": {
+      "type_widget": "text",
+      "attribut_label": "Type site",
+      "type_util": "nomenclature",
+      "value": {
+        "code_nomenclature_type": "TYPE_SITE" 
+      },
+      "required": true
     },
     "id_inventor": {
       "type_widget": "observers",
@@ -57,7 +66,7 @@
       "code_list":"CODE_OBSERVERS_LIST",
       "required": true,
       "multi_select": false
-    },
+    },    
     "id_digitiser": {
       "type_widget": "text",
       "attribut_label": "Digitiser",
@@ -76,6 +85,9 @@
     },
     "nb_visits": {
       "attribut_label": "Nb. visites"
+    },
+    "nb_individuals": {
+      "attribut_label": "Nb. individus"
     },
     "uuid_base_site": {
       "attribut_label": "uuid"

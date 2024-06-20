@@ -1,31 +1,38 @@
 CHANGELOG
 =========
 
-0.7.1dev (unrelease)
+0.7.3 (03/05/23)
 ------------------
-
-
-**⚠️ Notes de version**
+  
+**🐛 Corrections**
  
-* Si vous installé le module sans être passé par la version 0.7.0 :
-Après mise à jour du module, utiliser la commande pour générer les permissions disponibles pour les sous-modules déjà installés
-  ```
-  geonature monitorings update_module_available_permissions
-  ```
+* Correction du selecteur des groupes de sites
 
-Puis vous pouvez utiliser le script `data\upgrade_modules_permissions.sql` pour transférer les permissions et supprimer les permissions disponibles
+0.7.2 (27-02-23)
+------------------
+ 
+**🚀 Nouveautés**
+
+* Mise à jour de la documentation sur l'alimentation de la synthèse et l'installation d'un sous-module
+* Ajout des groupes de sites dans le sous-module de `test`
+  
+**🐛 Corrections**
+
+* Erreur lors de l'installation du module (#284)
+* Corrections des permissions (export PDF, groupes de sites)
 
 0.7.1 (05-12-23)
 ------------------
 
 **🚀 Nouveautés**
+
 * La gestion des permissions est définie pour chaque objet (module, site, visite) et l'objet ALL n'est plus pris en compte (#249). De fait les paramètres cruved des fichiers de configuration ainsi que permission object de `module.json` sont obsolètes.
 * Ajout de tests
 
 
 **🐛 Corrections**
 
-* export avec un filtre par jeux de données (#241)
+* Export avec un filtre par jeux de données (#241)
 
 
 0.7.0 (2023-08-23)
