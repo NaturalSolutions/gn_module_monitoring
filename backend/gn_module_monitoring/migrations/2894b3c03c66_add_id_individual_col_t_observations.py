@@ -13,7 +13,7 @@ from sqlalchemy.sql import column
 
 # revision identifiers, used by Alembic.
 revision = "2894b3c03c66"
-down_revision = "6a15625a0f4a"
+down_revision = "7fbcdd93626a"
 branch_labels = None
 depends_on = "84f40d008640"  # t_individuals (geonature)
 
